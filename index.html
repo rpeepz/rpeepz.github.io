@@ -1,11 +1,464 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en-US">
     <head>
-        
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="description" content="Papagna project timeline website">
+        <meta name="keywords" content="resume, portfolio, rpeepz, timeline">
+        <meta name="author" content="Robert Papagna">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="resume.js"></script>
+        <!-- <link rel="stylesheet" media="all" href="application.css"> -->
+        <title>Robert Papagna: timeline website</title>
     </head>
     <body>
-        <!-- # rpeepz.github.io
-        project website -->
-        "Hello"
+        <div id="sidebar">
+            <div class="pizazz height-875-min">
+                <img class="pizazz-img" src="IMG_5217.jpg"></img><br>
+                <div id="quote">
+                <span id="quote1">&#34;Because every human is different, everyone is the best at something&#58; being themselves.&#34;</span>
+                <span id="quote2">&#8212; Naval Ravikant</span>
+                </div>
+            </div>
+            <div id="name-header">Robert Papagna</div>
+            <div id="name-subheader">Portfolio and online resume</div>
+            <div id="filter-panel">
+                <div class="sidebar-h1">Category</div>
+                <div class="tagsel-container">
+                    <div id="tagsel-all" class="tagsel-vertical">All Projects</div>
+                    <div class="tagsel-vertical">Academic</div>
+                    <div class="tagsel-vertical">Active</div>
+                    <div class="tagsel-vertical">Automotive</div>
+                    <div class="tagsel-vertical">Computer</div>
+                    <div class="tagsel-vertical">Electronics</div>
+                    <div class="tagsel-vertical">Music</div>
+                    <div class="tagsel-vertical">Recreational</div>
+                    <div class="tagsel-vertical">Technical</div>
+                    Has Media<input id="educational-tagsel-checkbox" type="checkbox" checked><br>
+                </div>
+            </div>
+        </div>
+        <div id="content">	
+            <div id="printed-header">
+                <div id="content-name-header">Robert Papagna</div>
+                <div id="content-name-subheader">Portfolio and online resume</div>
+            </div>
+            <div class="hide-when-print" id="javascript-disabled">
+                The interactive features of this site require javascript.
+            </div>
+            <h1>Contact</h1>
+            <!-- <div class="expandable-section" id="history"> -->
+                <!-- <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div> -->
+                <!-- <div class="expandable-section-expandedtext" id="expanded"> -->
+                    <div id="contact">
+                        <table class="contact-table">
+                            <tr><td><span class="contact-label">Current City</span></td>
+                                <td><span class="contact-data">Fort Lauderdale</span></td></tr>
+                            <tr><td><span class="contact-label">Other Locations</span></td>
+                                <td><span class="contact-data">Bay Area, CA</span></td></tr>
+                            <tr><td><span class="contact-label">Cell</span></td>
+                                <td><span class="contact-data">(Removed)</span></td></tr>
+                            <tr><td><span class="contact-label">Email</span></td>
+                                <td><span class="contact-data">r.papagna@gmail.com</span></td></tr>
+                            <tr><td><span class="contact-label">GitHub</span></td>
+                                <td><span class="contact-data"><a href="https://github.com/rpeepz/">github.com/rpeepz</a></span></td></tr>
+                            <tr><td><span class="contact-label">LinkedIn</span></td>
+                                <td><span class="contact-data"><a href="https://www.linkedin.com/in/rpapagna-510/">linkedin.com/rpapagna</a></span></td></tr>
+                        </table>
+                    </div>
+                <!-- </div> -->
+            <!-- </div> -->
+            <!-- <div id="variable-intro"></div> -->
+            <h1>Education</h1>
+            <div class="expandable-section" id="history">
+                <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
+                <div class="expandable-section-expandedtext" id="expanded">
+                    <div id="education">
+                        <table>
+                            <tr class="education-table"><td><span class="ed-degree">High School Diploma</span></td>
+                                <td>Pinole Valley High School, Graduated July 2013. 3.2 GPA.</td></tr>
+                            <tr class="education-table"><td><span class="ed-degree">A.S. Automotive Technology</span></td>
+                                <td>Contra Costa College - Richmond, CA, Graduated May 2016.</td></tr>
+                            <tr class="education-table"><td><span class="ed-degree">General Education</span></td>
+                                <td>Diablo Valley College - Pleasant Hill, CA, Graduated May 2016. 3.0 GPA.</td></tr>
+                            <tr><td><span class="ed-degree">42 Cadet Level 10 (Comp.Sci)</span></td>
+                                <td>42 Silicon Valley. <a href="https://www.42.us.org/program/the-42-program/">www.42.us.org</a></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <h1>Certification</h1>
+            <div class="expandable-section" id="history">
+                <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
+                <div class="expandable-section-expandedtext" id="expanded">
+                    <div id="education">
+                        <table>
+                            <tr class="education-table"><td><span class="ed-degree">STCW 2010</span></td>
+                            <tr class="education-table"><td><span class="ed-degree">PADI Open Water Diver</span></td>
+                            <tr class="education-table"><td><span class="ed-degree">ASE Certificate</span></td>
+                            <tr class="education-table"><td><span class="ed-degree">Red Cross First Aid Certified</span></td>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <h1>Work History</h1>
+            <div class="expandable-section" id="history">
+                <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
+                <div class="expandable-section-expandedtext" id="expanded">
+                    <span id="job-history-subheader">Sorted by start date, most recent first. May include volunteer positions and professional associations as noted. All references ok to contact.</span>
+                    <!-- <span id="job-filter-text">Current Filter: *Custom*</span> -->
+                    <div class="job-entry">
+                        <span class="job-title">Refit Crew</span>
+                        <span class="job-employer">Trinity Yachts - Nina Lu 141ft (formerly Waku)</span>
+                        <span class="job-employer-website"><a href="https://yachtharbour.com/yacht/waku-2749" target="_blank">yachtharbour.com/yacht/waku</a></span>
+                        <span class="job-date">Sep 2020 - Oct 2020</span>
+                        <span class="job-description">Engine room full detail, paint lazarette, install insulation, install plumbing in galley, marble and stone installaion.</span>
+                        <span class="job-reference">Julianne Hammond, Co-owner of refit team. Cell (305) 304-6320. </span>
+                        <!-- <a href="mailto:kcooper@snelsonco.com">kcooper@snelsonco.com</a> -->
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Beach Cleanup</span>
+                        <span class="job-employer">The Mocean Community</span>
+                        <span class="job-employer-website"><a href="https://www.facebook.com/MoceanCommunity/" target="_blank">facebook.com/MoceanCommunity</a></span>
+                        <span class="job-date">Sep 19 2020</span>
+                        <span class="job-description">Volunteer position. Participate in 'World Cleanup Day' by assiting the Mocean Community in picking up garbage along the south Florida beach (Fort Lauderdale).</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Engineer Daywork</span>
+                        <span class="job-employer">Horizon Yachts - Status Quo 40m</span>
+                        <span class="job-employer-website"><a href="https://www.superyachttimes.com/yachts/status-quo-40m" target="_blank">superyachttimes.com/yachts/status-quo-40m</a></span>
+                        <span class="job-date">Aug 2020</span>
+                        <span class="job-description">Install plumbing for sea strainers, maintenance on ABT-TRAC stabilizers, paint bilge, detail engine room</span>
+                        <!-- <span class="job-reference">Julianne Hammond, Co-owner of refit team. Cell (305) 304-6320. </span> -->
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Interior Daywork</span>
+                        <span class="job-employer">Sheleighleigh 20m</span>
+                        <span class="job-date">Aug 2020</span>
+                        <span class="job-description">Tidy cabin, wax floor, full exterior washdown.</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Engineering Daywork</span>
+                        <span class="job-employer">Westport Yachts - Andiamo 45m</span>
+                        <span class="job-date">Aug 2020</span>
+                        <span class="job-description">Restore wodden sauna, sanding and painting interior spaces.</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Deckhand</span>
+                        <span class="job-employer">Customline Yachts - C 30m</span>
+                        <span class="job-date">Jul 2020 - Aug 2020</span>
+                        <span class="job-description">Solo deckhand, washdown, two part acid teak, detail engine room, overhaul main engine room bilge, sea trial, polish and clean interior spaces.</span>
+                        <span class="job-reference">Joe Collins, Captian. Cell (754) 248-4247. </span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Shrinkwrap Crew</span>
+                        <span class="job-employer">KB Yachts</span>
+                        <span class="job-employer-website"><a href="http://www.kbyachts.com/index.html" target="_blank">kbyachts.com</a></span>
+                        <span class="job-date">Jul 2020</span>
+                        <span class="job-description">Assemble scaffolding and construct shrinkwrap enclosure.</span>
+                        <span class="job-reference">Karen Goebel, Company Owner. Cell (954) 646-9661 . </span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">42 Cadet</span>
+                        <span class="job-employer">42 Silicon Valley</span>
+                        <span class="job-employer-website"><a href="https://www.42.us.org/" target="_blank">42.us.org</a></span>
+                        <span class="job-date">Feb 2019 - July 2020</span>
+                        <span class="job-description">Studying software engineering in a nontraditional program.</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Site Management Assistant (temp)</span>
+                        <span class="job-employer">East Bay Waldorf School</span>
+                        <span class="job-employer-website"><a href="https://www.eastbaywaldorf.org/" target="_blank">eastbaywaldorf.org</a></span>
+                        <span class="job-date">Oct 2018 - Jan 2019</span>
+                        <span class="job-description">Maintain campus, integrate beautification techniques, landscape, fabricate and repair fixtures and equipment.</span>
+                    </div>
+                    <!-- <div class="job-entry">
+                        <span class="job-title">Student</span>
+                        <span class="job-employer">California State University - Chico</span>
+                        <span class="job-employer-website"><a href="https://www.csuchico.edu">www.csuchico.edu</a></span>
+                        <span class="job-date">Aug 2016 - May 2018</span>
+                        <span class="job-description">B.S. Applied Mathematics, Minor in Computer Science. Graduated May 2018.</span>
+                        <span class="job-reference">Dr. Vladimir Rosenhaus, CSU Chico Dept. of Mathematics. Office (530) 898-4108. <a href="mailto:vrosenhaus@csuchico.edu">vrosenhaus@csuchico.edu</a></span>
+                        <span class="job-reference">Dr. Sugki Choi, CSU Chico Dept. of Electrical Engineering. <a href="mailto:schoi13@csuchico.edu">schoi13@csuchico.edu</a></span>
+                        <span class="job-reference">Kevin Buffardi, CSU Chico Dept. of Computer Science. Office (530) 898-5617. <a href="mailto:kbuffardi@csuchico.edu">kbuffardi@csuchico.edu</a></span>
+                        <span class="job-reference">Dr. Ben Nolting, formerly CSU Chico Dept. of Mathematics. <a href="mailto:bnolting@gmail.com">bnolting@gmail.com</a></span>
+                    </div> -->
+                    <div class="job-entry">
+                        <span class="job-title">Retail Associate</span>
+                        <span class="job-employer">Best Buy</span>
+                        <span class="job-employer-website"><a href="http://www.bestbuy.com/" target="_blank">bestbuy.com</a></span>
+                        <span class="job-date">Aug 2016 - Dec 2018</span>
+                        <span class="job-description">Managed employee schedules, handled cash on a daily basis, customer service.</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Student</span>
+                        <span class="job-employer">Contra Costa Community College</span>
+                        <span class="job-date">Jul 2014 - May 2016</span>
+                        <span class="job-description">General education, Automotive engine technician</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Preload</span>
+                        <span class="job-employer">UPS</span>
+                        <span class="job-employer-website"><a href="https://www.ups.com/us/en/Home.page" target="_blank">ups.com</a></span>
+                        <span class="job-date">Feb 2014 - Jul 2016</span>
+                        <span class="job-description">Maximize delivery efficiency in up to 7 package cars per day.</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Lifeguard</span>
+                        <span class="job-employer">Albany Aquatic Center</span>
+                        <span class="job-employer-website"><a href="https://www.albanyaquaticcenter.com/" target="_blank">albanyaquaticcenter.com</a></span>
+                        <span class="job-date">Feb 2012 - May 2013</span>
+                        <span class="job-description">Train lifeguards in deep and shallow water, maintain water chemistry, janitorial services</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Lead Photographer</span>
+                        <span class="job-employer">Masked Media</span>
+                        <span class="job-employer-website"><a href="https://www.facebook.com/MaskedMedia/" target="_blank">facebook.com/MaskedMedia</a></span>
+                        <span class="job-date">Aug 2012 - Jul 2017</span>
+                        <span class="job-description">Volunteer / recreational activity position. Attend, document, and create promotions for live music events and festivals.</span>
+                    </div>
+                    <div class="job-entry">
+                        <span class="job-title">Ambassador</span>
+                        <span class="job-employer">Pinole, CA Environmental Studies Academy</span>
+                        <span class="job-date">Sep 2010 - Jul 2013</span>
+                        <span class="job-description">Volunteer / community service position. Organize and participate in environmental cleanups at local parks and beaches</span>
+                    </div>
+                </div>
+            </div>
+            <!-- end work history -->
+            <h1>Projects Timeline</h1>
+            <div class="expandable-section" class="projects-container" id="projects-container">
+                <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
+                <div class="expandable-section-expandedtext" id="expanded">
+                    <div id="current-filter">All Projects, Include Media</div>
+                    <div class="project">
+                        <div class="project-title">This Website</div>
+                        <div id="project-name" class="project-name">Portfolio and Online Resume</div>
+                        <div id="expanded" class="project-description description-text">Built in vscode using templates I found online, also using HTML, CSS, Javascript, and JQuery. CSS is responsive to height and width. It is hosted on GithubPages.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 2 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Recreational</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://rpeepz.github.io/">rpeepz.github.io/</a></div>
+                            <div class="project-date">October 2020</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Security Encryption / Asymmetric Key Cryptosystems</div>
+                        <div id="project-name" class="project-name">ft_ssl_rsa</div>
+                        <div id="expanded" class="project-description description-text">This project is a continuation of the previous encryption project. I coded a random prime number generator and used it to make private RSA keys. I recoded part of the OpenSSL program, specifically GENRSA, RSA, and RSAUTL.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 4 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/ft_ssl">github.com/rpeepz/ft_ssl</a></div>
+                            <div class="project-date">November 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">42 Robotics Lab</div>
+                        <div id="project-name" class="project-name">Robotic Autonomous Painting Robot</div>
+                        <div id="expanded" class="project-description description-text">I was part of an R&amp;D team creating a programmable robot with the goal of autonomously painting a flat wall section. My major contributions were coding the brain (Arduino) that takes control of the motors. The motors kept track internally of its position within its frame via encoders. This was a sponsored project with 42 Robo Lab, led by Daniel Goncharov.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 5 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Electronics</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/UniKlo/PaintBot">github.com/UniKlo/PaintBot</a></div>
+                            <div class="project-date">October 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Raycasting 3d game engine</div>
+                        <div id="project-name" class="project-name">Wolf3D</div>
+                        <div id="expanded" class="project-description description-text">A project to test the understanding of graphics and practical application of mathematics. I built an engine to render a custom 'map' similar to the popular '90's game Wolfenstein 3D.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 2 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/Wolf-3D">github.com/rpeepz/Wolf-3D</a></div>
+                            <div class="project-date">September 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Graphically Beautiful Fractals</div>
+                        <div id="project-name" class="project-name">fract'ol</div>
+                        <div id="expanded" class="project-description description-text">I made an interactive program that uses the mouse position as an input to the formula which displays a fractal image. I programmed more than one set of famous fractals, and the ability to view depth with varrying color schemes. I also implemented multi threded processing to improve performance.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 2 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/fractol">github.com/rpeepz/fractol</a></div>
+                            <div class="project-date">September 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">eCommerce Auto parts shop</div>
+                        <div id="project-name" class="project-name">Website Rush</div>
+                        <div id="expanded" class="project-description description-text">An ecommerce site where users buy advertised items, built entirely in HTML and PHP. Built as a 2-day challenge for me and a randomly assigned partner to build a functional ecommerce site.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 2 days</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <!-- <div class="project-url"><a href="https://github.com/gavinfielder/42BookExchange">github.com/gavinfielder/42BookExchange</a></div> -->
+                            <div class="project-date">September 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Security Enryption / Cryptographic Hashing Algorithms</div>
+                        <div id="project-name" class="project-name">ft_ssl_md5</div>
+                        <div id="expanded" class="project-description description-text">A partial recode of the OpenSSL program. I implemented md5, sha1, sha224, sha256, sha384, sha512 hashing algorithms.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 4 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/ft_ssl">github.com/rpeepz/ft_ssl</a></div>
+                            <div class="project-date">August 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Artificial Intelligence</div>
+                        <div id="project-name" class="project-name">filler</div>
+                        <div id="expanded" class="project-description description-text">The goal of this project was to create a player for an algorithmic game called filler: where two players on a board, take turns placing a random shape piece, earning points until one player can no longer make a turn.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 4 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/Filler">github.com/rpeepz/Filler</a></div>
+                            <div class="project-date">July 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Recode of UNIX ls</div>
+                        <div id="project-name" class="project-name">ft_ls</div>
+                        <div id="expanded" class="project-description description-text">A recode of the unix shell ls command. Mine typically runs ~200% faster than the system ls</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 4 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/ft_ls">github.com/rpeepz/ft_ls</a></div>
+                            <div class="project-date">June 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Recode of the libc printf</div>
+                        <div id="project-name" class="project-name">ft_printf</div>
+                        <div id="expanded" class="project-description description-text">One of the major early projects at 42, a recoding of the libc printf with at least the options %d, %i, %u, %s, %c, %p, %x, %X, %o, and at least the optional flags 0, ' ', +, -, #, hh, h, l, ll, L, precision, and field width.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 3 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Academic</span>, <span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="https://github.com/rpeepz/ft_printf">github.com/rpeepz/ft_printf</a></div>
+                            <div class="project-date">April 2019</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Backyard Construction</div>
+                        <div id="project-name" class="project-name">all purpose shed</div>
+                        <div id="expanded" class="project-description description-text">A small project that my father and I decided to take on in the summer. The goal was to create a large usable indoor space for storage and handiwork. Equipped with running water and proper plumbing, electrical outlets and light fixtures, insulated walls, and gutters along the roof.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 9 months</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Active</span>, <span class="proj-tagsel">Recreational</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <!-- <div class="project-url"><a href=""></a></div> -->
+                            <div class="project-date">July 2017</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">Backyard Construction</div>
+                        <div id="project-name" class="project-name">retaining wall</div>
+                        <div id="expanded" class="project-description description-text"></div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 1 year</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Active</span>, <span class="proj-tagsel">Recreational</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <!-- <div class="project-url"><a href=""></a></div> -->
+                            <div class="project-date">October 2016</div>
+                        </div>
+                    </div>
+                    <div class="project">
+                        <div class="project-title">BMW Turbo</div>
+                        <div id="project-name" class="project-name">install and tune</div>
+                        <div id="expanded" class="project-description description-text">A project to upgrade the performance of my car. I spent just under one year researching the process and parts needed to install a turbocharger onto my 2003 BMW. After acquiring all the parts, I was able to achieve my goal of increasing the total horsepower of my car.</div>
+                        <!-- <div id="expanded" class="project-description description-text">Total working time: 4 weeks</div> -->
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Automotive</span>, <span class="proj-tagsel">Recreational</span>, <span class="proj-tagsel">Technical</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <!-- <div class="project-url"><a href=""></a></div> -->
+                            <div class="project-date">March 2016</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Projects Container -->
+            <h1>Achievements</h1>
+            <div class="expandable-section" id="history">
+                <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
+                <div class="expandable-section-expandedtext" id="expanded">
+                    <!-- 42 skills chart -->
+                    <div class="col-lg-6 col-sm-12 fixed-height">
+                        <h3>42 Academic Skill Chart</h3>
+                        <div class="container-inner-item boxed hide-overflow">
+                            <h4 class="profile-title"></h4>
+                            <div id="skill-chart" data-highcharts-chart="2">
+                                <div class="highcharts-container" id="highcharts-6" style="position: relative; overflow: hidden; width: 418px; height: 400px; text-align: left; line-height: normal; z-index: 0; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                                    <svg version="1.1" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Arial, Helvetica, sans-serif;font-size:12px;" xmlns="http://www.w3.org/2000/svg" width="418" height="400">
+                                        <desc>Created with Highcharts 4.2.4</desc>
+                                        <defs><clipPath id="highcharts-7"><rect x="0" y="0" width="398" height="375"></rect></clipPath></defs>
+                                        <rect x="0" y="0" width="418" height="400" fill="rgba(0, 0, 0, 0)" class=" highcharts-background"></rect>
+                                        <g class="highcharts-grid"><path fill="none" d="M 209 197.5 L 252.455514833977 63.75767739599402" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 291.65730110362904 83.73198516602301" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 322.76801483397696 114.84269889637096" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 342.74232260400595 154.04448516602304" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 349.625 197.5" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 342.74232260400595 240.95551483397696" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 322.76801483397696 280.15730110362904" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 291.65730110362904 311.26801483397696" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 252.455514833977 331.24232260400595" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 209 338.125" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 165.54448516602304 331.24232260400595" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 126.34269889637098 311.26801483397696" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 95.23198516602304 280.15730110362904" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 75.25767739599402 240.955514833977" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 68.375 197.50000000000003" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 75.25767739599402 154.04448516602304" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 95.23198516602301 114.84269889637098" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 126.34269889637095 83.73198516602304" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 165.544485166023 63.75767739599402" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 208.99999999999997 56.875" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 252.45551483397696 63.75767739599402" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 197.5 L 209 56.875" stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                        </g>
+                                        <g class="highcharts-grid"><path fill="none" stroke="#aaaaaa" stroke-width="1"></path>
+                                            <path fill="none" d="M 209 162.34375 A 35.15625 35.15625 0 1 1 208.96484375585936 162.34376757812353 M 209 197.5 A 0 0 0 1 0 209 197.5 " stroke="#aaaaaa" stroke-width="1" opacity="1"></path><path fill="none" d="M 209 127.1875 A 70.3125 70.3125 0 1 1 208.92968751171873 127.18753515624707 M 209 197.5 A 0 0 0 1 0 209 197.5 " stroke="#aaaaaa" stroke-width="1" opacity="1"></path>
+                                            <path fill="none" d="M 209 92.03125 A 105.46875 105.46875 0 1 1 208.89453126757806 92.0313027343706 M 209 197.5 A 0 0 0 1 0 209 197.5 " stroke="#aaaaaa" stroke-width="1" opacity="1"></path><path fill="none" d="M 209 56.875 A 140.625 140.625 0 1 1 208.85937502343742 56.87507031249413 M 209 197.5 A 0 0 0 1 0 209 197.5 " stroke="#aaaaaa" stroke-width="1" opacity="1"></path></g>
+                                        <g class="highcharts-axis"><path fill="none" d="M 209 56.875 A 140.625 140.625 0 1 1 208.85937502343742 56.87507031249413 M 209 197.5 A 0 0 0 1 0 209 197.5 " stroke="#aaaaaa" stroke-width="1"></path></g>
+                                        <g class="highcharts-axis"></g>
+                                        <g class="highcharts-series-group"><path fill="#00BABC" fill-opacity="0.25" d="M 0 0"></path><g class="highcharts-series highcharts-series-0" transform="translate(10,10) scale(1 1)" clip-path="url(#highcharts-7)">
+                                            <path fill="#00BABC" d="M 204.763632321326 151.10985770119788 L 229.61243752540648 127.41970851351718 L 199 187.5 L 210.652694699151 181.56265549559373 L 212.75047361672293 185.32213893201805 L 199 187.5 L 230.7003414933893 203.65213074854606 L 215.25793169556258 203.75793169556258 L 215.18405195555900 219.26299038962128 L 202.0138077405407 206.52843318677822 L 196.6791480538172 202.15328249054818 L 194.4991098111759 196.33349436871123 L 199 187.5 L 166.10932947820282 204.25863368179188 L 199 187.5 L 167.61002992546076 182.52831715794017 L 199 187.5 L 199 187.5 L 180.5495423465225 151.28893797790712 L 196.28317331418413 170.34663139732038 L 204.76363232132600 151.10985770119788 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5 L 199 187.5" fill-opacity="0.75"></path>
+                                            <path fill="none"    d="M 204.763632321326 151.10985770119788 L 229.61243752540648 127.41970851351718 L 199 187.5 L 210.652694699151 181.56265549559373 L 212.75047361672293 185.32213893201805 L 199 187.5 L 230.7003414933893 203.65213074854606 L 215.25793169556258 203.75793169556258 L 215.18405195555900 219.26299038962128 L 202.0138077405407 206.52843318677822 L 196.6791480538172 202.15328249054818 L 194.4991098111759 196.33349436871123 L 199 187.5 L 166.10932947820282 204.25863368179188 L 199 187.5 L 167.61002992546076 182.52831715794017 L 199 187.5 L 199 187.5 L 180.5495423465225 151.28893797790712 L 196.28317331418413 170.34663139732038 L 204.76363232132600 151.10985770119788 L 204.763632321326 151.10985770119788" stroke="#00BABC" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+                                            <path fill="none"    d="M 194.763632321326 151.10985770119788 L 204.76363232132600 151.10985770119788 L 229.61243752540648 127.41970851351718 L 199 187.5 L 210.65269469915100 181.56265549559373 L 212.75047361672293 185.32213893201805 L 199 187.5 L 230.70034149338930 203.65213074854606 L 215.25793169556258 203.75793169556258 L 215.1840519555590 219.26299038962128 L 202.0138077405407 206.52843318677822 L 196.6791480538172 202.15328249054818 L 194.4991098111759 196.33349436871123 L 199 187.5 L 166.10932947820282 204.25863368179188 L 199 187.5 L 167.61002992546076 182.52831715794017 L 199 187.5 L 199 187.5 L 180.54954234652250 151.28893797790712 L 196.28317331418413 170.34663139732038 L 204.763632321326 151.10985770119788 L 204.763632321326 151.10985770119788 L 214.763632321326 151.10985770119788" stroke-linejoin="round" visibility="visible" stroke="rgba(192,192,192,0.0001)" stroke-width="22" class=" highcharts-tracker" style=""></path>
+                                        </g>
+                                        <g class="highcharts-markers highcharts-series-0 highcharts-tracker" transform="translate(10,10) scale(1 1)" style="" clip-path="none"><path fill="#00BABC" d="M 230 197.65213074854606 C 237.992 197.65213074854606 237.992 209.65213074854606 230 209.65213074854606 C 222.008 209.65213074854606 222.008 197.65213074854606 230 197.65213074854606 Z" stroke="#FFFFFF" stroke-width="1" visibility="hidden"></path></g></g>
+                                        <g class="highcharts-axis-labels highcharts-xaxis-labels"><text x="234.90945827228825" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="middle" y="25.906306088930307" opacity="1"><tspan>Adaptation</tspan>
+                                            <tspan dy="11" x="234.90945827228825">&amp;</tspan><tspan dy="11" x="234.90945827228825">creativity</tspan>
+                                            <title>Adaptation &amp; creativity</title></text><text x="284.1921765193624" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="47.419231931301596" opacity="1"><tspan>Algorithms</tspan>
+                                                <tspan dy="11" x="284.1921765193624">&amp; AI</tspan><title>Algorithms &amp; AI</title></text>
+                                            <text x="326.1145606340219" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="83.37762686597807" opacity="1">Basics</text><text x="356.57295556869843" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="119.80001098063757" opacity="1">
+                                                <tspan>Company</tspan><tspan dy="11" x="356.57295556869843">experience</tspan><title>Company experience</title></text><text x="372.5858814110697" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="163.58272922771175" opacity="1"><tspan>DB</tspan><tspan dy="11" x="372.5858814110697">&amp;</tspan><tspan dy="11" x="372.5858814110697">Data</tspan><title>DB &amp; Data</title></text>
+                                            <text x="372.5858814110697" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="220.90164577228825" opacity="1"><tspan>Functional</tspan><tspan dy="11" x="372.5858814110697">programming</tspan><title>Functional programming</title></text>
+                                            <text x="356.57295556869843" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="275.6843640193624" opacity="1">Graphics</text><text x="326.1145606340219" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="306.6067481340219" opacity="1"><tspan>Group</tspan><tspan dy="11" x="326.1145606340219">&amp;</tspan><tspan dy="11" x="326.1145606340219">interpersonal</tspan>
+                                                <title>Group &amp; interpersonal</title></text><text x="284.1921765193624" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="342.5651430686984" opacity="1"><tspan>Imperative</tspan><tspan dy="11" x="284.1921765193624">programming</tspan><title>Imperative programming</title></text><text x="234.90945827228825" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="start" y="347.5780689110697" opacity="1"><tspan>Network</tspan><tspan dy="11" x="234.90945827228825">&amp;</tspan><tspan dy="11" x="234.90945827228825">system</tspan>
+                                            <tspan dy="11" x="234.90945827228825">administration</tspan><title>Network &amp; system administration</title></text><text x="183.09054172771178" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="353.0780689110697" opacity="1"><tspan>Object-</tspan>
+                                                <tspan dy="11" x="183.09054172771178">oriented</tspan><tspan dy="11" x="183.09054172771178">programming</tspan><title>Object-oriented programming</title></text><text x="133.80782348063758" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="348.06514306869843" opacity="1">Organization</text><text x="91.88543936597807" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="312.1067481340219" opacity="1"><tspan>Parallel</tspan>
+                                            <tspan dy="11" x="91.88543936597807">computing</tspan><title>Parallel computing</title></text><text x="61.427044431301596" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="275.6843640193624" opacity="1">Rigor</text><text x="45.414118588930336" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="226.40164577228825" opacity="1">Ruby</text><text x="45.41411858893031" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="174.58272922771178" opacity="1">Security</text>
+                                            <text x="61.42704443130157" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="125.30001098063758" opacity="1">Shell</text><text x="91.88543936597804" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="77.87762686597807" opacity="1"><tspan>Technology</tspan><tspan dy="11" x="91.88543936597804">integration</tspan>
+                                                <title>Technology integration</title></text><text x="133.80782348063752" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="end" y="52.919231931301596" opacity="1">Unix</text><text x="183.09054172771172" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="middle" y="36.906306088930336" opacity="1">Web</text>
+                                            <text x="0" style="color:#333;cursor:default;font-size:8px;width:9px;min-width:50px;fill:#333;text-overflow:clip;" transform="translate(0,0)" text-anchor="middle" y="-9999">20</text></g>
+                                        <g class="highcharts-axis-labels highcharts-yaxis-labels"></g>
+                                        <g class="highcharts-tooltip" style="cursor:default;padding:0;pointer-events:none;white-space:nowrap;" transform="translate(189,-9999)" opacity="0" visibility="visible"><path fill="#333" d="M 2 0 L 101 0 C 103 0 103 0 103 2 L 103 32 C 103 34 103 34 101 34 L 58 34 52 40 46 34 2 34 C 0 34 0 34 0 32 L 0 2 C 0 0 0 0 2 0"></path>
+                                            <text x="8" style="font-size:12px;color:#fff;fill:#fff;" y="20"><tspan style="font-weight:bold">Graphics</tspan><tspan dx="0">: 5.06</tspan></text></g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="footer">&copy; 2020 Robert Papagna</div>
+            <!-- <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+            <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+            <script src="variable_intro.js"></script> -->
+            <!-- <script src="application.js"></script> -->
+            <!-- # rpeepz.github.io project website -->
+        </div>
     </body>
 </html>

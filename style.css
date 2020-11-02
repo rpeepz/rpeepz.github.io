@@ -1,0 +1,1107 @@
+@media screen {
+
+	/* ************************************
+	 *               General              *
+	 * ************************************/
+	
+	body {
+		font-family: helvetica;
+		font-size: 14px;
+		background-color: #ecd4d4;
+		color: #3d4a5f;
+	}
+	
+	h1 {
+		font-size: 24px;
+		color: #554242;
+	}
+	
+	h2 {
+		font-size 18px;
+		color: #554242;
+	}
+		
+	h3 {
+		font-size 14px;
+		color: #554242;
+		margin-bottom: 5px;
+		margin-top: 5px;
+		margin-left: 10px;
+	}
+
+	a:link {
+		color: #18529e;
+	}
+	a:visited {
+		color: #6e209b;
+	}
+	a:active {
+		color: #494a35;
+	}
+	a:hover {
+		color: #206074;
+	}
+	
+	.print-only {
+		display: none;
+	}
+	
+	div.hidden-width-expander {
+		visibility: hidden;
+		max-height: 1px;
+	}
+	
+	.relative-fix {
+		position: relative;
+		float: right;
+		width: 0;
+		height: 0;
+	}
+	
+	/* ************************************
+	 *               Sidebar              *
+	 * ************************************/
+	
+	.pizazz {
+		display: block;
+		max-width: 220px;
+	}
+	
+	img.pizazz-img {
+		text-align: center;
+		width: 190px;
+		padding: 5px;
+		/* opacity: .5; */
+	}
+	
+	#quote {
+		margin-left: 10px;
+		margin-right: 10px;
+		color: #25104b;
+	}
+	
+	#quote1 {
+		display: blockx;
+	}
+	
+	#quote2 {
+		display: block;
+		font-style: italic;
+		text-align: right;
+	}
+	
+	
+	@media (max-width: 575px) {
+		#sidebar {
+			display: none;
+		}
+	}
+	
+	#sidebar {
+		position: fixed;
+		height: 100%;
+		width: 200px;
+		left: 0;
+		top: 0;
+		background-color: #5e7260;
+	}
+	
+	#name-header {
+		font-size: 30px;
+		margin-top: 18px;
+		font-weight: bold;
+		font-variant: small-caps;
+		margin-left: 10px;
+		color: #dddddd;
+		text-shadow: 2px 2px #2B2B2B;
+	}
+	
+	#name-subheader {
+		font-style: italic;
+		font-size: 13px;
+		margin-left: 17px;
+		margin-bottom: 25px;
+		color: #afafaf;
+	}
+	.tagsel-container {
+		margin-left: 15px;
+		color: #343623;
+	}
+	.tagsel {
+		margin-right: 5px;
+		display: inline-block;
+	}
+	.tagsel-vertical {
+		padding-top: 2px;
+		padding-bottom: 0px;
+		/* margin-left: 15px; */
+	}
+
+	.tagsel:hover {
+		text-shadow: 0px 0px 5px #C29282;
+		cursor: pointer;
+	}
+	.tagsel-vertical:hover {
+		text-shadow: 0px 0px 5px #C29282;
+		cursor: pointer;
+	}
+
+	.filter-panel {		
+	}
+	
+	.sidebar-h1 {
+		font-size: 20px;
+		margin-top: 10px;
+		margin-left: 10px;
+		color: #2B2B2B;
+	}
+	
+	.sidebar-h2 {
+		font-size: 18px;
+		margin-top: 15px;
+		margin-left: 10px;
+		color: #2B2B2B;
+	}
+	
+	#educational-tagsel {
+		margin-left: 15px;
+	}
+	
+	/* @media (max-height: 420px)
+	{
+		.height-470-min {
+			display: none;
+		}
+	}
+	@media (max-height: 550px)
+	{
+		.packed-600 {
+			display: inline-block;
+			margin-left: 5px;
+		}
+		.packed-container-600 {
+			margin-left: 15px;
+		}
+	}
+	@media (max-height: 825px)
+	{
+		.height-875-min {
+			display: none;
+		}
+		.pizazz-extra-toppings {
+			margin-top: 15px;
+		}
+	}
+	@media (min-height: 825px)
+	{
+		.height-875-max {
+			display: none;
+		}
+	}
+
+	@media (max-height: 950px)
+	{
+		.height-1000-min {
+			display: none;
+		}
+	}
+	@media (max-height: 1080px)
+	{
+		.height-1130-min {
+			display: none;
+		}
+		.packed-1130 {
+			display: inline-block;
+			margin-left: 5px;
+		}
+		.packed-container-1130 {
+			margin-left: 15px;
+		}
+	} */
+
+	
+	/* ************************************
+	 *           Content General          *
+	 * ************************************/
+
+	#javascript-disabled {
+		font-size: 18px;
+		color: #DE6457;
+		font-style: italic;
+	}
+	
+	#content-name-header {
+		font-size: 36px;
+		margin-top: 15px;
+		font-weight: bold;
+		font-variant: small-caps;
+		color: #5A6358;
+	}
+	
+	#content-name-subheader {
+		font-style: italic;
+		font-size: 14px;
+		margin-bottom: 30px;
+		color: #5A6358;
+	}
+	
+	#printed-header {
+		text-align: center;
+	}
+	@media (min-width: 575px)
+	{
+		#printed-header {
+			display: none;
+		}
+	}
+	
+	#printed-version-note {
+		margin-top: -15px;
+	}
+	
+	@media (min-width: 575px)
+	{
+		#content {
+			left: 200px;
+		}
+	}
+	@media (max-width: 575px)
+	{
+		#content {
+			left: 0;
+		}
+	}
+	#content {
+		position: absolute;
+		top: 0;
+		height: auto;
+		padding-left: 15px;
+	}
+	
+	td {
+		font-size: 14px;
+		min-width: 180px;
+	}
+
+	/* ************************************
+	 *           Contact Section          *
+	 * ************************************/
+	
+	#contact {
+		margin-left: 20px;
+	}
+
+	.contact-table {
+		font-size: 14px;
+	}
+	
+	.contact-label {
+		font-weight: bold;
+	}
+	
+	.contact-data {
+		
+	}
+		
+
+	/* ************************************
+	 *          Education Section         *
+	 * ************************************/
+	
+	#education {
+		margin-left: 20px;
+	}
+	
+	.education-table {
+		vertical-align: top;
+	}
+	
+	span.ed-degree {
+		text-decoration: underline;
+		white-space: nowrap;
+		margin-right: 10px;
+	}
+		
+	/* ************************************
+	 *        Variable Introduction       *
+	 * ************************************/
+
+	/* Default State */
+	.variable-intro-null { display: block; }
+	.variable-intro-dev  { display: none;  }
+	.variable-intro-qa   { display: none;  }
+	.variable-intro-db   { display: none;  }
+	.variable-intro-it   { display: none;  }
+	.variable-intro-anal { display: none;  }
+
+	p.variable-intro-p {
+		margin-top: 5px;
+		margin-left: 20px;
+	}
+	
+	/* ************************************
+	 *          Projects Section          *
+	 * ************************************/
+	
+	#current-filter::before {
+		content: "Current Catagory: ";
+	}
+	
+	#current-filter {
+		/* margin-left: 20px; */
+		/* margin-top: -5px; */
+		margin-bottom: 10px;
+		font-style: italic;
+	}
+	
+	#projects-container {
+		/* margin-left: 20px; */
+		margin-right: 20px;
+	}
+	
+	div.project {
+		display: block;
+		border-top: 1px solid #141414;
+		padding: 10px 0 20px 0;
+	}
+	
+	div.project-title {
+		font-size: 18px;
+		display: inline-block;
+		margin-bottom: 10px;
+		margin-left: -20px;
+		color: #5A6358;
+	}
+	div.project-title::before {
+		content: "\02756    "
+	}
+	div.project-name {
+		font-style: italic;
+		font-size: 18px;
+		margin: 0 10px 10px 20px;
+		float: right;
+		color: #5A6358;
+	}
+	
+	@media (min-width: 575px) {
+		div.project-name {
+			display: inline-block;
+		}
+	}
+	@media (max-width: 575px) {
+		div.project-name {
+			display: none;
+		}
+	}
+	
+	div.project-description {
+		font-style: italic;
+		padding: 0 30px 10px 20px;
+		text-align: justify;
+		text-justify: inter-word;
+	}
+	
+	div.project-description.description-text {
+		display: block; /*shown by default*/
+	}
+	
+	div.project-description.expand {
+		display: none; /*no longer used*/
+	}
+	
+	div.description-text div.project-description {
+		display: none;
+	}
+	
+	div.project-bottom-container {
+		position: relative;
+		display: inline-block;
+		width: 100%;
+		margin-bottom: -20px;
+		/*position: absolute;
+		right: 0;*/
+		/*float: right;*/
+	}
+	
+	div.project-date {
+		float: right;
+		/*position: relative;
+		display: inline-block;
+		right: 0;*/
+		font-size: 14px;
+		margin: 0 10px 0 10px;
+		color: #5A6358;
+	}
+	
+	div.project-url {
+		float: right;
+		/*position: absolute;
+		display: inline-block;
+		right: 0;*/
+		font-size: 14px;
+		margin: 0 10px 0 10px;
+	}
+	
+	div.project-tags::before {
+		content: "tags: ";
+	}
+	
+	div.project-tags {
+		display: block;
+		font-style: italic;
+		color: #7F93B3;
+		padding: 0 30px 0 30px;
+		margin-bottom: -20px;
+	
+	}
+
+	span.proj-tagsel:hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
+
+	.project-manual-hide {
+		position: absolute;
+		top: 0;
+		right: 10px;
+		display: block;
+		color: #C5D9E6;
+	}
+	
+	.project-manual-hide:hover {
+		cursor: pointer;
+		text-shadow: 2px 2px 5px #C29282;
+	}
+		
+	/* ************************************
+	 *       Embedded Image Galleries     *
+	 * ************************************/
+
+	.gallery-container {
+		text-align: center;
+	}
+	
+	img.gallery {
+		max-width: 500px;
+		margin: 5px 5px 5px 5px;
+	}
+		
+	div.expandable-section-clicktoexpand-gallery {
+		display: inline-block;
+		font-style: italic;
+		margin-top: 10px;
+	}
+	div.expandable-section-clicktoexpand-gallery:hover {
+		text-shadow: 0px 0px 5px #C29282;
+		cursor: pointer;
+	}
+	
+	img.dark-background {
+		background-color: #353D4A;
+	}
+
+	/* ************************************
+	 *         Job History Section        *
+	 * ************************************/
+	
+	.expandable-section {
+		position: relative;
+	}
+	
+	div.expandable-section-header {
+		display: inline-block;
+		font-size: 18px;
+		margin: 20px 15px 0 0;
+		font-weight: bold;
+	}
+	
+	div.expandable-section-clicktoexpand {
+		display: inline-block;
+		font-style: italic;
+		margin-bottom: 10px;
+		margin-left: 20px;
+	}
+	div.expandable-section-clicktoexpand:hover {
+		text-shadow: 0px 0px 5px #C29282;
+		cursor: pointer;
+	}
+	
+	div.expandable-section-expandedtext {
+		display: none;
+		margin-left: 20px;
+	}
+	
+	#job-history-subheader {
+		/* margin-left: 5px; */
+		font-size: 14px;
+		font-style: italic;
+	}
+	
+	#job-filter-text {
+		display: none;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		font-style: italic;
+	}
+
+	.job-entry {
+		display: block;
+		margin: 5px 20px 5px 0;
+		padding: 10px 20px 10px 0;
+		border-top: 1px solid #141414;
+	}
+	.job-title::before {
+		content: "\02756  "
+	}
+	.job-title {
+		display: inline-block;
+		font-size: 18px;
+		margin-right: 10px;
+		margin-left: -20px;
+		margin-bottom: 5px;
+		color: #5A6358;
+	}
+	
+	.job-employer {
+		display: inline-block;
+		font-size: 14px;
+		margin-left:5px;
+		margin-right: 5px;
+	}
+	
+	.job-employer-website {
+		display: inline-block;
+		font-size: 14px;
+		margin-left:5px;
+		margin-right: 5px;
+	}
+	
+	.job-employer-website::before {
+		content: "(";
+	}
+	
+	.job-employer-website::after {
+		content: ")";
+	}
+	
+	.job-date {
+		display: inline-block;
+		font-size: 14px;
+		margin-left: 5px;
+		margin-right: 5px;
+	}
+	
+	.job-description {
+		display: block;
+		font-size: 14px;
+		font-style: italic;
+		margin-left: 15px;
+		margin-bottom: 5px;
+	}
+	
+	.job-reference::before {
+		content: "Reference: ";
+	}
+	.job-reference {
+		display: block;
+		font-size: 14px;
+		font-style: italic;
+		margin-left: 30px;
+	}
+
+	.job-entry-manual-hide {
+		position: absolute;
+		top: -10px;
+		right: 0;
+		display: block;
+		color: #C5D9E6;
+	}
+	
+	.job-entry-manual-hide:hover {
+		cursor: pointer;
+		text-shadow: 2px 2px 5px #C29282;
+	}
+	
+
+	/* ************************************
+	 *               Footer               *
+	 * ************************************/
+	
+	#footer {
+		display: block;
+		margin-left: 20px;
+		margin-right: 20px;
+		margin-bottom: 50px;
+		padding-top: 10px;
+		padding-right: 20px;
+		text-align: right;
+		font-style: italic;
+		border-top: 1px solid #C5D9E6;
+	}
+
+}
+
+
+
+/* ************************************
+ *           Print Version            *
+ * ************************************/
+
+@media print {
+
+	/* ************************************
+	 *               General              *
+	 * ************************************/
+	
+	body {
+		font-family: helvetica;
+		font-size: 11px;
+		background-color: white;
+		color: black;
+	}
+	
+	h1 {
+		font-size: 18px;
+		margin-bottom: 0;
+		margin-top: 10px;
+	}
+	
+	h2 {
+		font-size 15px;
+		margin-bottom: 0;
+		margin-top: 10px;
+	}
+		
+	h3 {
+		font-size 12px;
+		margin-bottom: 5px;
+		margin-top: 5px;
+		margin-left: 10px;
+	}
+
+
+	a:link {
+		color: blue;
+	}
+	a:visited {
+		color: blue;
+	}
+	a:active {
+		color: blue;
+	}
+	a:hover {
+		color: blue;
+	}
+	
+	div.hidden-width-expander {
+		visibility: hidden;
+		max-height: 1px;
+	}
+	
+	.relative-fix {
+		position: relative;
+		float: right;
+		width: 0;
+		height: 0;
+	}
+	
+	.hide-when-print {
+		display: none;
+	}
+	.invisible-when-print {
+		visibility: hidden;
+	}
+
+
+	/* ************************************
+	 *               Sidebar              *
+	 * ************************************/
+
+	#sidebar {
+		display: none;
+	}
+
+	/* ************************************
+	 *           Content General          *
+	 * ************************************/
+	
+	#printed-header {
+		text-align: left;
+		/*margin-right: 50px;*/
+	}
+	
+	#content-name-header {
+		font-size: 24px;
+		margin-top: 15px;
+		font-weight: bold;
+		font-variant: small-caps;
+		color: black;
+	}
+	
+	#content-name-subheader {
+		font-style: italic;
+		font-size: 11px;
+		color: black;
+	}
+	
+	#printed-version-note {
+		margin-top: 5px;
+		margin-left: 15px;
+		/*margin-right: 15px;*/
+	}
+
+	#content {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: auto;
+		padding-left: 15px;
+	}
+	
+	td {
+		font-size: 11px;
+		min-width: 140px;
+		padding: 0;
+	}
+	
+	
+	.pizazz-upper-right {
+		position: absolute;
+		max-width: 175px;
+		z-index: -2;
+		top: 25px;
+		right: 25px;
+	}
+
+	.pizazz-upper-right-img-container {
+		text-align: right;
+	}
+	
+	img.pizazz-img-upper-right {
+		text-align: right;;
+		width: 150px;
+	}
+	
+	#quote-upper-right {
+		font-size: 10px;
+		margin-right: 20px;
+	}
+	
+	#quote1-upper-right {
+		display: block;
+		text-align: left;
+	}
+	
+	#quote2-upper-right {
+		display: block;
+		font-style: italic;
+		text-align: right;
+	}
+	
+	
+	/* ************************************
+	 *           Contact Section          *
+	 * ************************************/
+	
+	#contact {
+		margin-left: 20px;
+	}
+	.contact-table {
+		font-size: 11px;
+	}
+	
+	.contact-label {
+		font-weight: bold;
+	}
+	
+	.contact-data {
+	
+	}
+	
+	/* ************************************
+	 *          Education Section         *
+	 * ************************************/
+	
+	#education {
+		margin-left: 20px;
+	}
+	
+	.education-table {
+		vertical-align: top;
+	}
+	
+	span.ed-degree {
+		text-decoration: underline;
+		white-space: nowrap;
+		margin-right: 10px;
+	}
+
+	
+	/* ************************************
+	 *       Variable Introduction        *
+	 * ************************************/
+	/* Default State */
+	.variable-intro-null { display: none; }
+	.variable-intro-dev  { display: none;  }
+	.variable-intro-qa   { display: none;  }
+	.variable-intro-db   { display: none;  }
+	.variable-intro-it   { display: none;  }
+	.variable-intro-anal { display: none;  }
+
+
+	#variable-intro-selector {
+		display: none;
+	}
+
+	p.variable-intro-p {
+		margin-left: 20px;
+		margin-right: 20px;
+		margin-top: 5px;
+		margin-left: 
+	}
+	
+
+	
+	/* ************************************
+	 *          Projects Section          *
+	 * ************************************/
+	
+	#current-filter::before {
+		content: "Current Filter: ";
+	}
+	
+	#current-filter {
+		margin-left: 20px;
+		margin-top: 0;
+		margin-bottom: 10px;
+		font-style: italic;
+	}
+	
+	#projects-container {
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+	
+	div.project {
+		display: block;
+		border-top: 1px solid black;
+		padding: 3px 0 5px 0;
+	}
+	
+	div.project-title {
+		font-size: 15px;
+		display: inline-block;
+		margin-bottom: 0;
+		margin-left: -10px;
+	}
+	div.project-title::before {
+		content: "\02756  "
+	}
+	div.project-name {
+		font-style: italic;
+		font-size: 15px;
+		margin: 0 10px 0 10px;
+		float: right;
+	}
+	
+	div.project-name {
+		display: inline-block;
+	}
+	
+	div.project-description {
+		font-style: italic;
+		padding: 0 30px 10px 50px;
+		text-align: justify;
+		text-justify: inter-word;
+	}
+	
+	div.project-description.description-text {
+		display: block; /*shown by default*/
+	}
+	
+	div.project-description.expand {
+		display: none; /*no longer used*/
+	}
+	
+	div.project-bottom-container {
+		position: relative;
+		display: inline-block;
+		float: right;
+		margin-top: -13px;
+		/*width: 100%;*/
+		margin-bottom: -25px;
+		background-color: white;
+	}
+	
+	div.project-date {
+		float: right;
+		font-size: 11px;
+		margin: 0 10px 0 10px;
+	}
+	
+	div.project-url {
+		float: right;
+		font-size: 11px;
+		margin: 0 10px 0 10px;
+	}
+	
+	div.project-tags::before {
+		content: "tags: ";
+	}
+	
+	div.project-tags {
+		font-style: italic;
+		margin-top: -5px;
+		padding: 0 30px 0 30px;
+	}
+
+
+	.project-manual-hide {
+		display: none;
+	}
+			
+	/* ************************************
+	 *       Embedded Image Galleries     *
+	 * ************************************/
+
+	.gallery-container {
+		display: none;
+	}
+
+	.gallery-print-note::before {
+		content: "\0003C";
+	}
+	.gallery-print-note::after {
+		content: "\0003E";
+	}
+	.gallery-print-note: {
+		font-style: italic;
+		margin-top: 5px;
+		margin-left: 10px;
+	}
+
+	/* ************************************
+	 *         Job History Section        *
+	 * ************************************/
+	
+	.expandable-section {
+		position: relative;
+	}
+	
+	div.expandable-section-header {
+		display: inline-block;
+		font-size: 15px;
+		margin: 20px 15px 0 0;
+		font-weight: bold;
+	}
+	
+	div.expandable-section-clicktoexpand {
+		display: none;
+		font-style: italic;
+		margin-bottom: 20px;
+	}
+	
+	div.expandable-section-expandedtext {
+		display: block;
+		margin-left: 20px;
+	}
+
+	#job-history-subheader {
+		font-size: 11px;
+		font-style: italic;
+	}
+
+	#job-filter-text {
+		display: block;
+		margin-left: 0;
+		margin-top: 0;
+		margin-bottom: 10px;
+		font-style: italic;
+	}
+	
+	.job-entry {
+		display: block;
+		margin: 5px 20px 5px 0;
+		padding: 5px 20px 0 0;
+		border-top: 1px solid black;
+	}
+	.job-title::before {
+		content: "\02756  "
+	}
+	.job-title {
+		display: inline-block;
+		font-size: 15px;
+		margin-right: 10px;
+		margin-left: -20px;
+	}
+	
+	.job-employer {
+		display: inline-block;
+		font-size: 11px;
+		margin-left:5px;
+		margin-right: 5px;
+	}
+	
+	.job-employer-website {
+		display: inline-block;
+		font-size: 11px;
+		margin-left:5px;
+		margin-right: 5px;
+	}
+	
+	.job-employer-website::before {
+		content: "(";
+	}
+	
+	.job-employer-website::after {
+		content: ")";
+	}
+	
+	.job-date {
+		display: inline-block;
+		font-size: 11px;
+		margin-left: 5px;
+		margin-right: 5px;
+	}
+	
+	.job-description {
+		display: block;
+		font-size: 11px;
+		font-style: italic;
+		margin-left: 15px;
+	}
+	
+	.job-reference::before {
+		content: "Reference: ";
+	}
+	.job-reference {
+		display: block;
+		font-size: 12px;
+		font-style: italic;
+		margin-left: 30px;
+	}
+
+	.job-entry-manual-hide {
+		display: none;
+	}
+	
+	/* ************************************
+	 *               Footer               *
+	 * ************************************/
+		
+	#footer {
+		display: block;
+		margin-left: 20px;
+		margin-right: 20px;
+		padding-top: 10px;
+		padding-right: 20px;
+		text-align: right;
+		font-style: italic;
+		border-top: 1px solid black;
+	}
+
+
+
+
+}	
+
