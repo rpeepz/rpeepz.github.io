@@ -8,6 +8,7 @@
         <meta name="author" content="Robert Papagna">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="style1.css">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="resume.js"></script>
         <!-- <link rel="stylesheet" media="all" href="application.css"> -->
@@ -95,10 +96,12 @@
                 <div class="expandable-section-expandedtext" id="expanded">
                     <div id="education">
                         <table>
-                            <tr class="education-table"><td><span class="ed-degree">STCW 2010</span></td>
+                            <tr class="education-table"><td><span class="ed-degree"><a id="deckhand_cv" href="./rpcv.pdf" target="blank">Deckhand CV (pdf)</a></span></td>
+                            <tr class="education-table"><td><span class="ed-degree"><a id="stcw" href="./stcw.pdf" target="blank">STCW 2010 (pdf)</a></span></td>
                             <tr class="education-table"><td><span class="ed-degree">PADI Open Water Diver</span></td>
                             <tr class="education-table"><td><span class="ed-degree">ASE Certificate</span></td>
                             <tr class="education-table"><td><span class="ed-degree">Red Cross First Aid Certified</span></td>
+            
                         </table>
                     </div>
                 </div>
@@ -227,16 +230,86 @@
                     </div>
                 </div>
             </div>
+            <!-- <a href="#deckhand_cv">Click here to see an example of how a company uses Facebook ads.</a> -->
             <!-- end work history -->
             <h1>Projects Timeline</h1>
             <div class="expandable-section" class="projects-container" id="projects-container">
                 <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
                 <div class="expandable-section-expandedtext" id="expanded">
                     <div id="current-filter">All Projects, Include Media</div>
-                    <div class="project">
+                    
+                    <!-- <ul id='timeline'>
+                        <li class='work'>
+                            <input class='radio' id='work5' name='works' type='radio' checked>
+                            <div class="relative">
+                                <label for='work5'>This Website</label>
+                                <span class='date'>October 2020</span>
+                                <span class='circle'></span>
+                            </div>
+                          <div class='content'>
+                            <p>
+                                Built in vscode using templates I found online, also using HTML, CSS, Javascript, and JQuery. CSS is responsive to height and width. It is hosted on GithubPages.
+                            </p>
+                        </div>
+                        </li>
+                        <li class='work'>
+                          <input class='radio' id='work4' name='works' type='radio'>
+                          <div class="relative">
+                            <label for='work4'>Lorem ipsum dolor sit amet</label>
+                            <span class='date'>11 May 2013</span>
+                            <span class='circle'></span>
+                          </div>
+                          <div class='content'>
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odio ea necessitatibus quo velit natus cupiditate qui alias possimus ab praesentium nostrum quidem obcaecati nesciunt! Molestiae officiis voluptate excepturi rem veritatis eum aliquam qui laborum non ipsam ullam tempore reprehenderit illum eligendi cumque mollitia temporibus! Natus dicta qui est optio rerum.
+                            </p>
+                          </div>
+                        </li>
+                        <li class='work'>
+                          <input class='radio' id='work3' name='works' type='radio'>
+                          <div class="relative">
+                            <label for='work3'>Lorem ipsum dolor sit amet</label>
+                            <span class='date'>10 May 2013</span>
+                            <span class='circle'></span>
+                          </div>
+                          <div class='content'>
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odio ea necessitatibus quo velit natus cupiditate qui alias possimus ab praesentium nostrum quidem obcaecati nesciunt! Molestiae officiis voluptate excepturi rem veritatis eum aliquam qui laborum non ipsam ullam tempore reprehenderit illum eligendi cumque mollitia temporibus! Natus dicta qui est optio rerum.
+                            </p>
+                          </div>
+                        </li>
+                        <li class='work'>
+                          <input class='radio' id='work2' name='works' type='radio'>
+                          <div class="relative">
+                            <label for='work2'>Lorem ipsum dolor sit amet</label>
+                            <span class='date'>09 May 2013</span>
+                            <span class='circle'></span>
+                          </div>
+                          <div class='content'>
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odio ea necessitatibus quo velit natus cupiditate qui alias possimus ab praesentium nostrum quidem obcaecati nesciunt! Molestiae officiis voluptate excepturi rem veritatis eum aliquam qui laborum non ipsam ullam tempore reprehenderit illum eligendi cumque mollitia temporibus! Natus dicta qui est optio rerum.
+                            </p>
+                          </div>
+                        </li>
+                        <li class='work'>
+                          <input class='radio' id='work1' name='works' type='radio'>
+                          <div class="relative">
+                            <label for='work1'>Lorem ipsum dolor sit amet</label>
+                            <span class='date'>08 May 2013</span>
+                            <span class='circle'></span>
+                          </div>
+                          <div class='content'>
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odio ea necessitatibus quo velit natus cupiditate qui alias possimus ab praesentium nostrum quidem obcaecati nesciunt! Molestiae officiis voluptate excepturi rem veritatis eum aliquam qui laborum non ipsam ullam tempore reprehenderit illum eligendi cumque mollitia temporibus! Natus dicta qui est optio rerum.
+                            </p>
+                          </div>
+                        </li>
+                      </ul> -->
+
+                      <div class="project">
                         <div class="project-title">This Website</div>
                         <div id="project-name" class="project-name">Portfolio and Online Resume</div>
-                        <div id="expanded" class="project-description description-text">Built in vscode using templates I found online, also using HTML, CSS, Javascript, and JQuery. CSS is responsive to height and width. It is hosted on GithubPages.</div>
+                        <div id="expanded" class="project-description description-text">Full credit to Gavin Fielder who originally built this website. I have modified it in vscode using templates I found online, also using HTML, CSS, Javascript, and JQuery. CSS is responsive to height and width. It is hosted on GithubPages.</div>
                         <!-- <div id="expanded" class="project-description description-text">Total working time: 2 weeks</div> -->
                         <div id="project-tags" class="project-tags"><span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Recreational</span></div>
                         <div align="right" class="project-bottom-container">
