@@ -6,45 +6,96 @@
 //   By: gfielder <marvin@42.fr>                    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2019/04/14 14:56:01 by gfielder          #+#    #+#             //
-//   Updated: 2019/06/26 15:15:59 by gfielder         ###   ########.fr       //
+//   Updated: 2025/10/12 20:35:03 by rpapagna         ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
 
 //Requires jquery
 
 var include_educational;
+var show_work_history;
+var show_projects;
 var current_filter;
 var custom_filter;
 
 $(document).ready(function()
 {
 	include_educational = true;
-	current_filter = 'All Projects';
+	show_work_history = true;
+	show_projects = true;
+	current_filter = 'All Items';
 	custom_filter = false;
-	$('#educational-tagsel-checkbox').change(function() {
-		include_educational = this.checked;
-		if (current_filter == 'All Projects')
-			ShowAllProjects();
-		else
-			ShowProjectsWithTag(current_filter);
-		UpdateCurrentFilterText();
-	});
-	//Set up event listeners
+	
+	// Set up event listeners
 	$('.expandable-section-header').click(ExpandableClick);
 	$('.expandable-section-clicktoexpand').click(ExpandableClick);
 	$('.expandable-section-clicktoexpand-gallery').click(ExpandableClick);
-	$('.tagsel').not('#tagsel-all').click(OnTagSelect);
-	$('.tagsel-vertical').not('#tagsel-all').click(OnTagSelect);
-	$('.proj-tagsel').not('#tagsel-all').click(OnTagSelect);
-	$('#tagsel-all').click(ShowAllProjects);
+	
+	// New filter system event listeners
+	$('.tagsel-vertical').click(OnFilterSelect);
+	$('#toggle-work').change(function() {
+		show_work_history = this.checked;
+		applyFilters();
+	});
+	$('#toggle-projects').change(function() {
+		show_projects = this.checked;
+		applyFilters();
+	});
+	$('#toggle-educational').change(function() {
+		include_educational = this.checked;
+		applyFilters();
+	});
+	
 	$('.project-manual-hide').click(OnProjectHideClick);
 	$('.job-entry-manual-hide').click(OnJobEntryHideClick);
-	//$('#variable-intro-selector').change(OnVariableIntroSelect);
-	//Open the Projects Section by default.
+	
+	// Open the Projects Section by default.
 	var proj = $('#projects-section');
 	proj.children("#hidden-inline").html("Click to collapse...");
 	proj.children("#expanded").css('display', 'block');
 	$('#javascript-disabled').remove();
+	
+	// Initialize with all items shown
+	applyFilters();
+	
+	// // Mobile navigation toggle
+	// $('<button class="mobile-nav-toggle">☰</button>').insertBefore('#sidebar');
+	// $('.mobile-nav-toggle').click(function() {
+	//     $('#sidebar').toggleClass('active');
+	//     $(this).toggleClass('active');
+	// });
+	
+	// // Close sidebar when clicking outside on mobile
+	// $(document).click(function(event) {
+	//     if ($(window).width() <= 767) {
+	//         if (!$(event.target).closest('#sidebar, .mobile-nav-toggle').length) {
+	//             $('#sidebar').removeClass('active');
+	//             $('.mobile-nav-toggle').removeClass('active');
+	//         }
+	//     }
+	// });
+
+	// Mobile navigation toggle
+	$('<button class="mobile-nav-toggle"> ☰ </button>').insertBefore('#sidebar');
+	$('.mobile-nav-toggle').click(function() {
+		$('#sidebar').toggleClass('active');
+	});
+
+	// Close sidebar when clicking outside on mobile
+	$(document).click(function(event) {
+		if ($(window).width() <= 767) {
+			if (!$(event.target).closest('#sidebar, .mobile-nav-toggle').length) {
+				$('#sidebar').removeClass('active');
+			}
+		}
+	});
+
+	// Close sidebar on link click (mobile)
+	$('#sidebar a').click(function() {
+		if ($(window).width() <= 767) {
+			$('#sidebar').removeClass('active');
+		}
+	});
 });
 
 function ExpandableClick(eventObject)
@@ -76,61 +127,111 @@ function ExpandableClick(eventObject)
 	}
 }
 
-function ShowAllProjects()
+function OnFilterSelect(eventObject)
 {
-	current_filter = 'All Projects';
-	var projs = $(".project");
-	var tags;
-	projs.each(function(index, element) {
-		tags=$(element).children("#project-tags").html();
-		if (tags.includes('Media') && include_educational == false)
-			$(element).css('display', 'none');
-		else
-			$(element).css('display', 'block');
-	});
+	$('.tagsel-vertical').removeClass('active');
+	$(eventObject.target).addClass('active');
+	
+	var filterText = $(eventObject.target).text();
+	var category = $(eventObject.target).data('category');
+	
+	if (filterText === 'All Items') {
+		ShowAllItems();
+	} else {
+		ShowItemsWithFilter(filterText, category);
+	}
+}
+
+function ShowAllItems()
+{
+	current_filter = 'All Items';
+	$('.job-entry').css('display', show_work_history ? 'block' : 'none');
+	$('.project').css('display', show_projects ? 'block' : 'none');
 	custom_filter = false;
 	UpdateCurrentFilterText();
 }
 
+function ShowItemsWithFilter(filterText, category)
+{
+	current_filter = filterText;
+	
+	// Convert filter text to tag format (lowercase, hyphens)
+	var filterTag = filterText.toLowerCase().replace(/\s+/g, '-');
+	
+	// Filter work history
+	if (show_work_history) {
+		$('.job-entry').each(function() {
+			var tags = $(this).data('tags');
+			if (tags && tags.includes(filterTag)) {
+				$(this).css('display', 'block');
+			} else {
+				$(this).css('display', 'none');
+			}
+		});
+	} else {
+		$('.job-entry').css('display', 'none');
+	}
+	
+	// Filter projects
+	if (show_projects) {
+		$('.project').each(function() {
+			var tags = $(this).data('tags');
+			var projTags = $(this).children("#project-tags").html();
+			
+			// Check both data-tags and the visible project tags
+			var hasTag = (tags && tags.includes(filterTag)) || 
+						(projTags && projTags.toLowerCase().includes(filterText.toLowerCase()));
+			
+			if (hasTag) {
+				if (projTags.includes('Educational') && include_educational == false) {
+					$(this).css('display', 'none');
+				} else {
+					$(this).css('display', 'block');
+				}
+			} else {
+				$(this).css('display', 'none');
+			}
+		});
+	} else {
+		$('.project').css('display', 'none');
+	}
+	
+	custom_filter = false;
+	UpdateCurrentFilterText();
+}
+
+function applyFilters()
+{
+	if (current_filter === 'All Items') {
+		ShowAllItems();
+	} else {
+		var activeFilter = $('.tagsel-vertical.active');
+		if (activeFilter.length) {
+			var filterText = activeFilter.text();
+			var category = activeFilter.data('category');
+			ShowItemsWithFilter(filterText, category);
+		}
+	}
+}
+
 function UpdateCurrentFilterText()
 {
-	if (custom_filter)
-	{
-		$('#current-filter').html('*Custom*');
-	}
-	else
-	{
-		if (include_educational)
-			$('#current-filter').html(current_filter + ', Include Media');
-		else
-			$('#current-filter').html(current_filter);
-	}
-}
-
-function OnTagSelect(eventObject)
-{
-	ShowProjectsWithTag($(eventObject.target).html(), eventObject.shiftKey);
-}
-
-function ShowProjectsWithTag(tag, addOnly = false)
-{
-	current_filter = tag;
-	var projs = $(".project");
-	var tags;
-	projs.each(function(index, element) {
-		tags=$(element).children("#project-tags").html();
-		if (tags.includes(tag))
-		{
-			if (tags.includes('Media') && include_educational == false)
-				$(element).css('display', 'none');
-			else
-				$(element).css('display', 'block');
+	if (custom_filter) {
+		$('#current-filter').html('*Custom Filter*');
+	} else {
+		var displayText = current_filter;
+		if (!show_work_history && !show_projects) {
+			displayText += ' (Nothing to show)';
+		} else if (!show_work_history) {
+			displayText += ' (Projects only)';
+		} else if (!show_projects) {
+			displayText += ' (Work only)';
 		}
-		else if (!addOnly)
-			$(element).css('display', 'none');
-	});
-	custom_filter = addOnly;
-	UpdateCurrentFilterText();
+		if (!include_educational) {
+			displayText += ', Excluding Educational';
+		}
+		$('#current-filter').html(displayText);
+	}
 }
 
 function OnProjectHideClick(eventObject)
@@ -145,7 +246,6 @@ function OnJobEntryHideClick(eventObject)
 {
 	job = $(eventObject.target.parentElement.parentElement);
 	job.css('display', 'none');
-	$('#job-filter-text').css('display', 'block');
+	custom_filter = true;
+	UpdateCurrentFilterText();
 }
-
-
