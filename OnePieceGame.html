@@ -1,0 +1,2561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Piece Card War</title>
+    <!-- PeerJS for WebRTC P2P connections -->
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Maya Blue */
+    --maya-blue: #60BFF5;
+    --maya-blue-dark: #4da8db;
+    
+    /* Lapis Lazuli */
+    --lapis: #2E63A4;
+    --lapis-dark: #1e4470;
+    
+    /* Dirty Brown */
+    --brown: #AF6528;
+    --brown-dark: #8b4f1e;
+    
+    /* Tangerine Yellow */
+    --tangerine: #FFCE00;
+    --tangerine-dark: #d4a900;
+    
+    /* Red */
+    --red: #D70000;
+    --red-dark: #a80000;
+    
+    /* Theme colors - Light Mode */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9f9f9;
+    --bg-tertiary: #f5f5f5;
+    --bg-gradient-start: var(--maya-blue);
+    --bg-gradient-end: var(--lapis);
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-tertiary: #999999;
+    --border-color: #ddd;
+    --shadow: rgba(0, 0, 0, 0.2);
+    --shadow-heavy: rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode {
+    /* Theme colors - Dark Mode */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --bg-tertiary: #333333;
+    --bg-gradient-start: var(--lapis-dark);
+    --bg-gradient-end: #000000;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #808080;
+    --border-color: #444;
+    --shadow: rgba(0, 0, 0, 0.5);
+    --shadow-heavy: rgba(0, 0, 0, 0.7);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    min-height: 100vh;
+    color: var(--text-primary);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.screen {
+    display: none;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.screen.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: var(--bg-primary);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px var(--shadow-heavy);
+    max-width: 1200px;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+#collection-screen .container,
+#gameover-screen .container {
+    max-width: 1400px;
+}
+
+#collection-screen .container {
+    max-width: 1400px;
+    width: 95%;
+}
+
+#collection-screen.screen.active {
+    align-items: flex-start;
+    padding-top: 40px;
+}
+
+h1 {
+    text-align: center;
+    color: var(--maya-blue);
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+h2 {
+    color: var(--maya-blue);
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: var(--brown);
+    margin-bottom: 15px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--maya-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--maya-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(96, 191, 245, 0.4);
+}
+
+.btn-secondary {
+    background: var(--tangerine);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--tangerine-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 206, 0, 0.4);
+}
+
+.btn-danger {
+    background: var(--red);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--red-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(215, 0, 0, 0.4);
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-large {
+    padding: 16px 48px;
+    font-size: 20px;
+}
+
+.login-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#profile-form {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 30px auto 0;
+}
+
+#profile-form input {
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+#profile-form input:focus {
+    outline: none;
+    border-color: var(--maya-blue);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.stats {
+    background: var(--bg-tertiary);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.lobby-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.section {
+    background: var(--bg-secondary);
+    padding: 25px;
+    border-radius: 12px;
+}
+
+#join-code-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+#lobby-code-display {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    text-align: center;
+}
+
+#lobby-code {
+    font-size: 24px;
+    color: var(--maya-blue);
+    letter-spacing: 3px;
+}
+
+.connection-status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.connection-status.connected {
+    color: #27ae60;
+}
+
+.connection-status.error {
+    color: #e74c3c;
+}
+
+.open-lobbies {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.open-lobbies h4 {
+    margin-bottom: 10px;
+    color: var(--brown);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#open-lobbies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.open-lobbies h4 {
+    margin-bottom: 10px;
+    color: var(--brown);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lobby-host {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.card.my-card {
+    border-color: var(--maya-blue) !important;
+    box-shadow: 0 0 15px rgba(96, 191, 245, 0.5);
+}
+
+.card.opponent-card {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 15px rgba(215, 0, 0, 0.5);
+}
+
+.claim-profile-link {
+    color: #667eea;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+.claim-profile-link:hover {
+    color: #5568d3;
+}
+
+/* Music Contol */
+.music-control {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--bg-primary);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px var(--shadow-heavy);
+    display: none;
+    z-index: 1000;
+    border: 2px solid var(--maya-blue);
+}
+
+.music-control.active {
+    display: block;
+}
+
+.music-control h4 {
+    margin-bottom: 10px;
+    color: var(--maya-blue);
+    font-size: 14px;
+}
+
+.volume-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.volume-btn {
+    padding: 8px 12px;
+    border: 2px solid var(--maya-blue);
+    background: var(--bg-primary);
+    color: var(--maya-blue);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-size: 12px;
+}
+
+.volume-btn:hover {
+    background: var(--maya-blue);
+    color: white;
+}
+
+.volume-btn.active {
+    background: var(--maya-blue);
+    color: white;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-primary);
+    padding: 10px 15px;
+    border-radius: 50px;
+    box-shadow: 0 5px 20px var(--shadow-heavy);
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid var(--maya-blue);
+    transition: all 0.3s;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--shadow-heavy);
+}
+
+.theme-toggle-icon {
+    font-size: 20px;
+}
+
+.my-username {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    position: relative;
+}
+
+.my-username::before {
+    content: '⭐ ';
+    -webkit-text-fill-color: #ffd700;
+    color: #ffd700;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #764ba2;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.player-info.my-player h3 {
+    color: var(--maya-blue);
+    font-weight: 700;
+}
+
+.player-info.opponent-player h3 {
+    color: var(--red);
+}
+
+.connection-status.loading {
+    color: #667eea;
+    font-style: italic;
+}
+
+/* Game Screen */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+}
+
+.player-info {
+    text-align: center;
+}
+
+.score-display {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--maya-blue);
+    margin-top: 5px;
+}
+
+.round-info {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--maya-blue);
+}
+
+.game-board {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin: 60px 0;
+    min-height: 350px;
+}
+
+.card-slot {
+    width: 200px;
+    height: 300px;
+    perspective: 1000px;
+}
+
+.card, .card-back {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    transition: all 0.3s;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.card-back img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.card {
+    background: var(--bg-primary);
+    border: 3px solid var(--maya-blue);
+    animation: cardFlip 0.6s;
+}
+
+@keyframes cardFlip {
+    0% { transform: rotateY(180deg); }
+    100% { transform: rotateY(0deg); }
+}
+
+.card.winner {
+    border-color: var(--tangerine);
+    box-shadow: 0 0 30px rgba(255, 206, 0, 0.6);
+    transform: scale(1.05);
+}
+
+.card-header {
+    text-align: center;
+}
+
+.card-image {
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    font-size: 48px;
+    overflow: hidden;
+}
+
+.card-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
+.card-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.card-arc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.card-power {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--maya-blue);
+}
+
+.vs {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--brown);
+}
+
+.game-controls {
+    text-align: center;
+    margin-top: 40px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.waiting-message {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+    color: var(--brown);
+    font-weight: bold;
+}
+
+.result-display {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-primary);
+    padding: 25px 35px;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px var(--shadow-heavy);
+    text-align: center;
+    z-index: 1000;
+    border: 3px solid var(--maya-blue);
+}
+
+.result-display h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+
+
+/* Collection Screen */
+.filter-section {
+    margin-bottom: 20px;
+}
+
+#arc-filter {
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 300px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-auto-rows: auto;
+    gap: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+#collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+#cards-won-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.collection-card {
+    height: 260px;
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.collection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.collection-card.locked {
+    opacity: 0.6;
+    border-color: var(--text-tertiary);
+    cursor: not-allowed;
+    position: relative;
+}
+
+.collection-card.locked::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(128, 128, 128, 0.6);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.collection-card .card-image {
+    height: 120px;
+    font-size: 36px;
+}
+
+.collection-card .card-name {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.collection-card .card-arc {
+    font-size: 10px;
+}
+
+.collection-card .card-power {
+    font-size: 28px;
+}
+
+/* Game Over Screen */
+#gameover-screen .container {
+    text-align: center;
+}
+
+#gameover-result {
+    font-size: 48px;
+    margin-bottom: 30px;
+}
+
+#gameover-stats {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+#cards-won-grid {
+    max-height: 400px;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1.4em;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    /* Header adjustments */
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    #player-name {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    /* Stats bar */
+    .stats {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    /* Lobby actions */
+    .lobby-actions {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .section {
+        padding: 15px;
+    }
+
+    /* Open lobbies */
+    .open-lobbies {
+        padding: 12px;
+    }
+
+    .open-lobbies h4 {
+        font-size: 14px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .btn-large {
+        padding: 14px 32px;
+        font-size: 18px;
+    }
+
+    .btn-small {
+        padding: 8px 16px;
+        font-size: 13px;
+        width: auto;
+    }
+
+    /* Login options */
+    .login-options {
+        gap: 12px;
+    }
+
+    /* Profile form */
+    #profile-form {
+        gap: 12px;
+        margin: 20px auto 0;
+    }
+
+    #profile-form input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Theme toggle - reposition for mobile */
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .theme-toggle-icon {
+        font-size: 16px;
+    }
+
+    /* Music control - reposition for mobile */
+    .music-control {
+        bottom: 10px;
+        right: 10px;
+        padding: 10px;
+    }
+
+    .music-control h4 {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .volume-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    /* Game header */
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .player-info h3 {
+        font-size: 16px;
+    }
+
+    .player-info p {
+        font-size: 13px;
+    }
+
+    .score-display {
+        font-size: 20px;
+    }
+
+    .round-info {
+        font-size: 16px;
+        order: -1;
+    }
+
+    /* Game board */
+    .game-board {
+        flex-direction: column;
+        gap: 15px;
+        margin: 30px 0;
+        min-height: auto;
+    }
+    
+    .card-slot {
+        width: 160px;
+        height: 240px;
+    }
+
+    .vs {
+        font-size: 24px;
+    }
+
+    .card, .card-back {
+        padding: 12px;
+    }
+
+    .card-name {
+        font-size: 14px;
+    }
+
+    .card-arc {
+        font-size: 10px;
+    }
+
+    .card-image {
+        height: 100px;
+        font-size: 40px;
+    }
+
+    .card-power {
+        font-size: 28px;
+    }
+
+    /* Game controls */
+    .game-controls {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .waiting-message {
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    /* Result display */
+    .result-display {
+        width: 90%;
+        max-width: 300px;
+        padding: 20px;
+        top: 25%;
+    }
+
+    .result-display h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    /* Collection screen */
+    .filter-section {
+        margin-bottom: 15px;
+    }
+
+    #arc-filter {
+        padding: 8px;
+        font-size: 14px;
+        max-width: 100%;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 15px;
+        max-height: 500px;
+    }
+
+    .collection-card {
+        height: 220px;
+        padding: 10px;
+    }
+
+    .collection-card .card-image {
+        height: 90px;
+        font-size: 32px;
+    }
+
+    .collection-card .card-name {
+        font-size: 12px;
+    }
+
+    .collection-card .card-arc {
+        font-size: 9px;
+    }
+
+    .collection-card .card-power {
+        font-size: 24px;
+    }
+
+    /* Game over screen */
+    #gameover-result {
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+    #gameover-stats {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    #gameover-stats p {
+        margin-bottom: 8px;
+    }
+
+    #cards-won-grid {
+        max-height: 300px;
+    }
+
+    /* Lobby code display */
+    #lobby-code-display {
+        padding: 15px;
+    }
+
+    #lobby-code {
+        font-size: 18px;
+        letter-spacing: 1px;
+        word-break: break-all;
+    }
+
+    .connection-status {
+        font-size: 13px;
+    }
+
+    /* Join code input */
+    #join-code-input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Claim profile link */
+    .claim-profile-link {
+        font-size: 13px;
+        display: block;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+        margin: 5px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.1em;
+    }
+
+    .card-slot {
+        width: 140px;
+        height: 210px;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+    }
+
+    .collection-card {
+        height: 190px;
+        padding: 8px;
+    }
+
+    .collection-card .card-image {
+        height: 70px;
+        font-size: 28px;
+    }
+
+    .stats {
+        font-size: 12px;
+    }
+
+    #gameover-result {
+        font-size: 24px;
+    }
+
+    #gameover-stats {
+        font-size: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <!-- Theme Toggle -->
+    <div id="theme-toggle" class="theme-toggle">
+        <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+        <span id="theme-text">Dark</span>
+    </div>
+
+    <!-- Battle Music Audio -->
+    <audio id="battle-music" loop>
+        <source src="https://quicksounds.com/uploads/tracks/143341674_950320944_1102458802.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Control Widget -->
+    <div id="music-control" class="music-control">
+        <h4>🎵 Battle Music</h4>
+        <div class="volume-controls">
+            <button id="volume-full" class="volume-btn active">Full</button>
+            <button id="volume-half" class="volume-btn">Half</button>
+            <button id="volume-mute" class="volume-btn">Mute</button>
+        </div>
+    </div>
+
+    <!-- Login/Profile Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1>⚔️ One Piece Card War ⚔️</h1>
+            <div class="login-options">
+                <button id="guest-btn" class="btn btn-primary">Play as Guest</button>
+                <button id="claim-profile-btn" class="btn btn-secondary">Claim Profile</button>
+                <button id="login-btn" class="btn btn-secondary">Login to Profile</button>
+            </div>
+            <div id="profile-form" class="hidden">
+                <input type="text" id="username-input" placeholder="Enter username" maxlength="20">
+                <input type="password" id="password-input" placeholder="Enter password (optional for guest)">
+                <button id="submit-profile-btn" class="btn btn-primary">Submit</button>
+                <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lobby Screen -->
+    <div id="lobby-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>Welcome, <span id="player-name" class="my-username"></span>!
+                    <a href="#" id="claim-profile-link" class="claim-profile-link hidden">Claim Profile</a>
+                </h2>
+                <button id="logout-btn" class="btn btn-small">Logout</button>
+            </div>
+            
+            <div class="stats">
+                <p>Wins: <span id="wins">0</span> | Losses: <span id="losses">0</span> | Cards Collected: <span id="cards-collected">0</span>/52</p>
+            </div>
+
+            <div class="lobby-actions">
+                <div class="section">
+                    <h3>Host a Game</h3>
+                    <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
+                    <div id="lobby-code-display" class="hidden">
+                        <p>Lobby Code: <strong id="lobby-code"></strong></p>
+                        <p class="connection-status" id="connection-status">Initializing connection...</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Join a Game</h3>
+                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="20">
+                    <button id="join-game-btn" class="btn btn-primary">Join Lobby</button>
+                    <p class="connection-status hidden" id="join-status">Connecting...</p>
+                </div>
+
+                <div class="open-lobbies">
+                    <h4>
+                        <span>Open Lobbies</span>
+                        <span id="lobbies-loading" class="loading-spinner hidden"></span>
+                    </h4>
+                    <div id="open-lobbies-list">
+                        <p style="color: #999; font-style: italic;">Searching for lobbies...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Your Collection</h3>
+                <button id="view-collection-btn" class="btn btn-secondary">View Cards</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collection Screen -->
+    <div id="collection-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>Card Collection</h2>
+                <button id="back-to-lobby-btn" class="btn btn-small">Back to Lobby</button>
+            </div>
+            <div class="filter-section">
+                <select id="arc-filter">
+                    <option value="all">All Arcs</option>
+                </select>
+            </div>
+            <div id="collection-grid" class="card-grid" style="display: ruby"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="container">
+            <div class="game-header">
+                <div class="player-info" id="player1-info">
+                    <h3 id="player1-name">Player 1</h3>
+                    <p>Cards: <span id="player1-cards">5</span></p>
+                    <div class="score-display">Score: <span id="player1-score">0</span></div>
+                </div>
+                <div class="round-info">
+                    <p>Round <span id="round-number">1</span>/5</p>
+                </div>
+                <div class="player-info" id="player2-info">
+                    <h3 id="player2-name">Player 2</h3>
+                    <p>Cards: <span id="player2-cards">5</span></p>
+                    <div class="score-display">Score: <span id="player2-score">0</span></div>
+                </div>
+            </div>
+
+            <div class="game-board">
+                <div class="card-slot" id="player1-card-slot">
+                    <div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="card-slot" id="player2-card-slot">
+                    <div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button id="play-card-btn" class="btn btn-primary btn-large">Play Card</button>
+                <button id="concede-btn" class="btn btn-danger">Concede</button>
+            </div>
+
+            <div id="waiting-message" class="waiting-message hidden">
+                Waiting for opponent...
+            </div>
+
+            <div id="result-display" class="result-display hidden">
+                <h2 id="result-text"></h2>
+                <button id="continue-btn" class="btn btn-primary">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+        <div class="container">
+            <h1 id="gameover-result"></h1>
+            <div id="gameover-stats"></div>
+            <div id="cards-won-display" class="hidden">
+                <h3>Cards Won:</h3>
+                <div id="cards-won-grid" class="card-grid"></div>
+            </div>
+            <button id="return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
+        </div>
+    </div>
+
+<script>
+// Character image emoji mapping
+const CHARACTER_IMAGES = {
+    "Monkey D. Luffy": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d57vqib-703ad600-c6f2-4f99-9d89-5d3817208219.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2VjNzE5ZjQ2LTQ0ZDYtNDU5My1hYjFlLTk1MmIwMTkwOWE0ZVwvZDU3dnFpYi03MDNhZDYwMC1jNmYyLTRmOTktOWQ4OS01ZDM4MTcyMDgyMTkucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.MDljTCjgh5wUDesVbS212iPfh4guv1KJUyF-8lyO8Gk",
+    "Roronoa Zoro": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5litwf-0862eea8-8f00-4613-9e3e-e4f98a879f9b.png/v1/fit/w_828,h_1264,q_70,strp/epp___romance_dawn__zoro_by_sergiart_d5litwf-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVsaXR3Zi0wODYyZWVhOC04ZjAwLTQ2MTMtOWUzZS1lNGY5OGE4NzlmOWIucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.0Ejn-2vbmopEfsXF2RUxDGTjiYJpcaId8mQYQ4hieCU",
+    "Koby": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d7pze6h-6d72ad14-8fbe-48d9-a74b-6a8d8cdf7f3f.jpg/v1/fill/w_1280,h_1876,q_75,strp/one_piece___coby_by_onepieceworldproject_d7pze6h-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTg3NiIsInBhdGgiOiJcL2ZcLzVjZTk4NjQ3LTU5NzUtNGY3Zi1iZDA5LTBlZDcxOTQzM2VlMVwvZDdwemU2aC02ZDcyYWQxNC04ZmJlLTQ4ZDktYTc0Yi02YThkOGNkZjdmM2YuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.DAA1Q7cBjinXggxrQ6Yc_x5YPD6Su3M3U4YJX6RJlS4",
+    "Alvida": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/ddrl9ds-4fac1530-8bf1-49e3-b6f3-8c1d6c1881d7.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece_alvida_by_onepieceworldproject_ddrl9ds-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGRybDlkcy00ZmFjMTUzMC04YmYxLTQ5ZTMtYjZmMy04YzFkNmMxODgxZDcuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.Ajwx0vKDDiJ_1gyVdq6wbmAJEhqmQdBmytVFQzdL5fo",
+    "Shanks": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6tmtua-40267365-7467-41d8-9535-fa4c836fa387.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___shanks_by_onepieceworldproject_d6tmtua-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZ0bXR1YS00MDI2NzM2NS03NDY3LTQxZDgtOTUzNS1mYTRjODM2ZmEzODcuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.2Ee6gF8FtTR9MXyQ6Hr6EU36GbJCEeiP6H9Pe6-90-E",
+    "Nami": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dl2vi5r-fcb63cef-c063-4121-a9dc-555d7cf3d1f4.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___nami_by_onepieceworldproject_dl2vi5r-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGwydmk1ci1mY2I2M2NlZi1jMDYzLTQxMjEtYTlkYy01NTVkN2NmM2QxZjQuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.6oL7aF1PVnfvMyi7JvYGA2sL6GgipXkMVccn1jMfEJE",
+    "Buggy": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/devnmsc-f6b96f9c-809b-4088-b3fe-f7ca5b0854d1.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___buggy_the_clown_by_onepieceworldproject_devnmsc-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGV2bm1zYy1mNmI5NmY5Yy04MDliLTQwODgtYjNmZS1mN2NhNWIwODU0ZDEuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.txVYKx4HWGjVw0b5cUTD1DRTeLWK--oxIA-7-Edrgkc",
+    "Mohji": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/djycezu-c357c46e-a900-4239-b595-6767a6a38b06.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___mohji_by_onepieceworldproject_djycezu-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGp5Y2V6dS1jMzU3YzQ2ZS1hOTAwLTQyMzktYjU5NS02NzY3YTZhMzhiMDYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.CG0SeVpUdgm6ktLJ8SbVU6X0ORmyxNPCMdo-AOp5n2c",
+    "Cabaji": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dk2ya15-d7d4ddcb-d07b-4a59-a2ca-d011cbd2247e.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___cabaji_by_onepieceworldproject_dk2ya15-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTg3NiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGsyeWExNS1kN2Q0ZGRjYi1kMDdiLTRhNTktYTJjYS1kMDExY2JkMjI0N2UuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.NhFtDJtPxtRQMMOGz11xDGd76hhe8ksxBQcECYYUYeU",
+    "Usopp": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d7ba41o-8b1cd969-f144-46ab-8470-449f7728bf30.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___usopp_by_onepieceworldproject_d7ba41o-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDdiYTQxby04YjFjZDk2OS1mMTQ0LTQ2YWItODQ3MC00NDlmNzcyOGJmMzAuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.8KMzgPlFeSVMNkgVpDBFoOe5BZQlkq_tPYEL6mhLqCQ",
+    "Kuro": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d709e68-e5c1ab51-e93e-426d-9896-7c8590928169.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___kuro_by_onepieceworldproject_d709e68-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDcwOWU2OC1lNWMxYWI1MS1lOTNlLTQyNmQtOTg5Ni03Yzg1OTA5MjgxNjkuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.1Khec5s644mEFibiTCSDN4xBcDmHEBYjh3Wgq4YOF5I",
+    "Kaya": "https://tse4.mm.bing.net/th/id/OIP.PRQjvzXURPPBaEzGRh-OwAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Jango": "https://tse4.mm.bing.net/th/id/OIP.3l1yLoMGrBT--2SsfbhYcQHaKH?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Sham": "https://i.pinimg.com/736x/9c/e1/16/9ce1166e8efaa77034e0ea486ef865ac.jpg",
+    "Buchi": "https://i.pinimg.com/736x/67/48/87/67488711dc61c0052058df430413a7c7.jpg",
+    "Sanji": "https://i.pinimg.com/236x/a6/78/37/a67837a646f4e631ebf3cd485ba93d7e.jpg?nii=t",
+    "Zeff": "https://i.pinimg.com/736x/66/24/87/662487b5ef285a4ff58fcd5a3aac0812.jpg",
+    "Don Krieg": "https://i.pinimg.com/736x/2e/1d/9e/2e1d9e064779ef3b33a2345054398052.jpg",
+    "Gin": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/ddgik88-9227ffac-2891-4526-8add-3b87de9ca0e5.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___gin_by_onepieceworldproject_ddgik88-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGRnaWs4OC05MjI3ZmZhYy0yODkxLTQ1MjYtOGFkZC0zYjg3ZGU5Y2EwZTUuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.okFrdqB9CNwCbgbL0D62GK7X0scDSLk7ab5c2mDA3TY",
+    "Pearl": "https://tse1.mm.bing.net/th/id/OIP.wRNGNsv-Gfeu8bXfEGrvlQHaL9?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Dracule Mihawk": "https://tse2.mm.bing.net/th/id/OIP.7RPNltZzYzZWpH3z7Q5bNwHaGa?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Patty": "https://th.bing.com/th/id/R.0de9cfda79850c49770ac2bc595e1326?rik=7Fdb14%2bTUMe8kA&pid=ImgRaw&r=0",
+    "Arlong": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dl3mqnw-60657e84-3598-4056-aa4f-13f64dd285a6.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGwzbXFudy02MDY1N2U4NC0zNTk4LTQwNTYtYWE0Zi0xM2Y2NGRkMjg1YTYuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.af6-EuHW5fAQ--3Zhxw4v460IeG4BMtIEs1nYMVV7CY",
+    "Nami (Arlong Park)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5m54iz-3f4b35a7-087c-458c-8ce0-a0e27cd12825.png/v1/fit/w_828,h_1264,q_70,strp/epp___arlong_park__nami_by_sergiart_d5m54iz-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVtNTRpei0zZjRiMzVhNy0wODdjLTQ1OGMtOGNlMC1hMGUyN2NkMTI4MjUucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.WQwsznJCAtSQmvw0s-WxdDFpU0ttAULJvYoCNQjGpq4",
+    "Kuroobi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d7vpjiu-b52e9e6b-435a-40f6-adf3-4c5e0025ec7a.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___kuroobi_by_onepieceworldproject_d7vpjiu-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDd2cGppdS1iNTJlOWU2Yi00MzVhLTQwZjYtYWRmMy00YzVlMDAyNWVjN2EuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.v6YWy3P2yRE7SOlTk_zTkka8bDGHvOI30_CjQoaR8bM",
+    "Chew": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dexthmu-537e923f-e38b-49d4-9c0e-a2c02943f755.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___chew_by_onepieceworldproject_dexthmu-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGV4dGhtdS01MzdlOTIzZi1lMzhiLTQ5ZDQtOWMwZS1hMmMwMjk0M2Y3NTUuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.JWp0No8O41P8Xv2-Hs_aKztJGHxvOnchXnJT0lEiytM",
+    "Hatchan": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d81rnti-61c3485c-411e-4b28-b84b-929a990bf61f.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___hatchan_by_onepieceworldproject_d81rnti-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDgxcm50aS02MWMzNDg1Yy00MTFlLTRiMjgtYjg0Yi05MjlhOTkwYmY2MWYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.UQZWji3P4dFD5gL9YAfVqHF4bERCCFbz49ij8rGdBuA",
+    "Nojiko": "https://tse3.mm.bing.net/th/id/OIP.pYD2e0eeLso2GilWkttyhwAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Smoker": "https://th.bing.com/th/id/OIP.9Fz7_lWlUEy3WfuRTw24vgAAAA?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Tashigi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dcghae5-58dd2191-277c-4385-a6a9-299867708003.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___tashigi_by_onepieceworldproject_dcghae5-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTg3NiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGNnaGFlNS01OGRkMjE5MS0yNzdjLTQzODUtYTZhOS0yOTk4Njc3MDgwMDMuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.fhe8-6F_yp-nOMEmM6450j6h207WejlYlxImgvePDp4",
+    "Dragon": "https://tse1.mm.bing.net/th/id/OIP.M3Jb8aCZ3bN1dY3TEfAVLgHaKy?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Bartolomeo (Young)": "https://tse3.mm.bing.net/th/id/OIP.fo2mmqaruPmsxCTGh5ZC9gHaKl?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Mr. 9": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dh1u5uz-045f066a-87d2-447c-9bbd-ecd0e7052cec.jpg/v1/fill/w_738,h_1082,q_70,strp/one_piece_mr_9_by_onepieceworldproject_dh1u5uz-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzVjZTk4NjQ3LTU5NzUtNGY3Zi1iZDA5LTBlZDcxOTQzM2VlMVwvZGgxdTV1ei0wNDVmMDY2YS04N2QyLTQ0N2MtOWJiZC1lY2QwZTcwNTJjZWMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.xpbLlhvpTqdiXxWABsl-IYYLpIPbJ6Yc7DhNv0TTeMo",
+    "Miss Monday": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr0bx-8ef3e495-e250-431d-89be-51e9fe573d0d.png/v1/fill/w_841,h_950/miss_monday_by_bodskih_dfcr0bx-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTU1OCIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjBieC04ZWYzZTQ5NS1lMjUwLTQzMWQtODliZS01MWU5ZmU1NzNkMGQucG5nIiwid2lkdGgiOiI8PTEzODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.wr1ylx9D41Z4Hl3mltsRt5rOAC9hUHYLMpF5IHD8tpo",
+    "Igaram": "https://i.pinimg.com/736x/a5/9c/45/a59c45141682a03317db5f5b86e0f4d6.jpg",
+    "Princess Vivi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de30ax5-1890382d-ec9a-4ccd-a333-2f126b9b82e3.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi8xY2UxMzcyYS1iNzVjLTQwNTgtYjBjOC0xYmYxYzJkNjgzN2UvZGUzMGF4NS0xODkwMzgyZC1lYzlhLTRjY2QtYTMzMy0yZjEyNmI5YjgyZTMucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.kM-1vMHaj06MJCImnlJsR38mHumRp5b_carmg2rOmdw",
+    "Dorry": "https://i.pinimg.com/736x/c5/f8/6c/c5f86c48669e647557a63153d7280c9f.jpg",
+    "Brogy": "https://i.pinimg.com/736x/39/71/b0/3971b0ec988e1072f880c37f977c9a0e.jpg",
+    "Mr. 3": "https://tse3.mm.bing.net/th/id/OIP.Z35c8hlbu-8RiIdwDUWxsAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Miss Goldenweek": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d8du5tf-ba04f220-aafa-4839-b086-5960a38d2343.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___miss_goldenweek_by_onepieceworldproject_d8du5tf-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDhkdTV0Zi1iYTA0ZjIyMC1hYWZhLTQ4MzktYjA4Ni01OTYwYTM4ZDIzNDMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.wIvBFZrfNwcLCEBS6_-LXnLJyJq6HHPaDeAohvU07wU",
+    "Mr. 5": "https://i.pinimg.com/originals/cf/0f/93/cf0f93575cee582d01ba465041592858.jpg",
+    "Tony Tony Chopper": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5j838u-522da15c-443e-47a4-b5d5-e0a926e7a99f.png/v1/fit/w_828,h_1264,q_70,strp/epp___drum__chopper_by_sergiart_d5j838u-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVqODM4dS01MjJkYTE1Yy00NDNlLTQ3YTQtYjVkNS1lMGE5MjZlN2E5OWYucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.Z-tcI2TNSJBah8Rzk8p6zS_OwcF7XEcvAu3TR91PRCE",
+    "Wapol": "https://tse4.mm.bing.net/th/id/OIP.CeVZcZjwgkHp2QowMx9YPwHaK2?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Dr. Kureha": "https://tse4.mm.bing.net/th/id/OIP.6oT8H4iufjlwxThjep64jQHaKU?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Dalton": "https://i.pinimg.com/736x/05/27/7e/05277eef7a73bdf555bc3b1cf01bb2bb.jpg",
+    "Chess": "https://tse4.mm.bing.net/th/id/OIP.BPMUGvtKZoUEom23UH6BIAHaPC?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Kuromarimo": "https://i.pinimg.com/originals/ed/f6/7e/edf67e3336b49a1f23714a861e973688.jpg",
+    "Crocodile": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6qedj9-285dac66-9b6e-418e-be50-9df6d7b01717.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___crocodile_by_onepieceworldproject_d6qedj9-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZxZWRqOS0yODVkYWM2Ni05YjZlLTQxOGUtYmU1MC05ZGY2ZDdiMDE3MTcuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.f4AaX4WiZhHd3SAehptFl5gMYXXdVa_CnfAHrZMDEI8",
+    "Nico Robin": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6u682k-954262f0-6794-41f7-a999-ecc6fa1ec553.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___nico_robin_by_onepieceworldproject_d6u682k-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZ1Njgyay05NTQyNjJmMC02Nzk0LTQxZjctYTk5OS1lY2M2ZmExZWM1NTMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.-10BlbsYn-jsLlRN_UlYrKht2bdWQKK0fwE_KzP5lAw",
+    "Mr. 1 (Daz Bones)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de2zwd9-dc59ab3e-13e9-4118-aea5-397164116e70.png/v1/fit/w_533,h_800/daz_bonez___mr1_by_hobbj_de2zwd9-375w-2x.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6Ii9mLzFjZTEzNzJhLWI3NWMtNDA1OC1iMGM4LTFiZjFjMmQ2ODM3ZS9kZTJ6d2Q5LWRjNTlhYjNlLTEzZTktNDExOC1hZWE1LTM5NzE2NDExNmU3MC5wbmciLCJ3aWR0aCI6Ijw9NTMzIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.6g7IJhEH0IjoQDX3e4_MBBPaBWrnAbHWnytKw1MKBH4",
+    "Mr. 2 (Bon Clay)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d70r0t0-d14f8217-4d93-4ff4-9200-8e92bed4c6af.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___bentham_by_onepieceworldproject_d70r0t0-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDcwcjB0MC1kMTRmODIxNy00ZDkzLTRmZjQtOTIwMC04ZTkyYmVkNGM2YWYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.iL-GeWcyaDAt07o3X2yD9Hv9NbpmMqkOB3KxABm9dUk",
+    "Miss Doublefinger": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr137-c5214b14-e402-42e8-ba9f-4ed1582d5e3c.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjEzNy1jNTIxNGIxNC1lNDAyLTQyZTgtYmE5Zi00ZWQxNTgyZDVlM2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.GKTGW_f7lqvQ6zpbcCM5Sf3HW3ouam4xmC1C-ZLiM6I"
+};
+
+// Card data for 10 One Piece arcs - 52 characters total
+const CARD_DATABASE = [
+    // Romance Dawn Arc (5 cards)
+    { id: 1, name: "Monkey D. Luffy", arc: "Romance Dawn", power: 65 },
+    { id: 2, name: "Roronoa Zoro", arc: "Romance Dawn", power: 62 },
+    { id: 3, name: "Koby", arc: "Romance Dawn", power: 15 },
+    { id: 4, name: "Alvida", arc: "Romance Dawn", power: 25 },
+    { id: 5, name: "Shanks", arc: "Romance Dawn", power: 98 },
+
+    // Orange Town Arc (4 cards)
+    { id: 6, name: "Nami", arc: "Orange Town", power: 35 },
+    { id: 7, name: "Buggy", arc: "Orange Town", power: 45 },
+    { id: 8, name: "Mohji", arc: "Orange Town", power: 18 },
+    { id: 9, name: "Cabaji", arc: "Orange Town", power: 22 },
+
+    // Syrup Village Arc (6 cards)
+    { id: 10, name: "Usopp", arc: "Syrup Village", power: 28 },
+    { id: 11, name: "Kuro", arc: "Syrup Village", power: 48 },
+    { id: 12, name: "Kaya", arc: "Syrup Village", power: 5 },
+    { id: 13, name: "Jango", arc: "Syrup Village", power: 30 },
+    { id: 14, name: "Sham", arc: "Syrup Village", power: 20 },
+    { id: 15, name: "Buchi", arc: "Syrup Village", power: 20 },
+
+    // Baratie Arc (7 cards)
+    { id: 16, name: "Sanji", arc: "Baratie", power: 60 },
+    { id: 17, name: "Zeff", arc: "Baratie", power: 55 },
+    { id: 18, name: "Don Krieg", arc: "Baratie", power: 52 },
+    { id: 19, name: "Gin", arc: "Baratie", power: 42 },
+    { id: 20, name: "Pearl", arc: "Baratie", power: 35 },
+    { id: 21, name: "Dracule Mihawk", arc: "Baratie", power: 100 },
+    { id: 22, name: "Patty", arc: "Baratie", power: 25 },
+
+    // Arlong Park Arc (6 cards)
+    { id: 23, name: "Arlong", arc: "Arlong Park", power: 68 },
+    { id: 24, name: "Nami (Arlong Park)", arc: "Arlong Park", power: 38 },
+    { id: 25, name: "Kuroobi", arc: "Arlong Park", power: 40 },
+    { id: 26, name: "Chew", arc: "Arlong Park", power: 38 },
+    { id: 27, name: "Hatchan", arc: "Arlong Park", power: 36 },
+    { id: 28, name: "Nojiko", arc: "Arlong Park", power: 12 },
+
+    // Loguetown Arc (4 cards)
+    { id: 29, name: "Smoker", arc: "Loguetown", power: 72 },
+    { id: 30, name: "Tashigi", arc: "Loguetown", power: 40 },
+    { id: 31, name: "Dragon", arc: "Loguetown", power: 95 },
+    { id: 32, name: "Bartolomeo (Young)", arc: "Loguetown", power: 20 },
+
+    // Whiskey Peak Arc (4 cards)
+    { id: 33, name: "Mr. 9", arc: "Whiskey Peak", power: 30 },
+    { id: 34, name: "Miss Monday", arc: "Whiskey Peak", power: 32 },
+    { id: 35, name: "Igaram", arc: "Whiskey Peak", power: 35 },
+    { id: 36, name: "Princess Vivi", arc: "Whiskey Peak", power: 28 },
+
+    // Little Garden Arc (5 cards)
+    { id: 37, name: "Dorry", arc: "Little Garden", power: 70 },
+    { id: 38, name: "Brogy", arc: "Little Garden", power: 70 },
+    { id: 39, name: "Mr. 3", arc: "Little Garden", power: 44 },
+    { id: 40, name: "Miss Goldenweek", arc: "Little Garden", power: 26 },
+    { id: 41, name: "Mr. 5", arc: "Little Garden", power: 42 },
+
+    // Drum Island Arc (6 cards)
+    { id: 42, name: "Tony Tony Chopper", arc: "Drum Island", power: 50 },
+    { id: 43, name: "Wapol", arc: "Drum Island", power: 46 },
+    { id: 44, name: "Dr. Kureha", arc: "Drum Island", power: 40 },
+    { id: 45, name: "Dalton", arc: "Drum Island", power: 48 },
+    { id: 46, name: "Chess", arc: "Drum Island", power: 32 },
+    { id: 47, name: "Kuromarimo", arc: "Drum Island", power: 30 },
+
+    // Alabasta Arc (5 cards)
+    { id: 48, name: "Crocodile", arc: "Alabasta", power: 85 },
+    { id: 49, name: "Nico Robin", arc: "Alabasta", power: 58 },
+    { id: 50, name: "Mr. 1 (Daz Bones)", arc: "Alabasta", power: 65 },
+    { id: 51, name: "Mr. 2 (Bon Clay)", arc: "Alabasta", power: 56 },
+    { id: 52, name: "Miss Doublefinger", arc: "Alabasta", power: 50 }
+];
+
+// Get all unique arcs
+const ARCS = [...new Set(CARD_DATABASE.map(card => card.arc))];
+
+// P2P Connection Manager
+class P2PManager {
+    constructor() {
+        this.peer = null;
+        this.connection = null;
+        this.isHost = false;
+        this.onMessage = null;
+        this.onConnectionEstablished = null;
+        this.onConnectionClosed = null;
+    }
+
+    initialize(userId) {
+        return new Promise((resolve, reject) => {
+            this.peer = new Peer(userId, {
+                debug: 0,
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:global.stun.twilio.com:3478' }
+                    ]
+                }
+            });
+
+            this.peer.on('open', (id) => {
+                console.log('Peer initialized with ID:', id);
+                resolve(id);
+            });
+
+            this.peer.on('error', (err) => {
+                console.error('Peer error:', err);
+                reject(err);
+            });
+
+            // Listen for incoming connections (when someone joins your lobby)
+            this.peer.on('connection', (conn) => {
+                console.log('Incoming connection from:', conn.peer);
+                this.connection = conn;
+                this.setupConnection();
+            });
+        });
+    }
+
+    connectToPeer(peerId) {
+        return new Promise((resolve, reject) => {
+            console.log('Connecting to peer:', peerId);
+            this.connection = this.peer.connect(peerId, {
+                reliable: true
+            });
+
+            this.connection.on('open', () => {
+                console.log('Connection opened');
+                this.setupConnection();
+                resolve();
+            });
+
+            this.connection.on('error', (err) => {
+                console.error('Connection error:', err);
+                reject(err);
+            });
+        });
+    }
+
+    setupConnection() {
+        this.connection.on('data', (data) => {
+            console.log('Received data:', data);
+            if (this.onMessage) {
+                this.onMessage(data);
+            }
+        });
+
+        this.connection.on('close', () => {
+            console.log('Connection closed');
+            if (this.onConnectionClosed) {
+                this.onConnectionClosed();
+            }
+        });
+
+        if (this.onConnectionEstablished) {
+            this.onConnectionEstablished();
+        }
+    }
+
+    send(data) {
+        if (this.connection && this.connection.open) {
+            console.log('Sending data:', data);
+            this.connection.send(data);
+            return true;
+        }
+        console.error('Cannot send - connection not open');
+        return false;
+    }
+
+    disconnect() {
+        if (this.connection) {
+            this.connection.close();
+        }
+        if (this.peer) {
+            this.peer.destroy();
+        }
+        this.connection = null;
+        this.peer = null;
+    }
+}
+
+// Game state management
+class GameState {
+    constructor() {
+        this.currentUser = null;
+        this.currentLobby = null;
+        this.currentGame = null;
+        this.isHost = false;
+        this.p2p = new P2PManager();
+        this.opponentData = null;
+    }
+
+    // User management
+    createUser(username, password = null, isGuest = false) {
+        const userId = this.generateId();
+        const user = {
+            id: userId,
+            username: username,
+            password: password,
+            isGuest: isGuest,
+            wins: 0,
+            losses: 0,
+            collection: new Set(),
+            createdAt: Date.now()
+        };
+        
+        // Load from localStorage if not guest
+        if (!isGuest && password) {
+            const saved = this.loadUser(username, password);
+            if (saved) {
+                return saved;
+            }
+        }
+        
+        // Give starting cards (random 10 cards)
+        this.giveStartingCards(user);
+        
+        if (!isGuest) {
+            this.saveUser(user);
+        }
+        
+        return user;
+    }
+
+    giveStartingCards(user) {
+        const shuffled = [...CARD_DATABASE].sort(() => Math.random() - 0.5);
+        for (let i = 0; i < 10; i++) {
+            user.collection.add(shuffled[i].id);
+        }
+    }
+
+    saveUser(user) {
+        const users = JSON.parse(localStorage.getItem('onePieceUsers') || '{}');
+        users[user.username] = {
+            password: user.password,
+            wins: user.wins,
+            losses: user.losses,
+            collection: Array.from(user.collection),
+            createdAt: user.createdAt
+        };
+        localStorage.setItem('onePieceUsers', JSON.stringify(users));
+    }
+
+    loadUser(username, password) {
+        const users = JSON.parse(localStorage.getItem('onePieceUsers') || '{}');
+        if (users[username] && users[username].password === password) {
+            return {
+                id: this.generateId(),
+                username: username,
+                password: password,
+                isGuest: false,
+                wins: users[username].wins || 0,
+                losses: users[username].losses || 0,
+                collection: new Set(users[username].collection || []),
+                createdAt: users[username].createdAt
+            };
+        }
+        return null;
+    }
+
+    // P2P Lobby management
+    async createLobby(hostUser) {
+        this.isHost = true;
+        const peerId = await this.p2p.initialize(this.generateLobbyCode());
+        
+        this.currentLobby = {
+            code: peerId,
+            host: hostUser,
+            guest: null,
+            createdAt: Date.now()
+        };
+        
+        return peerId;
+    }
+
+    async joinLobby(code, guestUser) {
+        this.isHost = false;
+        await this.p2p.initialize(this.generateId());
+        await this.p2p.connectToPeer(code);
+        
+        this.currentLobby = {
+            code: code,
+            host: null,
+            guest: guestUser,
+            createdAt: Date.now()
+        };
+        
+        // Send join message with user data
+        this.p2p.send({
+            type: 'join',
+            username: guestUser.username,
+            collection: Array.from(guestUser.collection)
+        });
+        
+        return true;
+    }
+
+    // Game management with P2P sync
+    startGame(hostDeck, guestDeck) {
+        const hostUser = this.isHost ? this.currentUser : this.opponentData;
+        const guestUser = this.isHost ? this.opponentData : this.currentUser;
+        
+        this.currentGame = {
+            player1: {
+                user: hostUser,
+                deck: hostDeck,
+                score: 0,
+                cardsWon: []
+            },
+            player2: {
+                user: guestUser,
+                deck: guestDeck,
+                score: 0,
+                cardsWon: []
+            },
+            round: 1,
+            maxRounds: 5,
+            player1Played: false,
+            player2Played: false,
+            player1Card: null,
+            player2Card: null
+        };
+        
+        return this.currentGame;
+    }
+
+    createDeck(user, count) {
+        const deck = [];
+        const userCards = Array.from(user.collection);
+        
+        // Fill with random cards if needed
+        while (userCards.length < count) {
+            const randomCard = CARD_DATABASE[Math.floor(Math.random() * CARD_DATABASE.length)];
+            if (!userCards.includes(randomCard.id)) {
+                userCards.push(randomCard.id);
+            }
+        }
+        
+        // Shuffle and take 'count' cards
+        const shuffled = userCards.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < count; i++) {
+            const cardData = CARD_DATABASE.find(c => c.id === shuffled[i]);
+            if (cardData) {
+                deck.push({...cardData});
+            }
+        }
+        
+        return deck;
+    }
+
+    playCard() {
+        const game = this.currentGame;
+        const isPlayer1 = this.isHost;
+        
+        let card;
+        if (isPlayer1) {
+            card = game.player1.deck.shift();
+            game.player1Card = card;
+            game.player1Played = true;
+        } else {
+            card = game.player2.deck.shift();
+            game.player2Card = card;
+            game.player2Played = true;
+        }
+        
+        // Send card to opponent
+        this.p2p.send({
+            type: 'cardPlayed',
+            card: card,
+            isPlayer1: isPlayer1
+        });
+        
+        return {
+            card: card,
+            isPlayer1: isPlayer1
+        };
+    }
+
+    checkBothPlayed() {
+        return this.currentGame.player1Played && this.currentGame.player2Played;
+    }
+
+    resolveRound() {
+        const game = this.currentGame;
+        const card1 = game.player1Card;
+        const card2 = game.player2Card;
+        
+        let winner = null;
+        if (card1.power > card2.power) {
+            winner = 1;
+            game.player1.score++;
+            if (!game.player1.user.collection.has(card2.id)) {
+                game.player1.cardsWon.push(card2);
+            }
+        } else if (card2.power > card1.power) {
+            winner = 2;
+            game.player2.score++;
+            if (!game.player2.user.collection.has(card1.id)) {
+                game.player2.cardsWon.push(card1);
+            }
+        }
+        
+        // Reset for next round
+        game.player1Played = false;
+        game.player2Played = false;
+        game.round++;
+        
+        return {
+            card1,
+            card2,
+            winner,
+            player1Score: game.player1.score,
+            player2Score: game.player2.score
+        };
+    }
+
+    checkGameOver() {
+        const game = this.currentGame;
+        if (game.round > game.maxRounds) {
+            if (game.player1.score > game.player2.score) {
+                return { winner: 1, loser: 2 };
+            } else if (game.player2.score > game.player1.score) {
+                return { winner: 2, loser: 1 };
+            } else {
+                return { winner: 0, loser: 0 }; // Tie
+            }
+        }
+        return null;
+    }
+
+    concede() {
+        const isPlayer1 = this.isHost;
+        const result = { winner: isPlayer1 ? 2 : 1, loser: isPlayer1 ? 1 : 2, conceded: true };
+        
+        // Notify opponent
+        this.p2p.send({
+            type: 'concede'
+        });
+        
+        return result;
+    }
+
+    endGame(result) {
+        const game = this.currentGame;
+        
+        // Update stats
+        if (result.winner === 1) {
+            game.player1.user.wins++;
+            game.player2.user.losses++;
+            game.player1.cardsWon.forEach(card => {
+                game.player1.user.collection.add(card.id);
+            });
+        } else if (result.winner === 2) {
+            game.player2.user.wins++;
+            game.player1.user.losses++;
+            game.player2.cardsWon.forEach(card => {
+                game.player2.user.collection.add(card.id);
+            });
+        }
+        
+        // Save current user (can't save opponent)
+        if (!this.currentUser.isGuest) {
+            this.saveUser(this.currentUser);
+        }
+        
+        return {
+            winner: result.winner === 1 ? game.player1.user : (result.winner === 2 ? game.player2.user : null),
+            loser: result.winner === 1 ? game.player2.user : (result.winner === 2 ? game.player1.user : null),
+            cardsWon: result.winner === 1 ? game.player1.cardsWon : (result.winner === 2 ? game.player2.cardsWon : []),
+            conceded: result.conceded || false,
+            tie: result.winner === 0
+        };
+    }
+
+    // Utility functions
+    generateId() {
+        return 'p' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    }
+
+    generateLobbyCode() {
+        return 'game' + Date.now().toString(36) + Math.random().toString(36).substr(2, 3);
+    }
+
+    cleanup() {
+        this.p2p.disconnect();
+        this.currentLobby = null;
+        this.currentGame = null;
+        this.opponentData = null;
+    }
+}
+
+// Initialize game state
+const gameState = new GameState();
+
+// Music Manager
+class MusicManager {
+    constructor() {
+        this.audio = null;
+        this.currentVolume = 1.0;
+        this.isPlaying = false;
+    }
+    
+    initialize() {
+        this.audio = document.getElementById('battle-music');
+        this.audio.volume = this.currentVolume;
+    }
+    
+    setVolume(volume) {
+        this.currentVolume = volume;
+        if (this.audio) this.audio.volume = volume;
+    }
+    
+    play() {
+        if (this.audio && !this.isPlaying) {
+            this.audio.play().catch(err => console.log('Audio play failed:', err));
+            this.isPlaying = true;
+            document.getElementById('music-control').classList.add('active');
+        }
+    }
+    
+    stop() {
+        if (this.audio && this.isPlaying) {
+            this.audio.pause();
+            this.audio.currentTime = 0;
+            this.isPlaying = false;
+            document.getElementById('music-control').classList.remove('active');
+        }
+    }
+}
+
+const musicManager = new MusicManager();
+
+// Main application logic
+document.addEventListener('DOMContentLoaded', () => {
+    // Screen elements
+    const loginScreen = document.getElementById('login-screen');
+    const lobbyScreen = document.getElementById('lobby-screen');
+    const collectionScreen = document.getElementById('collection-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+
+    // Login screen elements
+    const guestBtn = document.getElementById('guest-btn');
+    const claimProfileBtn = document.getElementById('claim-profile-btn');
+    const loginBtn = document.getElementById('login-btn');
+    const profileForm = document.getElementById('profile-form');
+    const usernameInput = document.getElementById('username-input');
+    const passwordInput = document.getElementById('password-input');
+    const submitProfileBtn = document.getElementById('submit-profile-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    // Lobby screen elements
+    const playerNameSpan = document.getElementById('player-name');
+    const winsSpan = document.getElementById('wins');
+    const lossesSpan = document.getElementById('losses');
+    const cardsCollectedSpan = document.getElementById('cards-collected');
+    const logoutBtn = document.getElementById('logout-btn');
+    const hostGameBtn = document.getElementById('host-game-btn');
+    const lobbyCodeDisplay = document.getElementById('lobby-code-display');
+    const lobbyCodeSpan = document.getElementById('lobby-code');
+    const connectionStatus = document.getElementById('connection-status');
+    const joinCodeInput = document.getElementById('join-code-input');
+    const joinGameBtn = document.getElementById('join-game-btn');
+    const joinStatus = document.getElementById('join-status');
+    const viewCollectionBtn = document.getElementById('view-collection-btn');
+
+    // Collection screen elements
+    const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
+    const arcFilter = document.getElementById('arc-filter');
+    const collectionGrid = document.getElementById('collection-grid');
+
+    // Game screen elements
+    const player1NameSpan = document.getElementById('player1-name');
+    const player2NameSpan = document.getElementById('player2-name');
+    const player1CardsSpan = document.getElementById('player1-cards');
+    const player2CardsSpan = document.getElementById('player2-cards');
+    const player1ScoreSpan = document.getElementById('player1-score');
+    const player2ScoreSpan = document.getElementById('player2-score');
+    const roundNumberSpan = document.getElementById('round-number');
+    const player1CardSlot = document.getElementById('player1-card-slot');
+    const player2CardSlot = document.getElementById('player2-card-slot');
+    const playCardBtn = document.getElementById('play-card-btn');
+    const concedeBtn = document.getElementById('concede-btn');
+    const waitingMessage = document.getElementById('waiting-message');
+    const resultDisplay = document.getElementById('result-display');
+    const resultText = document.getElementById('result-text');
+    const continueBtn = document.getElementById('continue-btn');
+
+    // Game over screen elements
+    const gameoverResult = document.getElementById('gameover-result');
+    const gameoverStats = document.getElementById('gameover-stats');
+    const cardsWonDisplay = document.getElementById('cards-won-display');
+    const cardsWonGrid = document.getElementById('cards-won-grid');
+    const returnLobbyBtn = document.getElementById('return-lobby-btn');
+
+    let currentFormMode = null;
+    let hasPlayedThisRound = false;
+    let openLobbiesInterval = null;
+
+    // Initialize music
+    musicManager.initialize();
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Light';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        
+        themeIcon.textContent = isDark ? '☀️' : '🌙';
+        themeText.textContent = isDark ? 'Light' : 'Dark';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // Music control handlers
+    document.getElementById('volume-full').addEventListener('click', () => {
+        musicManager.setVolume(1.0);
+        document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('volume-full').classList.add('active');
+    });
+
+    document.getElementById('volume-half').addEventListener('click', () => {
+        musicManager.setVolume(0.2);
+        document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('volume-half').classList.add('active');
+    });
+
+    document.getElementById('volume-mute').addEventListener('click', () => {
+        musicManager.setVolume(0);
+        document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('volume-mute').classList.add('active');
+    });
+    
+    function broadcastLobby(code, hostName) {
+        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
+        lobbies[code] = { 
+            hostName: hostName, 
+            timestamp: Date.now(),
+            full: false 
+        };
+        localStorage.setItem('openLobbies', JSON.stringify(lobbies));
+    }
+
+    function removeLobbyBroadcast(code) {
+        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
+        delete lobbies[code];
+        localStorage.setItem('openLobbies', JSON.stringify(lobbies));
+    }
+
+    function markLobbyFull(code) {
+        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
+        if (lobbies[code]) {
+            lobbies[code].full = true;
+            lobbies[code].timestamp = Date.now() - 100000; // Mark as old so it gets cleaned up soon
+            localStorage.setItem('openLobbies', JSON.stringify(lobbies));
+        }
+    }
+
+    function updateOpenLobbies() {
+        const lobbiesLoading = document.getElementById('lobbies-loading');
+        lobbiesLoading.classList.remove('hidden');
+        
+        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
+        const now = Date.now();
+        const openLobbiesList = document.getElementById('open-lobbies-list');
+        
+        // Clean up old lobbies (older than 2 minutes)
+        Object.keys(lobbies).forEach(code => {
+            if (now - lobbies[code].timestamp > 120000) {
+                delete lobbies[code];
+            }
+        });
+        localStorage.setItem('openLobbies', JSON.stringify(lobbies));
+        
+        // Filter out: old lobbies, current user's lobby, and lobbies currently being joined
+        const availableLobbies = Object.keys(lobbies).filter(code => {
+            const lobby = lobbies[code];
+            if (now - lobby.timestamp > 120000) return false;
+            if (lobby.hostName === gameState.currentUser?.username) return false;
+            if (lobby.full) return false;
+            return true;
+        });
+        
+        setTimeout(() => {
+            lobbiesLoading.classList.add('hidden');
+            if (availableLobbies.length === 0) {
+                openLobbiesList.innerHTML = '<p style="color: #999; font-style: italic;">No open lobbies</p>';
+            } else {
+                openLobbiesList.innerHTML = availableLobbies.map(code => `
+                    <div class="lobby-item">
+                        <span class="lobby-host">${lobbies[code].hostName}</span>
+                        <button class="btn btn-small btn-primary" onclick="document.getElementById('join-code-input').value='${code}';document.getElementById('join-game-btn').click()">Join</button>
+                    </div>
+                `).join('');
+            }
+        }, 500);
+    }
+
+    // Setup P2P message handlers
+    gameState.p2p.onMessage = (data) => {
+        console.log('Message received:', data);
+        
+        switch(data.type) {
+            case 'join':
+                // Guest has joined
+                gameState.opponentData = {
+                    username: data.username,
+                    collection: new Set(data.collection)
+                };
+                connectionStatus.textContent = `${data.username} joined! Starting game...`;
+                connectionStatus.className = 'connection-status connected';
+                
+                // Mark lobby as full immediately
+                if (gameState.currentLobby?.code) {
+                    markLobbyFull(gameState.currentLobby.code);
+                }
+                
+                // Host creates decks and starts game
+                setTimeout(() => {
+                    const hostDeck = gameState.createDeck(gameState.currentUser, 5);
+                    const guestDeck = gameState.createDeck(gameState.opponentData, 5);
+                    
+                    // Send game start to guest
+                    gameState.p2p.send({
+                        type: 'gameStart',
+                        hostDeck: hostDeck,
+                        guestDeck: guestDeck,
+                        hostUsername: gameState.currentUser.username
+                    });
+                    
+                    gameState.startGame(hostDeck, guestDeck);
+                    startGameSession();
+                }, 1000);
+                break;
+                
+            case 'gameStart':
+                // Guest receives game start
+                gameState.opponentData = {
+                    username: data.hostUsername,
+                    collection: new Set()
+                };
+                gameState.startGame(data.hostDeck, data.guestDeck);
+                startGameSession();
+                break;
+                
+            case 'cardPlayed':
+                // Opponent played a card
+                if (data.isPlayer1) {
+                    gameState.currentGame.player1Card = data.card;
+                    gameState.currentGame.player1Played = true;
+                } else {
+                    gameState.currentGame.player2Card = data.card;
+                    gameState.currentGame.player2Played = true;
+                }
+                
+                // Check if both played
+                if (gameState.checkBothPlayed()) {
+                    waitingMessage.classList.add('hidden');
+                    showBothCards();
+                }
+                break;
+                
+            case 'concede':
+                // Opponent conceded
+                const result = { winner: gameState.isHost ? 1 : 2, loser: gameState.isHost ? 2 : 1, conceded: true };
+                endGameSession(result);
+                break;
+        }
+    };
+
+    gameState.p2p.onConnectionClosed = () => {
+        alert('Connection to opponent lost!');
+        showLobby();
+    };
+
+    // Login screen handlers
+    guestBtn.addEventListener('click', () => {
+        const guestName = `Guest${Math.floor(Math.random() * 10000)}`;
+        gameState.currentUser = gameState.createUser(guestName, null, true);
+        showLobby();
+    });
+
+    claimProfileBtn.addEventListener('click', () => {
+        currentFormMode = 'claim';
+        profileForm.classList.remove('hidden');
+        usernameInput.value = '';
+        passwordInput.value = '';
+        passwordInput.placeholder = 'Enter password';
+    });
+
+    loginBtn.addEventListener('click', () => {
+        currentFormMode = 'login';
+        profileForm.classList.remove('hidden');
+        usernameInput.value = '';
+        passwordInput.value = '';
+        passwordInput.placeholder = 'Enter password';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        profileForm.classList.add('hidden');
+        currentFormMode = null;
+    });
+
+    submitProfileBtn.addEventListener('click', () => {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!username) {
+            alert('Please enter a username');
+            return;
+        }
+
+        if (currentFormMode === 'claim') {
+            if (!password) {
+                alert('Please enter a password');
+                return;
+            }
+            const users = JSON.parse(localStorage.getItem('onePieceUsers') || '{}');
+            if (users[username]) {
+                alert('Username already exists. Please choose another or login.');
+                return;
+            }
+            gameState.currentUser = gameState.createUser(username, password, false);
+            showLobby();
+        } else if (currentFormMode === 'login') {
+            const user = gameState.loadUser(username, password);
+            if (user) {
+                gameState.currentUser = user;
+                showLobby();
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+    });
+
+    // Lobby screen handlers
+    logoutBtn.addEventListener('click', () => {
+        gameState.cleanup();
+        gameState.currentUser = null;
+        showScreen(loginScreen);
+    });
+
+    document.getElementById('claim-profile-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        const username = prompt('Enter username:');
+        if (!username) return;
+        const password = prompt('Enter password:');
+        if (!password) return;
+        
+        const users = JSON.parse(localStorage.getItem('onePieceUsers') || '{}');
+        if (users[username]) { alert('Username exists!'); return; }
+    
+        gameState.currentUser.username = username;
+        gameState.currentUser.password = password;
+        gameState.currentUser.isGuest = false;
+        gameState.saveUser(gameState.currentUser);
+        alert('Profile claimed!');
+        showLobby();
+    })
+
+    hostGameBtn.addEventListener('click', async () => {
+        hostGameBtn.disabled = true;
+        lobbyCodeDisplay.classList.remove('hidden');
+        connectionStatus.textContent = 'Initializing connection...';
+        connectionStatus.className = 'connection-status loading';
+        
+        try {
+            const code = await gameState.createLobby(gameState.currentUser);
+            lobbyCodeSpan.textContent = code;
+            broadcastLobby(code, gameState.currentUser.username);
+            connectionStatus.textContent = 'Waiting for opponent to join...';
+            connectionStatus.className = 'connection-status';
+        } catch (err) {
+            connectionStatus.textContent = 'Error creating lobby: ' + err.message;
+            connectionStatus.className = 'connection-status error';
+            hostGameBtn.disabled = false;
+        }
+    });
+
+    joinGameBtn.addEventListener('click', async () => {
+        const code = joinCodeInput.value.trim();
+        if (!code) {
+            alert('Please enter a lobby code');
+            return;
+        }
+
+        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
+        if (lobbies[code] && lobbies[code].full) {
+            alert('This lobby is already full or in progress!');
+            return;
+        }
+
+        joinGameBtn.disabled = true;
+        joinStatus.classList.remove('hidden');
+        joinStatus.textContent = 'Connecting...';
+        joinStatus.className = 'connection-status loading';
+
+        try {
+            await gameState.joinLobby(code, gameState.currentUser);
+            markLobbyFull(code);
+            joinStatus.textContent = 'Connected! Waiting for host...';
+            joinStatus.className = 'connection-status connected';
+        } catch (err) {
+            joinStatus.textContent = 'Failed to connect: ' + err.message;
+            joinStatus.className = 'connection-status error';
+            joinGameBtn.disabled = false;
+        }
+    });
+
+    viewCollectionBtn.addEventListener('click', () => {
+        showCollection();
+    });
+
+    backToLobbyBtn.addEventListener('click', () => {
+        showLobby();
+    });
+
+    arcFilter.addEventListener('change', () => {
+        renderCollection();
+    });
+
+    // Game screen handlers
+    playCardBtn.addEventListener('click', () => {
+        if (hasPlayedThisRound) return;
+        
+        hasPlayedThisRound = true;
+        playCardBtn.disabled = true;
+        waitingMessage.classList.remove('hidden');
+        
+        const result = gameState.playCard();
+        displayCard(result.card, result.isPlayer1);
+        
+        // Check if opponent already played
+        if (gameState.checkBothPlayed()) {
+            waitingMessage.classList.add('hidden');
+            showBothCards();
+        }
+    });
+
+    concedeBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to concede? This will count as a loss.')) {
+            const result = gameState.concede();
+            endGameSession(result);
+        }
+    });
+
+    continueBtn.addEventListener('click', () => {
+        resultDisplay.classList.add('hidden');
+        const gameOver = gameState.checkGameOver();
+        if (gameOver) {
+            endGameSession(gameOver);
+        } else {
+            // Reset for next round
+            hasPlayedThisRound = false;
+            playCardBtn.disabled = false;
+            player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+            player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+        }
+    });
+
+    returnLobbyBtn.addEventListener('click', () => {
+        gameState.cleanup();
+        showLobby();
+    });
+
+    function showBothCards() {
+        const img1 = CHARACTER_IMAGES[gameState.currentGame.player1Card.name] || '❓';
+        const img2 = CHARACTER_IMAGES[gameState.currentGame.player2Card.name] || '❓';
+        
+        const result = gameState.resolveRound();
+        
+        const p1Class = gameState.isHost ? 'my-card' : 'opponent-card';
+        const p2Class = !gameState.isHost ? 'my-card' : 'opponent-card';
+        
+        // Check if it's a URL or emoji
+        const img1HTML = img1.startsWith('http') ? `<img src="${img1}" alt="${result.card1.name}">` : img1;
+        const img2HTML = img2.startsWith('http') ? `<img src="${img2}" alt="${result.card2.name}">` : img2;
+        
+        player1CardSlot.innerHTML = `
+            <div class="card ${p1Class} ${result.winner === 1 ? 'winner' : ''}">
+                <div class="card-header">
+                    <div class="card-name">${result.card1.name}</div>
+                    <div class="card-arc">${result.card1.arc}</div>
+                </div>
+                <div class="card-image">${img1HTML}</div>
+                <div class="card-power">${result.card1.power}</div>
+            </div>
+        `;
+        
+        player2CardSlot.innerHTML = `
+            <div class="card ${p2Class} ${result.winner === 2 ? 'winner' : ''}">
+                <div class="card-header">
+                    <div class="card-name">${result.card2.name}</div>
+                    <div class="card-arc">${result.card2.arc}</div>
+                </div>
+                <div class="card-image">${img2HTML}</div>
+                <div class="card-power">${result.card2.power}</div>
+            </div>
+        `;
+        
+        // Update scores and cards remaining
+        player1ScoreSpan.textContent = result.player1Score;
+        player2ScoreSpan.textContent = result.player2Score;
+        player1CardsSpan.textContent = gameState.currentGame.player1.deck.length;
+        player2CardsSpan.textContent = gameState.currentGame.player2.deck.length;
+        roundNumberSpan.textContent = gameState.currentGame.round;
+        
+        // Show result
+        setTimeout(() => {
+            if (result.winner === 1) {
+                resultText.textContent = `${gameState.currentGame.player1.user.username} wins with ${result.card1.name} (${result.card1.power})!`;
+            } else if (result.winner === 2) {
+                resultText.textContent = `${gameState.currentGame.player2.user.username} wins with ${result.card2.name} (${result.card2.power})!`;
+            } else {
+                resultText.textContent = `It's a tie! Both played ${result.card1.power} power cards!`;
+            }
+            resultDisplay.classList.remove('hidden');
+        }, 1500);
+    }
+
+    function displayCard(card, isPlayer1) {
+        const img = CHARACTER_IMAGES[card.name] || '❓';
+        const isMyCard = (isPlayer1 && gameState.isHost) || (!isPlayer1 && !gameState.isHost);
+        
+        // Check if it's a URL or emoji
+        const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+        
+        const cardHTML = `
+            <div class="card ${isMyCard ? 'my-card' : 'opponent-card'}">
+                <div class="card-header">
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-arc">${card.arc}</div>
+                </div>
+                <div class="card-image">${imgHTML}</div>
+                <div class="card-power">${card.power}</div>
+            </div>
+        `;
+        
+        if (isPlayer1) {
+            player1CardSlot.innerHTML = cardHTML;
+        } else {
+            player2CardSlot.innerHTML = cardHTML;
+        }
+    }
+
+    function showScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
+
+    function showLobby() {
+        const user = gameState.currentUser;
+        playerNameSpan.textContent = user.username;
+        winsSpan.textContent = user.wins;
+        lossesSpan.textContent = user.losses;
+        cardsCollectedSpan.textContent = user.collection.size;
+        
+        lobbyCodeDisplay.classList.add('hidden');
+        joinStatus.classList.add('hidden');
+        hostGameBtn.disabled = false;
+        joinGameBtn.disabled = false;
+        joinCodeInput.value = '';
+        
+        const claimLink = document.getElementById('claim-profile-link');
+        if (gameState.currentUser.isGuest) {
+            claimLink.classList.remove('hidden');
+        } else {
+            claimLink.classList.add('hidden');
+        }
+
+        if (openLobbiesInterval) clearInterval(openLobbiesInterval);
+        updateOpenLobbies();
+        openLobbiesInterval = setInterval(updateOpenLobbies, 3000);
+
+        showScreen(lobbyScreen);
+    }
+
+    function showCollection() {
+        arcFilter.innerHTML = '<option value="all">All Arcs</option>';
+        ARCS.forEach(arc => {
+            const option = document.createElement('option');
+            option.value = arc;
+            option.textContent = arc;
+            arcFilter.appendChild(option);
+        });
+        
+        renderCollection();
+        showScreen(collectionScreen);
+    }
+
+    function renderCollection() {
+        const selectedArc = arcFilter.value;
+        const userCollection = gameState.currentUser.collection;
+        
+        let cards = CARD_DATABASE;
+        if (selectedArc !== 'all') {
+            cards = cards.filter(card => card.arc === selectedArc);
+        }
+        
+        collectionGrid.innerHTML = '';
+        
+        cards.forEach(card => {
+            const cardDiv = document.createElement('div');
+            cardDiv.style = `border: 1px solid;padding: 3px;margin: 3px;`;
+            cardDiv.className = 'collection-card';
+            if (!userCollection.has(card.id)) {
+                cardDiv.classList.add('locked');
+                cardDiv.style = `border: 1px solid;
+                                padding: 3px;margin: 3px;
+                                background: rgba(128, 128, 128, 0.6);
+                                filter: grayscale(100%);`;
+            }
+            
+            const img = CHARACTER_IMAGES[card.name] || '❓';
+            const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+
+            cardDiv.innerHTML = `
+                <div class="card-header">
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-arc">${card.arc}</div>
+                </div>
+                <div class="card-image">${imgHTML}</div>
+                <div class="card-power">${userCollection.has(card.id) ? card.power : '?'}</div>
+            `;
+            
+            collectionGrid.appendChild(cardDiv);
+        });
+    }
+
+    function startGameSession() {
+        if (gameState.currentLobby?.code && gameState.isHost) {
+            removeLobbyBroadcast(gameState.currentLobby.code);
+        }
+        if (openLobbiesInterval) clearInterval(openLobbiesInterval);
+        
+        hasPlayedThisRound = false;
+        
+        // Start battle music
+        musicManager.play();
+        
+        // Mark which player is "you"
+        if (gameState.isHost) {
+            document.getElementById('player1-info').classList.add('my-player');
+            document.getElementById('player2-info').classList.add('opponent-player');
+        } else {
+            document.getElementById('player1-info').classList.add('opponent-player');
+            document.getElementById('player2-info').classList.add('my-player');
+        }
+        
+        player1NameSpan.textContent = gameState.currentGame.player1.user.username;
+        player2NameSpan.textContent = gameState.currentGame.player2.user.username;
+        player1CardsSpan.textContent = 5;
+        player2CardsSpan.textContent = 5;
+        player1ScoreSpan.textContent = 0;
+        player2ScoreSpan.textContent = 0;
+        roundNumberSpan.textContent = 1;
+        
+        player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+        player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+        waitingMessage.classList.add('hidden');
+        playCardBtn.disabled = false;
+        
+        showScreen(gameScreen);
+    }
+
+    function endGameSession(gameOver) {
+        // Stop battle music
+        musicManager.stop();
+
+        const result = gameState.endGame(gameOver);
+        
+        if (result.tie) {
+            gameoverResult.textContent = "🤝 It's a Tie! 🤝";
+            gameoverStats.innerHTML = `
+                <p>Both players scored equally!</p>
+                <p>Final Score: ${gameState.currentGame.player1.score} - ${gameState.currentGame.player2.score}</p>
+            `;
+        } else if (result.conceded) {
+            gameoverResult.textContent = result.winner.username === gameState.currentUser.username ? 
+                '🎉 Victory by Concession! 🎉' : '💔 You Conceded 💔';
+            gameoverStats.innerHTML = `
+                <p>${result.winner.username} wins!</p>
+                <p>Total Wins: ${result.winner.wins} | Total Losses: ${result.winner.losses}</p>
+            `;
+        } else {
+            gameoverResult.textContent = result.winner.username === gameState.currentUser.username ? 
+                '🎉 Victory! 🎉' : '💔 Defeat 💔';
+            
+            gameoverStats.innerHTML = `
+                <p>${result.winner.username} wins!</p>
+                <p>Final Score: ${gameState.currentGame.player1.score} - ${gameState.currentGame.player2.score}</p>
+                <p>Total Wins: ${result.winner.wins} | Total Losses: ${result.winner.losses}</p>
+            `;
+        }
+        
+        if (result.cardsWon && result.cardsWon.length > 0 && result.winner && result.winner.username === gameState.currentUser.username) {
+            cardsWonDisplay.classList.remove('hidden');
+            cardsWonGrid.innerHTML = '';
+            result.cardsWon.forEach(card => {
+                const img = CHARACTER_IMAGES[card.name] || '❓';
+                const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'collection-card';
+                cardDiv.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-name">${card.name}</div>
+                        <div class="card-arc">${card.arc}</div>
+                    </div>
+                    <div class="card-image">${imgHTML}</div>
+                    <div class="card-power">${card.power}</div>
+                `;
+                cardsWonGrid.appendChild(cardDiv);
+            });
+        } else {
+            cardsWonDisplay.classList.add('hidden');
+        }
+        
+        showScreen(gameoverScreen);
+    }
+});
+</script>
+</body>
+</html>
