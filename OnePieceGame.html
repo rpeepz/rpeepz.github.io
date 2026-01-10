@@ -1182,7 +1182,7 @@ h3 {
                 <div class="open-lobbies">
                     <h4>
                         <span>Open Lobbies</span>
-                        <span id="lobbies-loading" class="loading-spinner hidden"></span>
+                        <button id="refresh-lobbies-btn" class="btn btn-small" style="padding: 4px 12px; font-size: 12px; margin-left: auto;">🔄 Refresh</button>
                     </h4>
                     <div id="open-lobbies-list">
                         <p style="color: #999; font-style: italic;">Searching for lobbies...</p>
@@ -1998,9 +1998,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateOpenLobbies() {
-        const lobbiesLoading = document.getElementById('lobbies-loading');
-        lobbiesLoading.classList.remove('hidden');
-        
         const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
         const now = Date.now();
         const openLobbiesList = document.getElementById('open-lobbies-list');
@@ -2022,19 +2019,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         });
         
-        setTimeout(() => {
-            lobbiesLoading.classList.add('hidden');
-            if (availableLobbies.length === 0) {
-                openLobbiesList.innerHTML = '<p style="color: #999; font-style: italic;">No open lobbies</p>';
-            } else {
-                openLobbiesList.innerHTML = availableLobbies.map(code => `
-                    <div class="lobby-item">
-                        <span class="lobby-host">${lobbies[code].hostName}</span>
-                        <button class="btn btn-small btn-primary" onclick="document.getElementById('join-code-input').value='${code}';document.getElementById('join-game-btn').click()">Join</button>
-                    </div>
-                `).join('');
-            }
-        }, 500);
+        if (availableLobbies.length === 0) {
+            openLobbiesList.innerHTML = '<p style="color: #999; font-style: italic;">No open lobbies</p>';
+        } else {
+            openLobbiesList.innerHTML = availableLobbies.map(code => `
+                <div class="lobby-item">
+                    <span class="lobby-host">${lobbies[code].hostName}</span>
+                    <button class="btn btn-small btn-primary" onclick="document.getElementById('join-code-input').value='${code}';document.getElementById('join-game-btn').click()">Join</button>
+                </div>
+            `).join('');
+        }
     }
 
     // Setup P2P message handlers
@@ -2270,6 +2264,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn');
+    refreshLobbiesBtn.addEventListener('click', () => {
+        refreshLobbiesBtn.disabled = true;
+        refreshLobbiesBtn.textContent = '⏳ Refreshing...';
+        updateOpenLobbies();
+        setTimeout(() => {
+            refreshLobbiesBtn.disabled = false;
+            refreshLobbiesBtn.textContent = '🔄 Refresh';
+        }, 1000);
+    });
+
     viewCollectionBtn.addEventListener('click', () => {
         showCollection();
     });
@@ -2433,7 +2438,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (openLobbiesInterval) clearInterval(openLobbiesInterval);
         updateOpenLobbies();
-        openLobbiesInterval = setInterval(updateOpenLobbies, 3000);
+        openLobbiesInterval = setInterval(updateOpenLobbies, 15000);
 
         showScreen(lobbyScreen);
     }
