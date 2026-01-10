@@ -283,40 +283,6 @@ h3 {
     color: #e74c3c;
 }
 
-.open-lobbies {
-    margin-top: 20px;
-    padding: 15px;
-    background: var(--bg-tertiary);
-    border-radius: 8px;
-}
-
-.open-lobbies h4 {
-    margin-bottom: 10px;
-    color: var(--brown);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#open-lobbies-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.open-lobbies h4 {
-    margin-bottom: 10px;
-    color: var(--brown);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.lobby-host {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
 .card.my-card {
     border-color: var(--maya-blue) !important;
     box-shadow: 0 0 15px rgba(96, 191, 245, 0.5);
@@ -804,15 +770,6 @@ h3 {
         padding: 15px;
     }
 
-    /* Open lobbies */
-    .open-lobbies {
-        padding: 12px;
-    }
-
-    .open-lobbies h4 {
-        font-size: 14px;
-    }
-
     /* Buttons */
     .btn {
         padding: 10px 20px;
@@ -1168,6 +1125,7 @@ h3 {
                     <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
                     <div id="lobby-code-display" class="hidden">
                         <p>Lobby Code: <strong id="lobby-code"></strong></p>
+                        <button id="copy-link-btn" class="btn btn-secondary btn-small" style="margin-top: 10px;">📋 Copy Join Link</button>
                         <p class="connection-status" id="connection-status">Initializing connection...</p>
                     </div>
                 </div>
@@ -1179,15 +1137,6 @@ h3 {
                     <p class="connection-status hidden" id="join-status">Connecting...</p>
                 </div>
 
-                <div class="open-lobbies">
-                    <h4>
-                        <span>Open Lobbies</span>
-                        <button id="refresh-lobbies-btn" class="btn btn-small" style="padding: 4px 12px; font-size: 12px; margin-left: auto;">🔄 Refresh</button>
-                    </h4>
-                    <div id="open-lobbies-list">
-                        <p style="color: #999; font-style: italic;">Searching for lobbies...</p>
-                    </div>
-                </div>
             </div>
 
             <div class="section">
@@ -1309,7 +1258,7 @@ const CHARACTER_IMAGES = {
     "Mr. 9": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dh1u5uz-045f066a-87d2-447c-9bbd-ecd0e7052cec.jpg/v1/fill/w_738,h_1082,q_70,strp/one_piece_mr_9_by_onepieceworldproject_dh1u5uz-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzVjZTk4NjQ3LTU5NzUtNGY3Zi1iZDA5LTBlZDcxOTQzM2VlMVwvZGgxdTV1ei0wNDVmMDY2YS04N2QyLTQ0N2MtOWJiZC1lY2QwZTcwNTJjZWMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.xpbLlhvpTqdiXxWABsl-IYYLpIPbJ6Yc7DhNv0TTeMo",
     "Miss Monday": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr0bx-8ef3e495-e250-431d-89be-51e9fe573d0d.png/v1/fill/w_841,h_950/miss_monday_by_bodskih_dfcr0bx-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTU1OCIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjBieC04ZWYzZTQ5NS1lMjUwLTQzMWQtODliZS01MWU5ZmU1NzNkMGQucG5nIiwid2lkdGgiOiI8PTEzODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.wr1ylx9D41Z4Hl3mltsRt5rOAC9hUHYLMpF5IHD8tpo",
     "Igaram": "https://i.pinimg.com/736x/a5/9c/45/a59c45141682a03317db5f5b86e0f4d6.jpg",
-    "Princess Vivi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de30ax5-1890382d-ec9a-4ccd-a333-2f126b9b82e3.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi8xY2UxMzcyYS1iNzVjLTQwNTgtYjBjOC0xYmYxYzJkNjgzN2UvZGUzMGF4NS0xODkwMzgyZC1lYzlhLTRjY2QtYTMzMy0yZjEyNmI5YjgyZTMucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.kM-1vMHaj06MJCImnlJsR38mHumRp5b_carmg2rOmdw",
+    "Princess Vivi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de30ax5-1890382d-ec9a-4ccd-a333-2f126b9b82e3.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi8xY2UxMzcyYS1iNzVjLTQwNTgtYjBjOC0xYmYxYzJkNjgzN2UvZGUzMGF4NS0xODkwMzgyZC1lYzlhLTRjY2QtYTMzMy0yZjEyNmI5YjgyZTMucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.kM-1vMHaj06MJCImnlJsR38mHumRp5b_carmg2rOmdw",
     "Dorry": "https://i.pinimg.com/736x/c5/f8/6c/c5f86c48669e647557a63153d7280c9f.jpg",
     "Brogy": "https://i.pinimg.com/736x/39/71/b0/3971b0ec988e1072f880c37f977c9a0e.jpg",
     "Mr. 3": "https://tse3.mm.bing.net/th/id/OIP.Z35c8hlbu-8RiIdwDUWxsAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
@@ -1325,7 +1274,7 @@ const CHARACTER_IMAGES = {
     "Nico Robin": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6u682k-954262f0-6794-41f7-a999-ecc6fa1ec553.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___nico_robin_by_onepieceworldproject_d6u682k-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZ1Njgyay05NTQyNjJmMC02Nzk0LTQxZjctYTk5OS1lY2M2ZmExZWM1NTMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.-10BlbsYn-jsLlRN_UlYrKht2bdWQKK0fwE_KzP5lAw",
     "Mr. 1 (Daz Bones)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de2zwd9-dc59ab3e-13e9-4118-aea5-397164116e70.png/v1/fit/w_533,h_800/daz_bonez___mr1_by_hobbj_de2zwd9-375w-2x.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6Ii9mLzFjZTEzNzJhLWI3NWMtNDA1OC1iMGM4LTFiZjFjMmQ2ODM3ZS9kZTJ6d2Q5LWRjNTlhYjNlLTEzZTktNDExOC1hZWE1LTM5NzE2NDExNmU3MC5wbmciLCJ3aWR0aCI6Ijw9NTMzIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.6g7IJhEH0IjoQDX3e4_MBBPaBWrnAbHWnytKw1MKBH4",
     "Mr. 2 (Bon Clay)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d70r0t0-d14f8217-4d93-4ff4-9200-8e92bed4c6af.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___bentham_by_onepieceworldproject_d70r0t0-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDcwcjB0MC1kMTRmODIxNy00ZDkzLTRmZjQtOTIwMC04ZTkyYmVkNGM2YWYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.iL-GeWcyaDAt07o3X2yD9Hv9NbpmMqkOB3KxABm9dUk",
-    "Miss Doublefinger": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr137-c5214b14-e402-42e8-ba9f-4ed1582d5e3c.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjEzNy1jNTIxNGIxNC1lNDAyLTQyZTgtYmE5Zi00ZWQxNTgyZDVlM2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.GKTGW_f7lqvQ6zpbcCM5Sf3HW3ouam4xmC1C-ZLiM6I"
+    "Miss Doublefinger": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr137-c5214b14-e402-42e8-ba9f-4ed1582d5e3c.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjEzNy1jNTIxNGIxNC1lNDAyLTQyZTgtYmE5Zi00ZWQxNTgyZDVlM2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.GKTGW_f7lqvQ6zpbcCM5Sf3HW3ouam4xmC1C-ZLiM6I"
 };
 
 // Card data for 10 One Piece arcs - 52 characters total
@@ -1419,51 +1368,102 @@ class P2PManager {
 
     initialize(userId) {
         return new Promise((resolve, reject) => {
+            // Add timeout for initialization
+            const timeout = setTimeout(() => {
+                if (this.peer) this.peer.destroy();
+                reject(new Error('Peer initialization timeout (30s). Please check your connection and try again.'));
+            }, 30000);
+
             this.peer = new Peer(userId, {
-                debug: 0,
+                debug: 1, // Enable some logging for troubleshooting
                 config: {
                     iceServers: [
+                        // Google STUN servers (most reliable)
                         { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' },
+                        { urls: 'stun:stun4.l.google.com:19302' },
+                        
+                        // Twilio STUN server
                         { urls: 'stun:global.stun.twilio.com:3478' }
-                    ]
-                }
+                    ],
+                    // Improve connection reliability
+                    iceTransportPolicy: 'all',
+                    iceCandidatePoolSize: 10
+                },
+                // Serialization for reliable data transfer
+                serialization: 'json'
             });
 
             this.peer.on('open', (id) => {
-                console.log('Peer initialized with ID:', id);
+                clearTimeout(timeout);
+                console.log('✅ Peer initialized with ID:', id);
                 resolve(id);
             });
 
             this.peer.on('error', (err) => {
-                console.error('Peer error:', err);
-                reject(err);
+                clearTimeout(timeout);
+                console.error('❌ Peer error:', err);
+                
+                // Provide more helpful error messages
+                let errorMsg = 'Connection failed: ';
+                if (err.type === 'peer-unavailable') {
+                    errorMsg += 'Lobby code not found or expired. Please check the code and try again.';
+                } else if (err.type === 'network') {
+                    errorMsg += 'Network error. Check your internet connection.';
+                } else if (err.type === 'server-error') {
+                    errorMsg += 'Server error. Please try again in a moment.';
+                } else {
+                    errorMsg += err.message || 'Unknown error';
+                }
+                
+                reject(new Error(errorMsg));
             });
 
             // Listen for incoming connections (when someone joins your lobby)
             this.peer.on('connection', (conn) => {
-                console.log('Incoming connection from:', conn.peer);
+                console.log('📞 Incoming connection from:', conn.peer);
                 this.connection = conn;
                 this.setupConnection();
+            });
+
+            // Add disconnected handler for debugging
+            this.peer.on('disconnected', () => {
+                console.warn('⚠️ Peer disconnected from signaling server, attempting reconnect...');
+                if (!this.peer.destroyed) {
+                    this.peer.reconnect();
+                }
             });
         });
     }
 
     connectToPeer(peerId) {
         return new Promise((resolve, reject) => {
-            console.log('Connecting to peer:', peerId);
+            console.log('🔗 Connecting to peer:', peerId);
+            
+            // Add timeout for connection attempt
+            const timeout = setTimeout(() => {
+                if (this.connection) this.connection.close();
+                reject(new Error('Connection timeout (30s). Host may not be available or lobby code is invalid.'));
+            }, 30000);
+            
             this.connection = this.peer.connect(peerId, {
-                reliable: true
+                reliable: true,
+                serialization: 'json'
             });
 
             this.connection.on('open', () => {
-                console.log('Connection opened');
+                clearTimeout(timeout);
+                console.log('✅ Connection opened successfully');
                 this.setupConnection();
                 resolve();
             });
 
             this.connection.on('error', (err) => {
-                console.error('Connection error:', err);
-                reject(err);
+                clearTimeout(timeout);
+                console.error('❌ Connection error:', err);
+                reject(new Error('Failed to connect: ' + (err.message || 'Unknown error')));
             });
         });
     }
@@ -1592,7 +1592,7 @@ class GameState {
     // P2P Lobby management
     async createLobby(hostUser) {
         this.isHost = true;
-        const peerId = await this.p2p.initialize(this.generateLobbyCode());
+        const peerId = await this.p2p.initialize(this.generateLobbyCode(hostUser.username));
         
         this.currentLobby = {
             code: peerId,
@@ -1606,7 +1606,7 @@ class GameState {
 
     async joinLobby(code, guestUser) {
         this.isHost = false;
-        await this.p2p.initialize(this.generateId());
+        await this.p2p.initialize(this.generateLobbyCode(guestUser.username));
         await this.p2p.connectToPeer(code);
         
         this.currentLobby = {
@@ -1808,9 +1808,12 @@ class GameState {
         return 'p' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
     }
 
-    generateLobbyCode() {
-        return 'game' + Date.now().toString(36) + Math.random().toString(36).substr(2, 3);
-    }
+    generateLobbyCode(username) {
+    // Sanitize username (remove spaces, special chars, lowercase)
+    const cleanUsername = username.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    // Add timestamp to make it unique
+    return cleanUsername + '_' + Date.now().toString(36);
+}
 
     cleanup() {
         this.p2p.disconnect();
@@ -1924,9 +1927,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardsWonGrid = document.getElementById('cards-won-grid');
     const returnLobbyBtn = document.getElementById('return-lobby-btn');
 
+    // Check for lobby code in URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const lobbyCodeFromUrl = urlParams.get('lobby') || urlParams.get('code') || urlParams.get('join');
+    
+    // Store it to use after login
+    let pendingLobbyCode = lobbyCodeFromUrl;
     let currentFormMode = null;
     let hasPlayedThisRound = false;
-    let openLobbiesInterval = null;
 
     // Initialize music
     musicManager.initialize();
@@ -1972,64 +1980,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('volume-mute').classList.add('active');
     });
     
-    function broadcastLobby(code, hostName) {
-        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
-        lobbies[code] = { 
-            hostName: hostName, 
-            timestamp: Date.now(),
-            full: false 
-        };
-        localStorage.setItem('openLobbies', JSON.stringify(lobbies));
-    }
-
-    function removeLobbyBroadcast(code) {
-        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
-        delete lobbies[code];
-        localStorage.setItem('openLobbies', JSON.stringify(lobbies));
-    }
-
-    function markLobbyFull(code) {
-        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
-        if (lobbies[code]) {
-            lobbies[code].full = true;
-            lobbies[code].timestamp = Date.now() - 100000; // Mark as old so it gets cleaned up soon
-            localStorage.setItem('openLobbies', JSON.stringify(lobbies));
-        }
-    }
-
-    function updateOpenLobbies() {
-        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
-        const now = Date.now();
-        const openLobbiesList = document.getElementById('open-lobbies-list');
-        
-        // Clean up old lobbies (older than 2 minutes)
-        Object.keys(lobbies).forEach(code => {
-            if (now - lobbies[code].timestamp > 120000) {
-                delete lobbies[code];
-            }
-        });
-        localStorage.setItem('openLobbies', JSON.stringify(lobbies));
-        
-        // Filter out: old lobbies, current user's lobby, and lobbies currently being joined
-        const availableLobbies = Object.keys(lobbies).filter(code => {
-            const lobby = lobbies[code];
-            if (now - lobby.timestamp > 120000) return false;
-            if (lobby.hostName === gameState.currentUser?.username) return false;
-            if (lobby.full) return false;
-            return true;
-        });
-        
-        if (availableLobbies.length === 0) {
-            openLobbiesList.innerHTML = '<p style="color: #999; font-style: italic;">No open lobbies</p>';
-        } else {
-            openLobbiesList.innerHTML = availableLobbies.map(code => `
-                <div class="lobby-item">
-                    <span class="lobby-host">${lobbies[code].hostName}</span>
-                    <button class="btn btn-small btn-primary" onclick="document.getElementById('join-code-input').value='${code}';document.getElementById('join-game-btn').click()">Join</button>
-                </div>
-            `).join('');
-        }
-    }
+    
 
     // Setup P2P message handlers
     gameState.p2p.onMessage = (data) => {
@@ -2044,11 +1995,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 connectionStatus.textContent = `${data.username} joined! Starting game...`;
                 connectionStatus.className = 'connection-status connected';
-                
-                // Mark lobby as full immediately
-                if (gameState.currentLobby?.code) {
-                    markLobbyFull(gameState.currentLobby.code);
-                }
                 
                 // Host creates decks and starts game
                 setTimeout(() => {
@@ -2224,7 +2170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const code = await gameState.createLobby(gameState.currentUser);
             lobbyCodeSpan.textContent = code;
-            broadcastLobby(code, gameState.currentUser.username);
             connectionStatus.textContent = 'Waiting for opponent to join...';
             connectionStatus.className = 'connection-status';
         } catch (err) {
@@ -2241,12 +2186,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const lobbies = JSON.parse(localStorage.getItem('openLobbies') || '{}');
-        if (lobbies[code] && lobbies[code].full) {
-            alert('This lobby is already full or in progress!');
-            return;
-        }
-
         joinGameBtn.disabled = true;
         joinStatus.classList.remove('hidden');
         joinStatus.textContent = 'Connecting...';
@@ -2254,7 +2193,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await gameState.joinLobby(code, gameState.currentUser);
-            markLobbyFull(code);
             joinStatus.textContent = 'Connected! Waiting for host...';
             joinStatus.className = 'connection-status connected';
         } catch (err) {
@@ -2264,15 +2202,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn');
-    refreshLobbiesBtn.addEventListener('click', () => {
-        refreshLobbiesBtn.disabled = true;
-        refreshLobbiesBtn.textContent = '⏳ Refreshing...';
-        updateOpenLobbies();
-        setTimeout(() => {
-            refreshLobbiesBtn.disabled = false;
-            refreshLobbiesBtn.textContent = '🔄 Refresh';
-        }, 1000);
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    copyLinkBtn.addEventListener('click', () => {
+        const lobbyCode = lobbyCodeSpan.textContent;
+        const currentUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${currentUrl}?lobby=${lobbyCode}`;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            copyLinkBtn.textContent = '✅ Link Copied!';
+            setTimeout(() => {
+                copyLinkBtn.textContent = '📋 Copy Join Link';
+            }, 2000);
+        }).catch(() => {
+            // Fallback if clipboard API doesn't work
+            prompt('Copy this link to share:', shareUrl);
+        });
     });
 
     viewCollectionBtn.addEventListener('click', () => {
@@ -2434,12 +2379,11 @@ document.addEventListener('DOMContentLoaded', () => {
             claimLink.classList.remove('hidden');
         } else {
             claimLink.classList.add('hidden');
-        }
-
-        if (openLobbiesInterval) clearInterval(openLobbiesInterval);
-        updateOpenLobbies();
-        openLobbiesInterval = setInterval(updateOpenLobbies, 15000);
-
+        } 
+        
+        // Check if there's a pending lobby code from URL
+        handlePendingLobbyCode();
+        
         showScreen(lobbyScreen);
     }
 
@@ -2496,11 +2440,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startGameSession() {
-        if (gameState.currentLobby?.code && gameState.isHost) {
-            removeLobbyBroadcast(gameState.currentLobby.code);
-        }
-        if (openLobbiesInterval) clearInterval(openLobbiesInterval);
-        
         hasPlayedThisRound = false;
         
         // Start battle music
@@ -2584,6 +2523,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         showScreen(gameoverScreen);
+    }
+
+    // Function to handle lobby code from URL
+    function handlePendingLobbyCode() {
+        if (pendingLobbyCode && joinCodeInput) {
+            joinCodeInput.value = pendingLobbyCode;
+            joinCodeInput.focus();
+            // Highlight the input to show user
+            joinCodeInput.style.backgroundColor = 'rgba(255, 206, 0, 0.2)';
+            setTimeout(() => {
+                joinCodeInput.style.backgroundColor = '';
+            }, 2000);
+            pendingLobbyCode = null; // Clear it after use
+        }
     }
 });
 </script>
