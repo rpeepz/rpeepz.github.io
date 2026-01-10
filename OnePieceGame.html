@@ -1152,7 +1152,10 @@ h3 {
                 <h2>Welcome, <span id="player-name" class="my-username"></span>!
                     <a href="#" id="claim-profile-link" class="claim-profile-link hidden">Claim Profile</a>
                 </h2>
-                <button id="logout-btn" class="btn btn-small">Logout</button>
+                <div style="display: flex; gap: 10px;">
+                    <button id="clear-data-btn" class="btn btn-small btn-danger">Clear Data</button>
+                    <button id="logout-btn" class="btn btn-small">Logout</button>
+                </div>
             </div>
             
             <div class="stats">
@@ -2176,6 +2179,28 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.cleanup();
         gameState.currentUser = null;
         showScreen(loginScreen);
+    });
+
+    const clearDataBtn = document.getElementById('clear-data-btn');
+    clearDataBtn.addEventListener('click', () => {
+        if (confirm('⚠️ WARNING: This will delete ALL saved profiles, collections, and game data. This cannot be undone!\n\nAre you sure you want to continue?')) {
+            if (confirm('Final confirmation: Delete everything?')) {
+                // Clear all localStorage
+                localStorage.clear();
+                
+                // Clear any session storage
+                sessionStorage.clear();
+                
+                // Cleanup current game state
+                gameState.cleanup();
+                gameState.currentUser = null;
+                
+                alert('✅ All data has been cleared. Refreshing page...');
+                
+                // Reload page to reset everything
+                window.location.reload();
+            }
+        }
     });
 
     document.getElementById('claim-profile-link').addEventListener('click', (e) => {
