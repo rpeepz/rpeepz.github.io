@@ -273,7 +273,6 @@ class GameState {
         // Reset for next round
         game.player1Played = false;
         game.player2Played = false;
-        game.round++;
         
         return {
             card1,
