@@ -556,6 +556,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     continueBtn.addEventListener('click', () => {
         resultDisplay.classList.add('hidden');
+
+        gameState.currentGame.round++;
+
         const gameOver = gameState.checkGameOver();
         if (gameOver) {
             endGameSession(gameOver);
@@ -563,6 +566,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset for next round
             hasPlayedThisRound = false;
             playCardBtn.disabled = false;
+
+            roundNumberSpan.textContent = gameState.currentGame.round;
+
             player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
             player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
         }
