@@ -1,3 +1,15 @@
+// Character rarity system configuration
+const RARITY_TIERS = {
+    SSS: { weight: 10, label: 'SSS - Legendary', color: '#ff0066' },      // 0.1% chance - Hot Pink/Magenta
+    SS: { weight: 50, label: 'SS - Mythic', color: '#9933ff' },           // 0.5% chance - Purple
+    S: { weight: 200, label: 'S - Epic', color: '#ff6600' },              // 2% chance - Bright Orange
+    A: { weight: 800, label: 'A - Rare', color: '#ffcc00' },              // 8% chance - Gold
+    B: { weight: 2000, label: 'B - Uncommon', color: '#00ccff' },         // 20% chance - Cyan
+    C: { weight: 3000, label: 'C - Common', color: '#00cc66' },           // 30% chance - Darker Green (was too bright)
+    D: { weight: 2500, label: 'D - Basic', color: '#8b7355' },            // 25% chance - Brown (distinct from gray)
+    F: { weight: 1440, label: 'F - Starter', color: '#b8b8b8' }           // 14.4% chance - Medium Gray (distinct from brown)
+};
+
 const CHARACTER_IMAGES = {
     "Monkey D. Luffy": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d57vqib-703ad600-c6f2-4f99-9d89-5d3817208219.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2VjNzE5ZjQ2LTQ0ZDYtNDU5My1hYjFlLTk1MmIwMTkwOWE0ZVwvZDU3dnFpYi03MDNhZDYwMC1jNmYyLTRmOTktOWQ4OS01ZDM4MTcyMDgyMTkucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.MDljTCjgh5wUDesVbS212iPfh4guv1KJUyF-8lyO8Gk",
     "Roronoa Zoro": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5litwf-0862eea8-8f00-4613-9e3e-e4f98a879f9b.png/v1/fit/w_828,h_1264,q_70,strp/epp___romance_dawn__zoro_by_sergiart_d5litwf-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVsaXR3Zi0wODYyZWVhOC04ZjAwLTQ2MTMtOWUzZS1lNGY5OGE4NzlmOWIucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.0Ejn-2vbmopEfsXF2RUxDGTjiYJpcaId8mQYQ4hieCU",
@@ -34,7 +46,7 @@ const CHARACTER_IMAGES = {
     "Mr. 9": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dh1u5uz-045f066a-87d2-447c-9bbd-ecd0e7052cec.jpg/v1/fill/w_738,h_1082,q_70,strp/one_piece_mr_9_by_onepieceworldproject_dh1u5uz-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzVjZTk4NjQ3LTU5NzUtNGY3Zi1iZDA5LTBlZDcxOTQzM2VlMVwvZGgxdTV1ei0wNDVmMDY2YS04N2QyLTQ0N2MtOWJiZC1lY2QwZTcwNTJjZWMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.xpbLlhvpTqdiXxWABsl-IYYLpIPbJ6Yc7DhNv0TTeMo",
     "Miss Monday": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr0bx-8ef3e495-e250-431d-89be-51e9fe573d0d.png/v1/fill/w_841,h_950/miss_monday_by_bodskih_dfcr0bx-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTU1OCIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjBieC04ZWYzZTQ5NS1lMjUwLTQzMWQtODliZS01MWU5ZmU1NzNkMGQucG5nIiwid2lkdGgiOiI8PTEzODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.wr1ylx9D41Z4Hl3mltsRt5rOAC9hUHYLMpF5IHD8tpo",
     "Igaram": "https://i.pinimg.com/736x/a5/9c/45/a59c45141682a03317db5f5b86e0f4d6.jpg",
-    "Princess Vivi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de30ax5-1890382d-ec9a-4ccd-a333-2f126b9b82e3.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi8xY2UxMzcyYS1iNzVjLTQwNTgtYjBjOC0xYmYxYzJkNjgzN2UvZGUzMGF4NS0xODkwMzgyZC1lYzlhLTRjY2QtYTMzMy0yZjEyNmI5YjgyZTMucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.kM-1vMHaj06MJCImnlJsR38mHumRp5b_carmg2rOmdw",
+    "Princess Vivi": "https://th.bing.com/th/id/R.143f33ebbeed4ae34caec9e07f677600?rik=ZAxdAcSd11pLHQ&pid=ImgRaw&r=0",
     "Dorry": "https://i.pinimg.com/736x/c5/f8/6c/c5f86c48669e647557a63153d7280c9f.jpg",
     "Brogy": "https://i.pinimg.com/736x/39/71/b0/3971b0ec988e1072f880c37f977c9a0e.jpg",
     "Mr. 3": "https://tse3.mm.bing.net/th/id/OIP.Z35c8hlbu-8RiIdwDUWxsAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
@@ -50,83 +62,241 @@ const CHARACTER_IMAGES = {
     "Nico Robin": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6u682k-954262f0-6794-41f7-a999-ecc6fa1ec553.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___nico_robin_by_onepieceworldproject_d6u682k-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZ1Njgyay05NTQyNjJmMC02Nzk0LTQxZjctYTk5OS1lY2M2ZmExZWM1NTMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.-10BlbsYn-jsLlRN_UlYrKht2bdWQKK0fwE_KzP5lAw",
     "Mr. 1 (Daz Bones)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de2zwd9-dc59ab3e-13e9-4118-aea5-397164116e70.png/v1/fit/w_533,h_800/daz_bonez___mr1_by_hobbj_de2zwd9-375w-2x.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6Ii9mLzFjZTEzNzJhLWI3NWMtNDA1OC1iMGM4LTFiZjFjMmQ2ODM3ZS9kZTJ6d2Q5LWRjNTlhYjNlLTEzZTktNDExOC1hZWE1LTM5NzE2NDExNmU3MC5wbmciLCJ3aWR0aCI6Ijw9NTMzIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.6g7IJhEH0IjoQDX3e4_MBBPaBWrnAbHWnytKw1MKBH4",
     "Mr. 2 (Bon Clay)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d70r0t0-d14f8217-4d93-4ff4-9200-8e92bed4c6af.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___bentham_by_onepieceworldproject_d70r0t0-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDcwcjB0MC1kMTRmODIxNy00ZDkzLTRmZjQtOTIwMC04ZTkyYmVkNGM2YWYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.iL-GeWcyaDAt07o3X2yD9Hv9NbpmMqkOB3KxABm9dUk",
-    "Miss Doublefinger": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr137-c5214b14-e402-42e8-ba9f-4ed1582d5e3c.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjEzNy1jNTIxNGIxNC1lNDAyLTQyZTgtYmE5Zi00ZWQxNTgyZDVlM2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.GKTGW_f7lqvQ6zpbcCM5Sf3HW3ouam4xmC1C-ZLiM6I"
+    "Miss Doublefinger": "https://static.dotgg.gg/onepiece/card/OP01-080.webp"
 };
 
 // Card data for 10 One Piece arcs - 52 characters total
+// Enhanced Card Database with rarity and availability
 const CARD_DATABASE = [
     // Romance Dawn Arc (5 cards)
-    { id: 1, name: "Monkey D. Luffy", arc: "Romance Dawn", power: 65 },
-    { id: 2, name: "Roronoa Zoro", arc: "Romance Dawn", power: 62 },
-    { id: 3, name: "Koby", arc: "Romance Dawn", power: 15 },
-    { id: 4, name: "Alvida", arc: "Romance Dawn", power: 25 },
-    { id: 5, name: "Shanks", arc: "Romance Dawn", power: 98 },
+    { id: 1, name: "Monkey D. Luffy", arc: "Romance Dawn", power: 65, rarity: "A", weight: 800, available: true },
+    { id: 2, name: "Roronoa Zoro", arc: "Romance Dawn", power: 62, rarity: "A", weight: 800, available: true },
+    { id: 3, name: "Koby", arc: "Romance Dawn", power: 15, rarity: "C", weight: 3000, available: true },
+    { id: 4, name: "Alvida", arc: "Romance Dawn", power: 25, rarity: "D", weight: 2500, available: true },
+    { id: 5, name: "Shanks", arc: "Romance Dawn", power: 98, rarity: "SSS", weight: 10, available: true },
 
     // Orange Town Arc (4 cards)
-    { id: 6, name: "Nami", arc: "Orange Town", power: 35 },
-    { id: 7, name: "Buggy", arc: "Orange Town", power: 45 },
-    { id: 8, name: "Mohji", arc: "Orange Town", power: 18 },
-    { id: 9, name: "Cabaji", arc: "Orange Town", power: 22 },
+    { id: 6, name: "Nami", arc: "Orange Town", power: 35, rarity: "B", weight: 2000, available: true },
+    { id: 7, name: "Buggy", arc: "Orange Town", power: 45, rarity: "B", weight: 2000, available: true },
+    { id: 8, name: "Mohji", arc: "Orange Town", power: 18, rarity: "D", weight: 2500, available: true },
+    { id: 9, name: "Cabaji", arc: "Orange Town", power: 22, rarity: "D", weight: 2500, available: true },
 
     // Syrup Village Arc (6 cards)
-    { id: 10, name: "Usopp", arc: "Syrup Village", power: 28 },
-    { id: 11, name: "Kuro", arc: "Syrup Village", power: 48 },
-    { id: 12, name: "Kaya", arc: "Syrup Village", power: 5 },
-    { id: 13, name: "Jango", arc: "Syrup Village", power: 30 },
-    { id: 14, name: "Sham", arc: "Syrup Village", power: 20 },
-    { id: 15, name: "Buchi", arc: "Syrup Village", power: 20 },
+    { id: 10, name: "Usopp", arc: "Syrup Village", power: 28, rarity: "B", weight: 2000, available: true },
+    { id: 11, name: "Kuro", arc: "Syrup Village", power: 48, rarity: "B", weight: 2000, available: true },
+    { id: 12, name: "Kaya", arc: "Syrup Village", power: 5, rarity: "F", weight: 1440, available: true },
+    { id: 13, name: "Jango", arc: "Syrup Village", power: 30, rarity: "C", weight: 3000, available: true },
+    { id: 14, name: "Sham", arc: "Syrup Village", power: 20, rarity: "D", weight: 2500, available: true },
+    { id: 15, name: "Buchi", arc: "Syrup Village", power: 20, rarity: "D", weight: 2500, available: true },
 
     // Baratie Arc (7 cards)
-    { id: 16, name: "Sanji", arc: "Baratie", power: 60 },
-    { id: 17, name: "Zeff", arc: "Baratie", power: 55 },
-    { id: 18, name: "Don Krieg", arc: "Baratie", power: 52 },
-    { id: 19, name: "Gin", arc: "Baratie", power: 42 },
-    { id: 20, name: "Pearl", arc: "Baratie", power: 35 },
-    { id: 21, name: "Dracule Mihawk", arc: "Baratie", power: 100 },
-    { id: 22, name: "Patty", arc: "Baratie", power: 25 },
+    { id: 16, name: "Sanji", arc: "Baratie", power: 60, rarity: "A", weight: 800, available: true },
+    { id: 17, name: "Zeff", arc: "Baratie", power: 55, rarity: "A", weight: 800, available: true },
+    { id: 18, name: "Don Krieg", arc: "Baratie", power: 52, rarity: "B", weight: 2000, available: true },
+    { id: 19, name: "Gin", arc: "Baratie", power: 42, rarity: "B", weight: 2000, available: true },
+    { id: 20, name: "Pearl", arc: "Baratie", power: 35, rarity: "C", weight: 3000, available: true },
+    { id: 21, name: "Dracule Mihawk", arc: "Baratie", power: 100, rarity: "SSS", weight: 10, available: true },
+    { id: 22, name: "Patty", arc: "Baratie", power: 25, rarity: "D", weight: 2500, available: true },
 
     // Arlong Park Arc (6 cards)
-    { id: 23, name: "Arlong", arc: "Arlong Park", power: 68 },
-    { id: 24, name: "Nami (Arlong Park)", arc: "Arlong Park", power: 38 },
-    { id: 25, name: "Kuroobi", arc: "Arlong Park", power: 40 },
-    { id: 26, name: "Chew", arc: "Arlong Park", power: 38 },
-    { id: 27, name: "Hatchan", arc: "Arlong Park", power: 36 },
-    { id: 28, name: "Nojiko", arc: "Arlong Park", power: 12 },
+    { id: 23, name: "Arlong", arc: "Arlong Park", power: 68, rarity: "S", weight: 200, available: true },
+    { id: 24, name: "Nami (Arlong Park)", arc: "Arlong Park", power: 38, rarity: "B", weight: 2000, available: true },
+    { id: 25, name: "Kuroobi", arc: "Arlong Park", power: 40, rarity: "B", weight: 2000, available: true },
+    { id: 26, name: "Chew", arc: "Arlong Park", power: 38, rarity: "C", weight: 3000, available: true },
+    { id: 27, name: "Hatchan", arc: "Arlong Park", power: 36, rarity: "C", weight: 3000, available: true },
+    { id: 28, name: "Nojiko", arc: "Arlong Park", power: 12, rarity: "F", weight: 1440, available: true },
 
     // Loguetown Arc (4 cards)
-    { id: 29, name: "Smoker", arc: "Loguetown", power: 72 },
-    { id: 30, name: "Tashigi", arc: "Loguetown", power: 40 },
-    { id: 31, name: "Dragon", arc: "Loguetown", power: 95 },
-    { id: 32, name: "Bartolomeo (Young)", arc: "Loguetown", power: 20 },
+    { id: 29, name: "Smoker", arc: "Loguetown", power: 72, rarity: "S", weight: 200, available: true },
+    { id: 30, name: "Tashigi", arc: "Loguetown", power: 40, rarity: "B", weight: 2000, available: true },
+    { id: 31, name: "Dragon", arc: "Loguetown", power: 95, rarity: "SSS", weight: 10, available: true },
+    { id: 32, name: "Bartolomeo (Young)", arc: "Loguetown", power: 20, rarity: "D", weight: 2500, available: true },
 
     // Whiskey Peak Arc (4 cards)
-    { id: 33, name: "Mr. 9", arc: "Whiskey Peak", power: 30 },
-    { id: 34, name: "Miss Monday", arc: "Whiskey Peak", power: 32 },
-    { id: 35, name: "Igaram", arc: "Whiskey Peak", power: 35 },
-    { id: 36, name: "Princess Vivi", arc: "Whiskey Peak", power: 28 },
+    { id: 33, name: "Mr. 9", arc: "Whiskey Peak", power: 30, rarity: "C", weight: 3000, available: true },
+    { id: 34, name: "Miss Monday", arc: "Whiskey Peak", power: 32, rarity: "C", weight: 3000, available: true },
+    { id: 35, name: "Igaram", arc: "Whiskey Peak", power: 35, rarity: "C", weight: 3000, available: true },
+    { id: 36, name: "Princess Vivi", arc: "Whiskey Peak", power: 28, rarity: "B", weight: 2000, available: true },
 
     // Little Garden Arc (5 cards)
-    { id: 37, name: "Dorry", arc: "Little Garden", power: 70 },
-    { id: 38, name: "Brogy", arc: "Little Garden", power: 70 },
-    { id: 39, name: "Mr. 3", arc: "Little Garden", power: 44 },
-    { id: 40, name: "Miss Goldenweek", arc: "Little Garden", power: 26 },
-    { id: 41, name: "Mr. 5", arc: "Little Garden", power: 42 },
+    { id: 37, name: "Dorry", arc: "Little Garden", power: 70, rarity: "S", weight: 200, available: true },
+    { id: 38, name: "Brogy", arc: "Little Garden", power: 70, rarity: "S", weight: 200, available: true },
+    { id: 39, name: "Mr. 3", arc: "Little Garden", power: 44, rarity: "B", weight: 2000, available: true },
+    { id: 40, name: "Miss Goldenweek", arc: "Little Garden", power: 26, rarity: "C", weight: 3000, available: true },
+    { id: 41, name: "Mr. 5", arc: "Little Garden", power: 42, rarity: "B", weight: 2000, available: true },
 
     // Drum Island Arc (6 cards)
-    { id: 42, name: "Tony Tony Chopper", arc: "Drum Island", power: 50 },
-    { id: 43, name: "Wapol", arc: "Drum Island", power: 46 },
-    { id: 44, name: "Dr. Kureha", arc: "Drum Island", power: 40 },
-    { id: 45, name: "Dalton", arc: "Drum Island", power: 48 },
-    { id: 46, name: "Chess", arc: "Drum Island", power: 32 },
-    { id: 47, name: "Kuromarimo", arc: "Drum Island", power: 30 },
+    { id: 42, name: "Tony Tony Chopper", arc: "Drum Island", power: 50, rarity: "A", weight: 800, available: true },
+    { id: 43, name: "Wapol", arc: "Drum Island", power: 46, rarity: "B", weight: 2000, available: true },
+    { id: 44, name: "Dr. Kureha", arc: "Drum Island", power: 40, rarity: "B", weight: 2000, available: true },
+    { id: 45, name: "Dalton", arc: "Drum Island", power: 48, rarity: "B", weight: 2000, available: true },
+    { id: 46, name: "Chess", arc: "Drum Island", power: 32, rarity: "C", weight: 3000, available: true },
+    { id: 47, name: "Kuromarimo", arc: "Drum Island", power: 30, rarity: "C", weight: 3000, available: true },
 
     // Alabasta Arc (5 cards)
-    { id: 48, name: "Crocodile", arc: "Alabasta", power: 85 },
-    { id: 49, name: "Nico Robin", arc: "Alabasta", power: 58 },
-    { id: 50, name: "Mr. 1 (Daz Bones)", arc: "Alabasta", power: 65 },
-    { id: 51, name: "Mr. 2 (Bon Clay)", arc: "Alabasta", power: 56 },
-    { id: 52, name: "Miss Doublefinger", arc: "Alabasta", power: 50 }
+    { id: 48, name: "Crocodile", arc: "Alabasta", power: 85, rarity: "SS", weight: 50, available: true },
+    { id: 49, name: "Nico Robin", arc: "Alabasta", power: 58, rarity: "A", weight: 800, available: true },
+    { id: 50, name: "Mr. 1 (Daz Bones)", arc: "Alabasta", power: 65, rarity: "A", weight: 800, available: true },
+    { id: 51, name: "Mr. 2 (Bon Clay)", arc: "Alabasta", power: 56, rarity: "A", weight: 800, available: true },
+    { id: 52, name: "Miss Doublefinger", arc: "Alabasta", power: 50, rarity: "B", weight: 2000, available: true }
 ];
 
 // Get all unique arcs
 const ARCS = [...new Set(CARD_DATABASE.map(card => card.arc))];
+
+// Arc availability configuration (can be toggled)
+const ARC_AVAILABILITY = {
+    "Romance Dawn": true,
+    "Orange Town": true,
+    "Syrup Village": true,
+    "Baratie": true,
+    "Arlong Park": true,
+    "Loguetown": true,
+    "Whiskey Peak": true,
+    "Little Garden": true,
+    "Drum Island": true,
+    "Alabasta": true
+};
+
+// Helper functions for the rarity system
+const CardRaritySystem = {
+    // Get available card pool based on arc availability and card availability
+    getAvailablePool() {
+        return CARD_DATABASE.filter(card => 
+            card.available && ARC_AVAILABILITY[card.arc]
+        );
+    },
+
+    // Weighted random selection based on rarity weights
+    drawRandomCard(excludeIds = []) {
+        const pool = this.getAvailablePool().filter(card => !excludeIds.includes(card.id));
+        if (pool.length === 0) return null;
+
+        // Calculate total weight
+        const totalWeight = pool.reduce((sum, card) => sum + card.weight, 0);
+        
+        // Random weighted selection
+        let random = Math.random() * totalWeight;
+        
+        for (const card of pool) {
+            random -= card.weight;
+            if (random <= 0) {
+                return card;
+            }
+        }
+        
+        // Fallback to last card (shouldn't reach here)
+        return pool[pool.length - 1];
+    },
+
+    // Draw multiple unique cards
+    drawMultipleCards(count, excludeIds = []) {
+        const drawn = [];
+        const excluded = new Set(excludeIds);
+        
+        for (let i = 0; i < count; i++) {
+            const card = this.drawRandomCard([...excluded]);
+            if (!card) break;
+            drawn.push(card);
+            excluded.add(card.id);
+        }
+        
+        return drawn;
+    },
+
+    // Generate starter deck (5 cards) - weighted random from available pool
+    generateStarterDeck() {
+        return this.drawMultipleCards(5);
+    },
+
+    // Get cards by rarity tier
+    getCardsByRarity(rarity) {
+        return this.getAvailablePool().filter(card => card.rarity === rarity);
+    },
+
+    // Get rarity info
+    getRarityInfo(rarity) {
+        return RARITY_TIERS[rarity] || RARITY_TIERS['F'];
+    },
+
+    // Calculate drop chance percentage
+    getDropChance(rarity) {
+        const totalWeight = Object.values(RARITY_TIERS).reduce((sum, tier) => sum + tier.weight, 0);
+        return ((RARITY_TIERS[rarity]?.weight || 0) / totalWeight * 100).toFixed(2);
+    }
+};
+
+// Add this after the CardRaritySystem definition at the end of config.js
+
+// Bot difficulty configuration - each difficulty uses cards from specific rarity tiers
+const BOT_DIFFICULTIES = {
+    EASY: {
+        name: 'Easy',
+        description: 'Uses only F, D, and C tier cards',
+        rarities: ['F', 'D', 'C'],
+        icon: '😊'
+    },
+    NORMAL: {
+        name: 'Normal',
+        description: 'Uses C, D, and B tier cards',
+        rarities: ['D', 'C', 'B'],
+        icon: '🙂'
+    },
+    HARD: {
+        name: 'Hard',
+        description: 'Uses B, A, and S tier cards',
+        rarities: ['B', 'A', 'S'],
+        icon: '😠'
+    },
+    EXPERT: {
+        name: 'Expert',
+        description: 'Uses A, S, and SS tier cards',
+        rarities: ['A', 'S', 'SS'],
+        icon: '😈'
+    },
+    LEGENDARY: {
+        name: 'Legendary',
+        description: 'Uses S, SS, and SSS tier cards',
+        rarities: ['S', 'SS', 'SSS'],
+        icon: '💀'
+    }
+};
+
+// Bot helper functions
+const BotManager = {
+    // Create a bot opponent
+    createBot(difficulty) {
+        return {
+            id: 'bot_' + Date.now(),
+            username: `${BOT_DIFFICULTIES[difficulty].icon} ${BOT_DIFFICULTIES[difficulty].name} Bot`,
+            isBot: true,
+            difficulty: difficulty,
+            wins: 0,
+            losses: 0,
+            collection: new Set(CARD_DATABASE.map(c => c.id)) // Bot has all cards
+        };
+    },
+
+    // Generate bot deck based on difficulty
+    generateBotDeck(difficulty, count = 5) {
+        const allowedRarities = BOT_DIFFICULTIES[difficulty].rarities;
+        const pool = CardRaritySystem.getAvailablePool().filter(card => 
+            allowedRarities.includes(card.rarity)
+        );
+        
+        if (pool.length === 0) {
+            console.warn('No cards available for bot difficulty:', difficulty);
+            return [];
+        }
+
+        // Shuffle and pick cards
+        const shuffled = [...pool].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, Math.min(count, shuffled.length));
+    },
+
+    // Bot plays a card (instant decision)
+    playBotCard(botDeck) {
+        if (botDeck.length === 0) return null;
+        return botDeck.shift();
+    }
+};
