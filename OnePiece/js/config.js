@@ -1,0 +1,132 @@
+const CHARACTER_IMAGES = {
+    "Monkey D. Luffy": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d57vqib-703ad600-c6f2-4f99-9d89-5d3817208219.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2VjNzE5ZjQ2LTQ0ZDYtNDU5My1hYjFlLTk1MmIwMTkwOWE0ZVwvZDU3dnFpYi03MDNhZDYwMC1jNmYyLTRmOTktOWQ4OS01ZDM4MTcyMDgyMTkucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.MDljTCjgh5wUDesVbS212iPfh4guv1KJUyF-8lyO8Gk",
+    "Roronoa Zoro": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5litwf-0862eea8-8f00-4613-9e3e-e4f98a879f9b.png/v1/fit/w_828,h_1264,q_70,strp/epp___romance_dawn__zoro_by_sergiart_d5litwf-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVsaXR3Zi0wODYyZWVhOC04ZjAwLTQ2MTMtOWUzZS1lNGY5OGE4NzlmOWIucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.0Ejn-2vbmopEfsXF2RUxDGTjiYJpcaId8mQYQ4hieCU",
+    "Koby": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d7pze6h-6d72ad14-8fbe-48d9-a74b-6a8d8cdf7f3f.jpg/v1/fill/w_1280,h_1876,q_75,strp/one_piece___coby_by_onepieceworldproject_d7pze6h-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTg3NiIsInBhdGgiOiJcL2ZcLzVjZTk4NjQ3LTU5NzUtNGY3Zi1iZDA5LTBlZDcxOTQzM2VlMVwvZDdwemU2aC02ZDcyYWQxNC04ZmJlLTQ4ZDktYTc0Yi02YThkOGNkZjdmM2YuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.DAA1Q7cBjinXggxrQ6Yc_x5YPD6Su3M3U4YJX6RJlS4",
+    "Alvida": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/ddrl9ds-4fac1530-8bf1-49e3-b6f3-8c1d6c1881d7.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece_alvida_by_onepieceworldproject_ddrl9ds-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGRybDlkcy00ZmFjMTUzMC04YmYxLTQ5ZTMtYjZmMy04YzFkNmMxODgxZDcuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.Ajwx0vKDDiJ_1gyVdq6wbmAJEhqmQdBmytVFQzdL5fo",
+    "Shanks": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6tmtua-40267365-7467-41d8-9535-fa4c836fa387.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___shanks_by_onepieceworldproject_d6tmtua-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZ0bXR1YS00MDI2NzM2NS03NDY3LTQxZDgtOTUzNS1mYTRjODM2ZmEzODcuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.2Ee6gF8FtTR9MXyQ6Hr6EU36GbJCEeiP6H9Pe6-90-E",
+    "Nami": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dl2vi5r-fcb63cef-c063-4121-a9dc-555d7cf3d1f4.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___nami_by_onepieceworldproject_dl2vi5r-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGwydmk1ci1mY2I2M2NlZi1jMDYzLTQxMjEtYTlkYy01NTVkN2NmM2QxZjQuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.6oL7aF1PVnfvMyi7JvYGA2sL6GgipXkMVccn1jMfEJE",
+    "Buggy": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/devnmsc-f6b96f9c-809b-4088-b3fe-f7ca5b0854d1.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___buggy_the_clown_by_onepieceworldproject_devnmsc-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGV2bm1zYy1mNmI5NmY5Yy04MDliLTQwODgtYjNmZS1mN2NhNWIwODU0ZDEuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.txVYKx4HWGjVw0b5cUTD1DRTeLWK--oxIA-7-Edrgkc",
+    "Mohji": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/djycezu-c357c46e-a900-4239-b595-6767a6a38b06.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___mohji_by_onepieceworldproject_djycezu-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGp5Y2V6dS1jMzU3YzQ2ZS1hOTAwLTQyMzktYjU5NS02NzY3YTZhMzhiMDYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.CG0SeVpUdgm6ktLJ8SbVU6X0ORmyxNPCMdo-AOp5n2c",
+    "Cabaji": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dk2ya15-d7d4ddcb-d07b-4a59-a2ca-d011cbd2247e.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___cabaji_by_onepieceworldproject_dk2ya15-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTg3NiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGsyeWExNS1kN2Q0ZGRjYi1kMDdiLTRhNTktYTJjYS1kMDExY2JkMjI0N2UuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.NhFtDJtPxtRQMMOGz11xDGd76hhe8ksxBQcECYYUYeU",
+    "Usopp": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d7ba41o-8b1cd969-f144-46ab-8470-449f7728bf30.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___usopp_by_onepieceworldproject_d7ba41o-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDdiYTQxby04YjFjZDk2OS1mMTQ0LTQ2YWItODQ3MC00NDlmNzcyOGJmMzAuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.8KMzgPlFeSVMNkgVpDBFoOe5BZQlkq_tPYEL6mhLqCQ",
+    "Kuro": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d709e68-e5c1ab51-e93e-426d-9896-7c8590928169.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___kuro_by_onepieceworldproject_d709e68-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDcwOWU2OC1lNWMxYWI1MS1lOTNlLTQyNmQtOTg5Ni03Yzg1OTA5MjgxNjkuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.1Khec5s644mEFibiTCSDN4xBcDmHEBYjh3Wgq4YOF5I",
+    "Kaya": "https://tse4.mm.bing.net/th/id/OIP.PRQjvzXURPPBaEzGRh-OwAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Jango": "https://tse4.mm.bing.net/th/id/OIP.3l1yLoMGrBT--2SsfbhYcQHaKH?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Sham": "https://i.pinimg.com/736x/9c/e1/16/9ce1166e8efaa77034e0ea486ef865ac.jpg",
+    "Buchi": "https://i.pinimg.com/736x/67/48/87/67488711dc61c0052058df430413a7c7.jpg",
+    "Sanji": "https://i.pinimg.com/236x/a6/78/37/a67837a646f4e631ebf3cd485ba93d7e.jpg?nii=t",
+    "Zeff": "https://i.pinimg.com/736x/66/24/87/662487b5ef285a4ff58fcd5a3aac0812.jpg",
+    "Don Krieg": "https://i.pinimg.com/736x/2e/1d/9e/2e1d9e064779ef3b33a2345054398052.jpg",
+    "Gin": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/ddgik88-9227ffac-2891-4526-8add-3b87de9ca0e5.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___gin_by_onepieceworldproject_ddgik88-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGRnaWs4OC05MjI3ZmZhYy0yODkxLTQ1MjYtOGFkZC0zYjg3ZGU5Y2EwZTUuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.okFrdqB9CNwCbgbL0D62GK7X0scDSLk7ab5c2mDA3TY",
+    "Pearl": "https://tse1.mm.bing.net/th/id/OIP.wRNGNsv-Gfeu8bXfEGrvlQHaL9?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Dracule Mihawk": "https://tse2.mm.bing.net/th/id/OIP.7RPNltZzYzZWpH3z7Q5bNwHaGa?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Patty": "https://th.bing.com/th/id/R.0de9cfda79850c49770ac2bc595e1326?rik=7Fdb14%2bTUMe8kA&pid=ImgRaw&r=0",
+    "Arlong": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dl3mqnw-60657e84-3598-4056-aa4f-13f64dd285a6.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGwzbXFudy02MDY1N2U4NC0zNTk4LTQwNTYtYWE0Zi0xM2Y2NGRkMjg1YTYuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.af6-EuHW5fAQ--3Zhxw4v460IeG4BMtIEs1nYMVV7CY",
+    "Nami (Arlong Park)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5m54iz-3f4b35a7-087c-458c-8ce0-a0e27cd12825.png/v1/fit/w_828,h_1264,q_70,strp/epp___arlong_park__nami_by_sergiart_d5m54iz-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVtNTRpei0zZjRiMzVhNy0wODdjLTQ1OGMtOGNlMC1hMGUyN2NkMTI4MjUucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.WQwsznJCAtSQmvw0s-WxdDFpU0ttAULJvYoCNQjGpq4",
+    "Kuroobi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d7vpjiu-b52e9e6b-435a-40f6-adf3-4c5e0025ec7a.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___kuroobi_by_onepieceworldproject_d7vpjiu-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDd2cGppdS1iNTJlOWU2Yi00MzVhLTQwZjYtYWRmMy00YzVlMDAyNWVjN2EuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.v6YWy3P2yRE7SOlTk_zTkka8bDGHvOI30_CjQoaR8bM",
+    "Chew": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dexthmu-537e923f-e38b-49d4-9c0e-a2c02943f755.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___chew_by_onepieceworldproject_dexthmu-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGV4dGhtdS01MzdlOTIzZi1lMzhiLTQ5ZDQtOWMwZS1hMmMwMjk0M2Y3NTUuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.JWp0No8O41P8Xv2-Hs_aKztJGHxvOnchXnJT0lEiytM",
+    "Hatchan": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d81rnti-61c3485c-411e-4b28-b84b-929a990bf61f.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___hatchan_by_onepieceworldproject_d81rnti-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDgxcm50aS02MWMzNDg1Yy00MTFlLTRiMjgtYjg0Yi05MjlhOTkwYmY2MWYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.UQZWji3P4dFD5gL9YAfVqHF4bERCCFbz49ij8rGdBuA",
+    "Nojiko": "https://tse3.mm.bing.net/th/id/OIP.pYD2e0eeLso2GilWkttyhwAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Smoker": "https://th.bing.com/th/id/OIP.9Fz7_lWlUEy3WfuRTw24vgAAAA?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Tashigi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dcghae5-58dd2191-277c-4385-a6a9-299867708003.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___tashigi_by_onepieceworldproject_dcghae5-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTg3NiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZGNnaGFlNS01OGRkMjE5MS0yNzdjLTQzODUtYTZhOS0yOTk4Njc3MDgwMDMuanBnIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.fhe8-6F_yp-nOMEmM6450j6h207WejlYlxImgvePDp4",
+    "Dragon": "https://tse1.mm.bing.net/th/id/OIP.M3Jb8aCZ3bN1dY3TEfAVLgHaKy?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Bartolomeo (Young)": "https://tse3.mm.bing.net/th/id/OIP.fo2mmqaruPmsxCTGh5ZC9gHaKl?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Mr. 9": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/dh1u5uz-045f066a-87d2-447c-9bbd-ecd0e7052cec.jpg/v1/fill/w_738,h_1082,q_70,strp/one_piece_mr_9_by_onepieceworldproject_dh1u5uz-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzVjZTk4NjQ3LTU5NzUtNGY3Zi1iZDA5LTBlZDcxOTQzM2VlMVwvZGgxdTV1ei0wNDVmMDY2YS04N2QyLTQ0N2MtOWJiZC1lY2QwZTcwNTJjZWMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.xpbLlhvpTqdiXxWABsl-IYYLpIPbJ6Yc7DhNv0TTeMo",
+    "Miss Monday": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr0bx-8ef3e495-e250-431d-89be-51e9fe573d0d.png/v1/fill/w_841,h_950/miss_monday_by_bodskih_dfcr0bx-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTU1OCIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjBieC04ZWYzZTQ5NS1lMjUwLTQzMWQtODliZS01MWU5ZmU1NzNkMGQucG5nIiwid2lkdGgiOiI8PTEzODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.wr1ylx9D41Z4Hl3mltsRt5rOAC9hUHYLMpF5IHD8tpo",
+    "Igaram": "https://i.pinimg.com/736x/a5/9c/45/a59c45141682a03317db5f5b86e0f4d6.jpg",
+    "Princess Vivi": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de30ax5-1890382d-ec9a-4ccd-a333-2f126b9b82e3.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi8xY2UxMzcyYS1iNzVjLTQwNTgtYjBjOC0xYmYxYzJkNjgzN2UvZGUzMGF4NS0xODkwMzgyZC1lYzlhLTRjY2QtYTMzMy0yZjEyNmI5YjgyZTMucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.kM-1vMHaj06MJCImnlJsR38mHumRp5b_carmg2rOmdw",
+    "Dorry": "https://i.pinimg.com/736x/c5/f8/6c/c5f86c48669e647557a63153d7280c9f.jpg",
+    "Brogy": "https://i.pinimg.com/736x/39/71/b0/3971b0ec988e1072f880c37f977c9a0e.jpg",
+    "Mr. 3": "https://tse3.mm.bing.net/th/id/OIP.Z35c8hlbu-8RiIdwDUWxsAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Miss Goldenweek": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d8du5tf-ba04f220-aafa-4839-b086-5960a38d2343.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___miss_goldenweek_by_onepieceworldproject_d8du5tf-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDhkdTV0Zi1iYTA0ZjIyMC1hYWZhLTQ4MzktYjA4Ni01OTYwYTM4ZDIzNDMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.wIvBFZrfNwcLCEBS6_-LXnLJyJq6HHPaDeAohvU07wU",
+    "Mr. 5": "https://i.pinimg.com/originals/cf/0f/93/cf0f93575cee582d01ba465041592858.jpg",
+    "Tony Tony Chopper": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ec719f46-44d6-4593-ab1e-952b01909a4e/d5j838u-522da15c-443e-47a4-b5d5-e0a926e7a99f.png/v1/fit/w_828,h_1264,q_70,strp/epp___drum__chopper_by_sergiart_d5j838u-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI2NCIsInBhdGgiOiIvZi9lYzcxOWY0Ni00NGQ2LTQ1OTMtYWIxZS05NTJiMDE5MDlhNGUvZDVqODM4dS01MjJkYTE1Yy00NDNlLTQ3YTQtYjVkNS1lMGE5MjZlN2E5OWYucG5nIiwid2lkdGgiOiI8PTgyOCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.Z-tcI2TNSJBah8Rzk8p6zS_OwcF7XEcvAu3TR91PRCE",
+    "Wapol": "https://tse4.mm.bing.net/th/id/OIP.CeVZcZjwgkHp2QowMx9YPwHaK2?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Dr. Kureha": "https://tse4.mm.bing.net/th/id/OIP.6oT8H4iufjlwxThjep64jQHaKU?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Dalton": "https://i.pinimg.com/736x/05/27/7e/05277eef7a73bdf555bc3b1cf01bb2bb.jpg",
+    "Chess": "https://tse4.mm.bing.net/th/id/OIP.BPMUGvtKZoUEom23UH6BIAHaPC?rs=1&pid=ImgDetMain&o=7&rm=3",
+    "Kuromarimo": "https://i.pinimg.com/originals/ed/f6/7e/edf67e3336b49a1f23714a861e973688.jpg",
+    "Crocodile": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6qedj9-285dac66-9b6e-418e-be50-9df6d7b01717.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___crocodile_by_onepieceworldproject_d6qedj9-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZxZWRqOS0yODVkYWM2Ni05YjZlLTQxOGUtYmU1MC05ZGY2ZDdiMDE3MTcuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.f4AaX4WiZhHd3SAehptFl5gMYXXdVa_CnfAHrZMDEI8",
+    "Nico Robin": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d6u682k-954262f0-6794-41f7-a999-ecc6fa1ec553.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___nico_robin_by_onepieceworldproject_d6u682k-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDZ1Njgyay05NTQyNjJmMC02Nzk0LTQxZjctYTk5OS1lY2M2ZmExZWM1NTMuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.-10BlbsYn-jsLlRN_UlYrKht2bdWQKK0fwE_KzP5lAw",
+    "Mr. 1 (Daz Bones)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ce1372a-b75c-4058-b0c8-1bf1c2d6837e/de2zwd9-dc59ab3e-13e9-4118-aea5-397164116e70.png/v1/fit/w_533,h_800/daz_bonez___mr1_by_hobbj_de2zwd9-375w-2x.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6Ii9mLzFjZTEzNzJhLWI3NWMtNDA1OC1iMGM4LTFiZjFjMmQ2ODM3ZS9kZTJ6d2Q5LWRjNTlhYjNlLTEzZTktNDExOC1hZWE1LTM5NzE2NDExNmU3MC5wbmciLCJ3aWR0aCI6Ijw9NTMzIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.6g7IJhEH0IjoQDX3e4_MBBPaBWrnAbHWnytKw1MKBH4",
+    "Mr. 2 (Bon Clay)": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5ce98647-5975-4f7f-bd09-0ed719433ee1/d70r0t0-d14f8217-4d93-4ff4-9200-8e92bed4c6af.jpg/v1/fit/w_828,h_1214,q_70,strp/one_piece___bentham_by_onepieceworldproject_d70r0t0-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiIvZi81Y2U5ODY0Ny01OTc1LTRmN2YtYmQwOS0wZWQ3MTk0MzNlZTEvZDcwcjB0MC1kMTRmODIxNy00ZDkzLTRmZjQtOTIwMC04ZTkyYmVkNGM2YWYuanBnIiwid2lkdGgiOiI8PTE1MzcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.iL-GeWcyaDAt07o3X2yD9Hv9NbpmMqkOB3KxABm9dUk",
+    "Miss Doublefinger": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/51158316-fd7e-48ca-b5fe-8542e9dfe357/dfcr137-c5214b14-e402-42e8-ba9f-4ed1582d5e3c.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MjI1MiIsInBhdGgiOiJcL2ZcLzUxMTU4MzE2LWZkN2UtNDhjYS1iNWZlLTg1NDJlOWRmZTM1N1wvZGZjcjEzNy1jNTIxNGIxNC1lNDAyLTQyZTgtYmE5Zi00ZWQxNTgyZDVlM2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.GKTGW_f7lqvQ6zpbcCM5Sf3HW3ouam4xmC1C-ZLiM6I"
+};
+
+// Card data for 10 One Piece arcs - 52 characters total
+const CARD_DATABASE = [
+    // Romance Dawn Arc (5 cards)
+    { id: 1, name: "Monkey D. Luffy", arc: "Romance Dawn", power: 65 },
+    { id: 2, name: "Roronoa Zoro", arc: "Romance Dawn", power: 62 },
+    { id: 3, name: "Koby", arc: "Romance Dawn", power: 15 },
+    { id: 4, name: "Alvida", arc: "Romance Dawn", power: 25 },
+    { id: 5, name: "Shanks", arc: "Romance Dawn", power: 98 },
+
+    // Orange Town Arc (4 cards)
+    { id: 6, name: "Nami", arc: "Orange Town", power: 35 },
+    { id: 7, name: "Buggy", arc: "Orange Town", power: 45 },
+    { id: 8, name: "Mohji", arc: "Orange Town", power: 18 },
+    { id: 9, name: "Cabaji", arc: "Orange Town", power: 22 },
+
+    // Syrup Village Arc (6 cards)
+    { id: 10, name: "Usopp", arc: "Syrup Village", power: 28 },
+    { id: 11, name: "Kuro", arc: "Syrup Village", power: 48 },
+    { id: 12, name: "Kaya", arc: "Syrup Village", power: 5 },
+    { id: 13, name: "Jango", arc: "Syrup Village", power: 30 },
+    { id: 14, name: "Sham", arc: "Syrup Village", power: 20 },
+    { id: 15, name: "Buchi", arc: "Syrup Village", power: 20 },
+
+    // Baratie Arc (7 cards)
+    { id: 16, name: "Sanji", arc: "Baratie", power: 60 },
+    { id: 17, name: "Zeff", arc: "Baratie", power: 55 },
+    { id: 18, name: "Don Krieg", arc: "Baratie", power: 52 },
+    { id: 19, name: "Gin", arc: "Baratie", power: 42 },
+    { id: 20, name: "Pearl", arc: "Baratie", power: 35 },
+    { id: 21, name: "Dracule Mihawk", arc: "Baratie", power: 100 },
+    { id: 22, name: "Patty", arc: "Baratie", power: 25 },
+
+    // Arlong Park Arc (6 cards)
+    { id: 23, name: "Arlong", arc: "Arlong Park", power: 68 },
+    { id: 24, name: "Nami (Arlong Park)", arc: "Arlong Park", power: 38 },
+    { id: 25, name: "Kuroobi", arc: "Arlong Park", power: 40 },
+    { id: 26, name: "Chew", arc: "Arlong Park", power: 38 },
+    { id: 27, name: "Hatchan", arc: "Arlong Park", power: 36 },
+    { id: 28, name: "Nojiko", arc: "Arlong Park", power: 12 },
+
+    // Loguetown Arc (4 cards)
+    { id: 29, name: "Smoker", arc: "Loguetown", power: 72 },
+    { id: 30, name: "Tashigi", arc: "Loguetown", power: 40 },
+    { id: 31, name: "Dragon", arc: "Loguetown", power: 95 },
+    { id: 32, name: "Bartolomeo (Young)", arc: "Loguetown", power: 20 },
+
+    // Whiskey Peak Arc (4 cards)
+    { id: 33, name: "Mr. 9", arc: "Whiskey Peak", power: 30 },
+    { id: 34, name: "Miss Monday", arc: "Whiskey Peak", power: 32 },
+    { id: 35, name: "Igaram", arc: "Whiskey Peak", power: 35 },
+    { id: 36, name: "Princess Vivi", arc: "Whiskey Peak", power: 28 },
+
+    // Little Garden Arc (5 cards)
+    { id: 37, name: "Dorry", arc: "Little Garden", power: 70 },
+    { id: 38, name: "Brogy", arc: "Little Garden", power: 70 },
+    { id: 39, name: "Mr. 3", arc: "Little Garden", power: 44 },
+    { id: 40, name: "Miss Goldenweek", arc: "Little Garden", power: 26 },
+    { id: 41, name: "Mr. 5", arc: "Little Garden", power: 42 },
+
+    // Drum Island Arc (6 cards)
+    { id: 42, name: "Tony Tony Chopper", arc: "Drum Island", power: 50 },
+    { id: 43, name: "Wapol", arc: "Drum Island", power: 46 },
+    { id: 44, name: "Dr. Kureha", arc: "Drum Island", power: 40 },
+    { id: 45, name: "Dalton", arc: "Drum Island", power: 48 },
+    { id: 46, name: "Chess", arc: "Drum Island", power: 32 },
+    { id: 47, name: "Kuromarimo", arc: "Drum Island", power: 30 },
+
+    // Alabasta Arc (5 cards)
+    { id: 48, name: "Crocodile", arc: "Alabasta", power: 85 },
+    { id: 49, name: "Nico Robin", arc: "Alabasta", power: 58 },
+    { id: 50, name: "Mr. 1 (Daz Bones)", arc: "Alabasta", power: 65 },
+    { id: 51, name: "Mr. 2 (Bon Clay)", arc: "Alabasta", power: 56 },
+    { id: 52, name: "Miss Doublefinger", arc: "Alabasta", power: 50 }
+];
+
+// Get all unique arcs
+const ARCS = [...new Set(CARD_DATABASE.map(card => card.arc))];
