@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Piece Card War</title>
+    <title>One Piece Card War v1.0</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Alternative: Use emoji as favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
+    
     <!-- PeerJS for WebRTC P2P connections -->
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
@@ -67,6 +73,43 @@
             </div>
 
             <div class="lobby-actions">
+                <!-- Bot Mode Section (NEW) -->
+                <div class="section">
+                    <h3>🤖 Play vs Bot (Offline)</h3>
+                    <button id="play-bot-btn" class="btn btn-primary">Play vs Bot</button>
+                    <div id="difficulty-selector" class="hidden">
+                        <h4>Select Difficulty:</h4>
+                        <div class="difficulty-buttons">
+                            <button class="btn btn-difficulty" data-difficulty="EASY">
+                                <span class="difficulty-icon">😊</span>
+                                <span class="difficulty-name">Easy</span>
+                                <span class="difficulty-desc">F, D, C cards</span>
+                            </button>
+                            <button class="btn btn-difficulty" data-difficulty="NORMAL">
+                                <span class="difficulty-icon">🙂</span>
+                                <span class="difficulty-name">Normal</span>
+                                <span class="difficulty-desc">D, C, B cards</span>
+                            </button>
+                            <button class="btn btn-difficulty" data-difficulty="HARD">
+                                <span class="difficulty-icon">😠</span>
+                                <span class="difficulty-name">Hard</span>
+                                <span class="difficulty-desc">B, A, S cards</span>
+                            </button>
+                            <button class="btn btn-difficulty" data-difficulty="EXPERT">
+                                <span class="difficulty-icon">😈</span>
+                                <span class="difficulty-name">Expert</span>
+                                <span class="difficulty-desc">A, S, SS cards</span>
+                            </button>
+                            <button class="btn btn-difficulty" data-difficulty="LEGENDARY">
+                                <span class="difficulty-icon">💀</span>
+                                <span class="difficulty-name">Legendary</span>
+                                <span class="difficulty-desc">S, SS, SSS cards</span>
+                            </button>
+                        </div>
+                        <button id="cancel-bot-btn" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+
                 <div class="section">
                     <h3>Host a Game</h3>
                     <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
@@ -89,6 +132,7 @@
             <div class="section">
                 <h3>Your Collection</h3>
                 <button id="view-collection-btn" class="btn btn-secondary">View Cards</button>
+                <button id="view-admin-btn" class="btn btn-secondary">⚙️ Admin Panel</button>
             </div>
         </div>
     </div>
@@ -104,11 +148,60 @@
                 <select id="arc-filter">
                     <option value="all">All Arcs</option>
                 </select>
+                <label class="filter-checkbox">
+                    <input type="checkbox" id="owned-only-filter">
+                    <span>Show Only Owned Cards</span>
+                </label>
             </div>
             <div id="collection-grid" class="card-grid" style="display: ruby"></div>
         </div>
     </div>
+    
+    <!-- Admin Panel Screen -->
+    <div id="admin-screen" class="screen">
+        <div class="admin-panel">
+            <!-- Back button in its own row at top -->
+            <div class="admin-header">
+                <button id="back-to-lobby-admin-btn" class="btn btn-secondary">← Back to Lobby</button>
+            </div>
 
+            <!-- Arc Availability - Full width -->
+            <section class="admin-section admin-section-full">
+                <h3>Arc Availability</h3>
+                <p class="help-text">Toggle which arcs are available in the card pool</p>
+                <div id="arc-toggles" class="arc-toggles">
+                    <!-- Arc toggles will be generated here -->
+                </div>
+            </section>
+
+            <!-- Rarity Distribution - Full width -->
+            <section class="admin-section admin-section-full">
+                <h3>Rarity Distribution</h3>
+                <div id="rarity-stats" class="rarity-stats">
+                    <!-- Rarity statistics will be shown here -->
+                </div>
+            </section>
+
+            <!-- Two columns for Card Pool Status and Test Deck -->
+            <div class="admin-bottom-grid">
+                <section class="admin-section">
+                    <h3>Card Pool Status</h3>
+                    <div id="pool-stats" class="pool-stats">
+                        <p>Total Cards in Database: <strong id="total-cards">0</strong></p>
+                        <p>Available Cards: <strong id="available-cards">0</strong></p>
+                        <p>Active Arcs: <strong id="active-arcs">0</strong></p>
+                    </div>
+                </section>
+
+                <section class="admin-section">
+                    <h3>Test Starter Deck</h3>
+                    <button id="test-deck-btn" class="btn btn-primary">Generate Test Deck</button>
+                    <div id="test-deck-display" class="test-deck-display"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
     <!-- Game Screen -->
     <div id="game-screen" class="screen">
         <div class="container">
