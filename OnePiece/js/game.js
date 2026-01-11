@@ -31,7 +31,7 @@ class GameState {
             }
         }
         
-        // Give starting cards (random 10 cards)
+        // Give starting cards (random cards)
         this.giveStartingCards(user);
         
         if (!isGuest) {
@@ -42,10 +42,13 @@ class GameState {
     }
 
     giveStartingCards(user) {
-        const shuffled = [...CARD_DATABASE].sort(() => Math.random() - 0.5);
-        for (let i = 0; i < 10; i++) {
-            user.collection.add(shuffled[i].id);
-        }
+        // Generate 5 random cards using weighted rarity system
+        const starterCards = CardRaritySystem.generateStarterDeck();
+        starterCards.forEach(card => {
+            user.collection.add(card.id);
+        });
+        
+        console.log('🎴 Starter deck generated:', starterCards.map(c => `${c.name} (${c.rarity})`));
     }
 
     saveUser(user) {
@@ -143,6 +146,52 @@ class GameState {
         return this.currentGame;
     }
 
+    // Start game against bot (offline mode)
+    startBotGame(playerDeck, botDifficulty) {
+        // Set player as host for bot games
+        this.isHost = true;
+
+        const botUser = BotManager.createBot(botDifficulty);
+        const botDeck = BotManager.generateBotDeck(botDifficulty, 5);
+        
+        this.currentGame = {
+            player1: {
+                user: this.currentUser,
+                deck: playerDeck,
+                score: 0,
+                cardsWon: []
+            },
+            player2: {
+                user: botUser,
+                deck: botDeck,
+                score: 0,
+                cardsWon: []
+            },
+            round: 1,
+            maxRounds: 5,
+            player1Played: false,
+            player2Played: false,
+            player1Card: null,
+            player2Card: null,
+            isBotGame: true,
+            botDifficulty: botDifficulty
+        };
+        
+        return this.currentGame;
+    }
+
+    // Bot plays automatically
+    playBotCard() {
+        const game = this.currentGame;
+        if (!game.isBotGame) return null;
+        
+        const card = BotManager.playBotCard(game.player2.deck);
+        game.player2Card = card;
+        game.player2Played = true;
+        
+        return card;
+    }
+
     createDeck(user, count) {
         const deck = [];
         const userCards = Array.from(user.collection);
@@ -168,32 +217,34 @@ class GameState {
     }
 
     playCard() {
-        const game = this.currentGame;
-        const isPlayer1 = this.isHost;
-        
-        let card;
-        if (isPlayer1) {
-            card = game.player1.deck.shift();
-            game.player1Card = card;
-            game.player1Played = true;
-        } else {
-            card = game.player2.deck.shift();
-            game.player2Card = card;
-            game.player2Played = true;
-        }
-        
-        // Send card to opponent
+    const game = this.currentGame;
+    const isPlayer1 = this.isHost;
+    
+    let card;
+    if (isPlayer1) {
+        card = game.player1.deck.shift();
+        game.player1Card = card;
+        game.player1Played = true;
+    } else {
+        card = game.player2.deck.shift();
+        game.player2Card = card;
+        game.player2Played = true;
+    }
+    
+    // Only send to P2P if not a bot game
+    if (!game.isBotGame) {
         this.p2p.send({
             type: 'cardPlayed',
             card: card,
             isPlayer1: isPlayer1
         });
-        
-        return {
-            card: card,
-            isPlayer1: isPlayer1
-        };
     }
+    
+    return {
+        card: card,
+        isPlayer1: isPlayer1
+    };
+}
 
     checkBothPlayed() {
         return this.currentGame.player1Played && this.currentGame.player2Played;
@@ -251,10 +302,12 @@ class GameState {
         const isPlayer1 = this.isHost;
         const result = { winner: isPlayer1 ? 2 : 1, loser: isPlayer1 ? 1 : 2, conceded: true };
         
-        // Notify opponent
-        this.p2p.send({
-            type: 'concede'
-        });
+        // Only notify opponent if not a bot game
+        if (!this.currentGame.isBotGame) {
+            this.p2p.send({
+                type: 'concede'
+            });
+        }
         
         return result;
     }
