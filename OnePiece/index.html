@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Piece Card War</title>
+    <!-- PeerJS for WebRTC P2P connections -->
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Theme Toggle -->
+    <div id="theme-toggle" class="theme-toggle">
+        <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+        <span id="theme-text">Dark</span>
+    </div>
+
+    <!-- Battle Music Audio -->
+    <audio id="battle-music" loop>
+        <source src="https://quicksounds.com/uploads/tracks/143341674_950320944_1102458802.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Control Widget -->
+    <div id="music-control" class="music-control">
+        <h4>🎵 Battle Music</h4>
+        <div class="volume-controls">
+            <button id="volume-full" class="volume-btn active">Full</button>
+            <button id="volume-half" class="volume-btn">Half</button>
+            <button id="volume-mute" class="volume-btn">Mute</button>
+        </div>
+    </div>
+
+    <!-- Login/Profile Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1>⚔️ One Piece Card War ⚔️</h1>
+            <div class="login-options">
+                <button id="guest-btn" class="btn btn-primary">Play as Guest</button>
+                <button id="claim-profile-btn" class="btn btn-secondary">Claim Profile</button>
+                <button id="login-btn" class="btn btn-secondary">Login to Profile</button>
+            </div>
+            <div id="profile-form" class="hidden">
+                <input type="text" id="username-input" placeholder="Enter username" maxlength="20">
+                <input type="password" id="password-input" placeholder="Enter password (optional for guest)">
+                <button id="submit-profile-btn" class="btn btn-primary">Submit</button>
+                <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lobby Screen -->
+    <div id="lobby-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>Welcome, <span id="player-name" class="my-username"></span>!
+                    <a href="#" id="claim-profile-link" class="claim-profile-link hidden">Claim Profile</a>
+                </h2>
+                <div style="display: flex; gap: 10px;">
+                    <button id="clear-data-btn" class="btn btn-small btn-danger">Clear Data</button>
+                    <button id="logout-btn" class="btn btn-small">Logout</button>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <p>Wins: <span id="wins">0</span> | Losses: <span id="losses">0</span> | Cards Collected: <span id="cards-collected">0</span>/52</p>
+            </div>
+
+            <div class="lobby-actions">
+                <div class="section">
+                    <h3>Host a Game</h3>
+                    <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
+                    <div id="lobby-code-display" class="hidden">
+                        <p>Lobby Code: <strong id="lobby-code"></strong></p>
+                        <button id="copy-link-btn" class="btn btn-secondary btn-small" style="margin-top: 10px;">📋 Copy Join Link</button>
+                        <p class="connection-status" id="connection-status">Initializing connection...</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Join a Game</h3>
+                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="20">
+                    <button id="join-game-btn" class="btn btn-primary">Join Lobby</button>
+                    <p class="connection-status hidden" id="join-status">Connecting...</p>
+                </div>
+
+            </div>
+
+            <div class="section">
+                <h3>Your Collection</h3>
+                <button id="view-collection-btn" class="btn btn-secondary">View Cards</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collection Screen -->
+    <div id="collection-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>Card Collection</h2>
+                <button id="back-to-lobby-btn" class="btn btn-small">Back to Lobby</button>
+            </div>
+            <div class="filter-section">
+                <select id="arc-filter">
+                    <option value="all">All Arcs</option>
+                </select>
+            </div>
+            <div id="collection-grid" class="card-grid" style="display: ruby"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="container">
+            <div class="game-header">
+                <div class="player-info" id="player1-info">
+                    <h3 id="player1-name">Player 1</h3>
+                    <p>Cards: <span id="player1-cards">5</span></p>
+                    <div class="score-display">Score: <span id="player1-score">0</span></div>
+                </div>
+                <div class="round-info">
+                    <p>Round <span id="round-number">1</span>/5</p>
+                </div>
+                <div class="player-info" id="player2-info">
+                    <h3 id="player2-name">Player 2</h3>
+                    <p>Cards: <span id="player2-cards">5</span></p>
+                    <div class="score-display">Score: <span id="player2-score">0</span></div>
+                </div>
+            </div>
+
+            <div class="game-board">
+                <div class="card-slot" id="player1-card-slot">
+                    <div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="card-slot" id="player2-card-slot">
+                    <div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button id="play-card-btn" class="btn btn-primary btn-large">Play Card</button>
+                <button id="concede-btn" class="btn btn-danger">Concede</button>
+            </div>
+
+            <div id="waiting-message" class="waiting-message hidden">
+                Waiting for opponent...
+            </div>
+
+            <div id="result-display" class="result-display hidden">
+                <h2 id="result-text"></h2>
+                <button id="continue-btn" class="btn btn-primary">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+        <div class="container">
+            <h1 id="gameover-result"></h1>
+            <div id="gameover-stats"></div>
+            <div id="cards-won-display" class="hidden">
+                <h3>Cards Won:</h3>
+                <div id="cards-won-grid" class="card-grid"></div>
+            </div>
+            <button id="return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/music.js"></script>
+    <script src="js/p2p.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
