@@ -595,11 +595,47 @@ h3 {
     font-size: 24px;
     margin-bottom: 15px;
     color: var(--text-primary);
+}
 
 
 /* Collection Screen */
 .filter-section {
     margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 10px 15px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.filter-checkbox:hover {
+    border-color: var(--maya-blue);
+    background: var(--bg-tertiary);
+}
+
+.filter-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--maya-blue);
+}
+
+.filter-checkbox span {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    user-select: none;
 }
 
 #arc-filter {
@@ -645,7 +681,31 @@ h3 {
     justify-content: space-between;
     transition: all 0.3s;
     cursor: pointer;
+    position: relative;
 }
+
+.collection-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0.15;
+    box-shadow: inset 0 0 60px 30px var(--rarity-color, transparent);
+}
+
+/* Rarity-specific inward glows */
+.collection-card[data-rarity="SSS"]::after { --rarity-color: #ff0066; }
+.collection-card[data-rarity="SS"]::after { --rarity-color: #9933ff; }
+.collection-card[data-rarity="S"]::after { --rarity-color: #ff6600; }
+.collection-card[data-rarity="A"]::after { --rarity-color: #ffcc00; }
+.collection-card[data-rarity="B"]::after { --rarity-color: #00ccff; }
+.collection-card[data-rarity="C"]::after { --rarity-color: #00cc66; }
+.collection-card[data-rarity="D"]::after { --rarity-color: #8b7355; }
+.collection-card[data-rarity="F"]::after { --rarity-color: #b8b8b8; }
 
 .collection-card:hover {
     transform: translateY(-5px);
@@ -687,6 +747,205 @@ h3 {
 
 .collection-card .card-power {
     font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rarity-badge {
+    font-weight: bold;
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .rarity-badge {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Admin Panel Styles */
+#admin-screen {
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+.admin-panel {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.admin-header {
+    margin-bottom: 20px;
+}
+
+.admin-header .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.admin-section {
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-section-full {
+    width: 100%;
+}
+
+.admin-section h3 {
+    color: var(--maya-blue);
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.help-text {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.arc-toggles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.arc-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.arc-toggle:hover {
+    border-color: var(--maya-blue);
+    transform: translateY(-2px);
+}
+
+.arc-toggle label {
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex: 1;
+}
+
+.arc-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.rarity-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.rarity-stat {
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-left: 4px solid;
+    border-radius: 6px;
+    transition: transform 0.2s ease;
+}
+
+.rarity-stat:hover {
+    transform: translateX(5px);
+}
+
+.rarity-stat .rarity-label {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.rarity-stat .rarity-count {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+.rarity-stat .rarity-chance {
+    color: var(--brown);
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+.admin-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.pool-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pool-stats p {
+    font-size: 1.1em;
+    color: var(--text-primary);
+}
+
+.pool-stats strong {
+    color: var(--maya-blue);
+    font-size: 1.2em;
+}
+
+.test-deck-display {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.test-card {
+    padding: 12px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.test-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.test-card .card-name {
+    font-weight: bold;
+    color: var(--text-primary);
+    font-size: 0.9em;
+}
+
+.test-card .card-power {
+    color: var(--brown);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.test-card .card-rarity {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
 }
 
 /* Game Over Screen */
@@ -706,6 +965,74 @@ h3 {
 
 #cards-won-grid {
     max-height: 400px;
+}
+
+#admin-screen {
+    background: var(--bg-primary);
+}
+
+#admin-screen .screen-header {
+    background: var(--card-bg);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#admin-screen .screen-header h2 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+/* Bot Mode Styles */
+.difficulty-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.btn-difficulty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    text-align: center;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s;
+}
+
+.btn-difficulty:hover {
+    background: var(--maya-blue);
+    color: white;
+    border-color: var(--maya-blue);
+    transform: translateX(5px);
+}
+
+.difficulty-icon {
+    font-size: 2em;
+    margin-bottom: 5px;
+}
+
+.difficulty-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.difficulty-desc {
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+/* Responsive admin panel layouts */
+@media (max-width: 1024px) {
+    .test-deck-display {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -731,6 +1058,22 @@ h3 {
     h3 {
         font-size: 1.2em;
         margin-bottom: 10px;
+    }
+
+    .admin-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .arc-toggles {
+        grid-template-columns: 1fr;
+    }
+    
+    .rarity-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .test-deck-display {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     /* Header adjustments */
@@ -914,6 +1257,13 @@ h3 {
     /* Collection screen */
     .filter-section {
         margin-bottom: 15px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .filter-checkbox {
+        justify-content: center;
     }
 
     #arc-filter {
@@ -948,6 +1298,18 @@ h3 {
 
     .collection-card .card-power {
         font-size: 24px;
+    }
+
+    .arc-toggles {
+        grid-template-columns: 1fr;
+    }
+    
+    .rarity-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .test-deck-display {
+        grid-template-columns: 1fr;
     }
 
     /* Game over screen */
@@ -997,6 +1359,18 @@ h3 {
         margin-left: 0;
         margin-top: 8px;
     }
+    
+    .difficulty-buttons {
+        gap: 8px;
+    }
+    
+    .btn-difficulty {
+        padding: 12px;
+    }
+    
+    .difficulty-icon {
+        font-size: 1.5em;
+    }
 }
 
 /* Extra small screens */
@@ -1018,6 +1392,10 @@ h3 {
         font-size: 1.1em;
     }
 
+    .test-deck-display {
+        grid-template-columns: 1fr;
+    }
+    
     .card-slot {
         width: 140px;
         height: 210px;
