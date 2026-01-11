@@ -54,6 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultText = document.getElementById('result-text');
     const continueBtn = document.getElementById('continue-btn');
 
+    // Add admin button to lobby screen (add this in HTML near view-collection-btn)
+    const viewAdminBtn = document.getElementById('view-admin-btn');
+    const adminScreen = document.getElementById('admin-screen');
+    const backToLobbyAdminBtn = document.getElementById('back-to-lobby-admin-btn');
+    
+    viewAdminBtn?.addEventListener('click', () => {
+        showAdmin();
+    });
+
+    backToLobbyAdminBtn?.addEventListener('click', () => {
+        showLobby();
+    });
+
     // Game over screen elements
     const gameoverResult = document.getElementById('gameover-result');
     const gameoverStats = document.getElementById('gameover-stats');
@@ -114,7 +127,113 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('volume-mute').classList.add('active');
     });
     
-    
+
+    // Admin panel functions
+    function showAdmin() {
+        showScreen(adminScreen);
+        renderAdminPanel();
+    }
+
+    function renderAdminPanel() {
+        // Render arc toggles
+        const arcToggles = document.getElementById('arc-toggles');
+        arcToggles.innerHTML = '';
+        
+        ARCS.forEach(arc => {
+            const toggle = document.createElement('div');
+            toggle.className = 'arc-toggle';
+            toggle.innerHTML = `
+                <label for="arc-${arc}">${arc}</label>
+                <input type="checkbox" id="arc-${arc}" ${ARC_AVAILABILITY[arc] ? 'checked' : ''}>
+            `;
+            
+            const checkbox = toggle.querySelector('input');
+            checkbox.addEventListener('change', (e) => {
+                ARC_AVAILABILITY[arc] = e.target.checked;
+                updatePoolStats();
+                saveArcAvailability();
+            });
+            
+            arcToggles.appendChild(toggle);
+        });
+        
+        // Render rarity stats
+        renderRarityStats();
+        
+        // Update pool stats
+        updatePoolStats();
+        
+        // Test deck button
+        document.getElementById('test-deck-btn').addEventListener('click', generateTestDeck);
+    }
+
+    function renderRarityStats() {
+        const rarityStats = document.getElementById('rarity-stats');
+        rarityStats.innerHTML = '';
+        
+        Object.entries(RARITY_TIERS).forEach(([rarity, info]) => {
+            const cards = CardRaritySystem.getCardsByRarity(rarity);
+            const chance = CardRaritySystem.getDropChance(rarity);
+            
+            const stat = document.createElement('div');
+            stat.className = 'rarity-stat';
+            stat.style.borderLeftColor = info.color;
+            stat.innerHTML = `
+                <div class="rarity-label" style="color: ${info.color}">${info.label}</div>
+                <div class="rarity-count">${cards.length} cards</div>
+                <div class="rarity-chance">${chance}% drop rate</div>
+            `;
+            
+            rarityStats.appendChild(stat);
+        });
+    }
+
+    function updatePoolStats() {
+        const availablePool = CardRaritySystem.getAvailablePool();
+        const activeArcs = ARCS.filter(arc => ARC_AVAILABILITY[arc]).length;
+        
+        document.getElementById('total-cards').textContent = CARD_DATABASE.length;
+        document.getElementById('available-cards').textContent = availablePool.length;
+        document.getElementById('active-arcs').textContent = activeArcs;
+    }
+
+    function generateTestDeck() {
+        const deck = CardRaritySystem.generateStarterDeck();
+        const display = document.getElementById('test-deck-display');
+        display.innerHTML = '';
+        
+        deck.forEach(card => {
+            const rarityInfo = CardRaritySystem.getRarityInfo(card.rarity);
+            const cardEl = document.createElement('div');
+            cardEl.className = 'test-card';
+            
+            // Get character image
+            const img = CHARACTER_IMAGES[card.name] || '';
+            const imgHTML = img ? `<img src="${img}" alt="${card.name}" style="width: 100%; height: 150px; object-fit: fill; border-radius: 8px; margin-bottom: 8px;">` : '';
+            
+            cardEl.innerHTML = `
+                ${imgHTML}
+                <div class="card-name">${card.name}</div>
+                <div class="card-power">⚔️ ${card.power}</div>
+                <div class="card-rarity" style="background-color: ${rarityInfo.color}">${card.rarity}</div>
+            `;
+            display.appendChild(cardEl);
+        });
+    }
+
+    function saveArcAvailability() {
+        localStorage.setItem('arcAvailability', JSON.stringify(ARC_AVAILABILITY));
+    }
+
+    function loadArcAvailability() {
+        const saved = localStorage.getItem('arcAvailability');
+        if (saved) {
+            Object.assign(ARC_AVAILABILITY, JSON.parse(saved));
+        }
+    }
+
+    // Load arc availability on startup
+    loadArcAvailability();
 
     // Setup P2P message handlers
     gameState.p2p.onMessage = (data) => {
@@ -366,21 +485,65 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCollection();
     });
 
+    // Add this new event listener
+    const ownedOnlyFilter = document.getElementById('owned-only-filter');
+    ownedOnlyFilter.addEventListener('change', () => {
+        renderCollection();
+    });
+
     // Game screen handlers
     playCardBtn.addEventListener('click', () => {
         if (hasPlayedThisRound) return;
         
-        hasPlayedThisRound = true;
-        playCardBtn.disabled = true;
-        waitingMessage.classList.remove('hidden');
+        console.log('🎮 Player playing card. Deck remaining:', gameState.currentGame.player1.deck.length);
         
         const result = gameState.playCard();
         displayCard(result.card, result.isPlayer1);
         
-        // Check if opponent already played
-        if (gameState.checkBothPlayed()) {
-            waitingMessage.classList.add('hidden');
-            showBothCards();
+        hasPlayedThisRound = true;
+        playCardBtn.disabled = true;
+        
+        // If bot game, bot plays immediately
+        if (gameState.currentGame.isBotGame) {
+            console.log('🤖 Bot preparing to play. Bot deck remaining:', gameState.currentGame.player2.deck.length);
+            
+            waitingMessage.classList.remove('hidden');
+            waitingMessage.textContent = 'Bot is thinking...';
+            
+            setTimeout(() => {
+                console.log('🤖 Bot playing card now...');
+                const botCard = gameState.playBotCard();
+                console.log('🤖 Bot played:', botCard);
+                
+                waitingMessage.classList.add('hidden');
+                
+                if (botCard) {
+                    displayCard(botCard, false); // false = player2 (bot)
+                    
+                    // Check and resolve immediately
+                    setTimeout(() => {
+                        if (gameState.checkBothPlayed()) {
+                            console.log('✅ Both cards played, showing results');
+                            showBothCards();
+                        } else {
+                            console.error('❌ Both cards NOT played!', {
+                                player1Played: gameState.currentGame.player1Played,
+                                player2Played: gameState.currentGame.player2Played
+                            });
+                        }
+                    }, 500);
+                } else {
+                    console.error('❌ Bot returned null/undefined! Bot deck length:', gameState.currentGame.player2.deck.length);
+                }
+            }, 800); // Small delay for bot to "think"
+        } else {
+            // P2P game logic (existing)
+            waitingMessage.classList.remove('hidden');
+            waitingMessage.textContent = 'Waiting for opponent...';
+            
+            if (gameState.checkBothPlayed()) {
+                showBothCards();
+            }
         }
     });
 
@@ -410,14 +573,99 @@ document.addEventListener('DOMContentLoaded', () => {
         showLobby();
     });
 
+    // Bot mode handlers
+    const playBotBtn = document.getElementById('play-bot-btn');
+    const difficultySelector = document.getElementById('difficulty-selector');
+    const difficultyButtons = document.querySelectorAll('.btn-difficulty');
+    const cancelBotBtn = document.getElementById('cancel-bot-btn');
+
+    playBotBtn.addEventListener('click', () => {
+        playBotBtn.classList.add('hidden');
+        difficultySelector.classList.remove('hidden');
+    });
+
+    cancelBotBtn.addEventListener('click', () => {
+        difficultySelector.classList.add('hidden');
+        playBotBtn.classList.remove('hidden');
+    });
+
+    difficultyButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const difficulty = btn.dataset.difficulty;
+            startBotGame(difficulty);
+        });
+    });
+
+    function startBotGame(difficulty) {
+        // Hide difficulty selector
+        difficultySelector.classList.add('hidden');
+        playBotBtn.classList.remove('hidden');
+
+        // Check if bot difficulty has enough cards
+        const allowedRarities = BOT_DIFFICULTIES[difficulty].rarities;
+        const availableCards = CardRaritySystem.getAvailablePool().filter(card => 
+            allowedRarities.includes(card.rarity)
+        );
+        
+        if (availableCards.length < 5) {
+            alert(`⚠️ ${BOT_DIFFICULTIES[difficulty].name} difficulty is not ready!\n\nThis difficulty needs at least 5 cards from rarities: ${allowedRarities.join(', ')}\n\nCurrently available: ${availableCards.length} cards\n\nPlease enable more arcs in the Admin Panel or choose a different difficulty.`);
+            return;
+        }
+
+        // Create player deck
+        const playerDeck = gameState.createDeck(gameState.currentUser, 5);
+        
+        // Start bot game (no P2P needed)
+        const game = gameState.startBotGame(playerDeck, difficulty);
+        
+        // Verify bot deck was created successfully
+        if (!game.player2.deck || game.player2.deck.length < 5) {
+            alert(`⚠️ Failed to create bot deck for ${BOT_DIFFICULTIES[difficulty].name} difficulty.\n\nPlease enable more arcs in the Admin Panel.`);
+            return;
+        }
+        
+        // Update UI
+        player1NameSpan.textContent = game.player1.user.username;
+        player2NameSpan.textContent = game.player2.user.username;
+        player1CardsSpan.textContent = game.player1.deck.length;
+        player2CardsSpan.textContent = game.player2.deck.length;
+        player1ScoreSpan.textContent = game.player1.score;
+        player2ScoreSpan.textContent = game.player2.score;
+        roundNumberSpan.textContent = game.round;
+        
+        // Mark players
+        document.getElementById('player1-info').classList.add('my-player');
+        document.getElementById('player2-info').classList.remove('my-player');
+        
+        // Show game screen
+        showScreen(gameScreen);
+        musicManager.play();
+        
+        // Reset game state
+        hasPlayedThisRound = false;
+        playCardBtn.disabled = false;
+        waitingMessage.classList.add('hidden');
+        resultDisplay.classList.add('hidden');
+        player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+        player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+    }
+    
     function showBothCards() {
         const img1 = CHARACTER_IMAGES[gameState.currentGame.player1Card.name] || '❓';
         const img2 = CHARACTER_IMAGES[gameState.currentGame.player2Card.name] || '❓';
         
         const result = gameState.resolveRound();
         
-        const p1Class = gameState.isHost ? 'my-card' : 'opponent-card';
-        const p2Class = !gameState.isHost ? 'my-card' : 'opponent-card';
+        // For bot games, player1 = human, player2 = bot
+        // For P2P games, use isHost
+        let p1Class, p2Class;
+        if (gameState.currentGame.isBotGame) {
+            p1Class = 'my-card';
+            p2Class = 'opponent-card';
+        } else {
+            p1Class = gameState.isHost ? 'my-card' : 'opponent-card';
+            p2Class = !gameState.isHost ? 'my-card' : 'opponent-card';
+        }
         
         // Check if it's a URL or emoji
         const img1HTML = img1.startsWith('http') ? `<img src="${img1}" alt="${result.card1.name}">` : img1;
@@ -467,7 +715,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayCard(card, isPlayer1) {
         const img = CHARACTER_IMAGES[card.name] || '❓';
-        const isMyCard = (isPlayer1 && gameState.isHost) || (!isPlayer1 && !gameState.isHost);
+        
+        // For bot games, player is always player1 (my card), bot is always player2 (opponent)
+        // For P2P games, use isHost to determine
+        let isMyCard;
+        if (gameState.currentGame.isBotGame) {
+            isMyCard = isPlayer1; // Player1 = human player, Player2 = bot
+        } else {
+            isMyCard = (isPlayer1 && gameState.isHost) || (!isPlayer1 && !gameState.isHost);
+        }
         
         // Check if it's a URL or emoji
         const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
@@ -536,21 +792,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCollection() {
         const selectedArc = arcFilter.value;
+        const ownedOnly = ownedOnlyFilter.checked;
         const userCollection = gameState.currentUser.collection;
         
-        let cards = CARD_DATABASE;
-        if (selectedArc !== 'all') {
-            cards = cards.filter(card => card.arc === selectedArc);
+        let cards = selectedArc === 'all' 
+            ? CARD_DATABASE 
+            : CARD_DATABASE.filter(card => card.arc === selectedArc);
+        
+        // Filter for owned only if checkbox is checked
+        if (ownedOnly) {
+            cards = cards.filter(card => userCollection.has(card.id));
         }
         
         collectionGrid.innerHTML = '';
         
+        if (cards.length === 0) {
+            collectionGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">No cards to display</p>';
+            return;
+        }
+        
         cards.forEach(card => {
+            const owned = userCollection.has(card.id); // Define owned first
+            
             const cardDiv = document.createElement('div');
             cardDiv.style = `border: 1px solid;padding: 3px;margin: 3px;`;
-            cardDiv.className = 'collection-card';
-            if (!userCollection.has(card.id)) {
-                cardDiv.classList.add('locked');
+            cardDiv.className = `collection-card ${owned ? '' : 'locked'}`;
+            cardDiv.setAttribute('data-rarity', card.rarity); // Add this line
+            
+            if (!owned) {
                 cardDiv.style = `border: 1px solid;
                                 padding: 3px;margin: 3px;
                                 background: rgba(128, 128, 128, 0.6);
@@ -560,13 +829,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = CHARACTER_IMAGES[card.name] || '❓';
             const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
 
+            const rarityInfo = CardRaritySystem.getRarityInfo(card.rarity);
+
             cardDiv.innerHTML = `
                 <div class="card-header">
                     <div class="card-name">${card.name}</div>
                     <div class="card-arc">${card.arc}</div>
                 </div>
-                <div class="card-image">${imgHTML}</div>
-                <div class="card-power">${userCollection.has(card.id) ? card.power : '?'}</div>
+                <div class="card-image">
+                    ${imgHTML}
+                </div>
+                <div class="card-power">
+                    <span class="rarity-badge" style="color: ${rarityInfo.color}">${card.rarity}</span>
+                    ${card.power}
+                </div>
             `;
             
             collectionGrid.appendChild(cardDiv);
