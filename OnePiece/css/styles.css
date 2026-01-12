@@ -796,6 +796,8 @@ body.dark-mode .rarity-badge {
 
 .admin-section-full {
     width: 100%;
+    overflow-y: auto;
+    height: 35vh;
 }
 
 .admin-section h3 {
@@ -812,8 +814,9 @@ body.dark-mode .rarity-badge {
 
 .arc-toggles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    row-gap: 4%;
+    column-gap: 15%;
 }
 
 .arc-toggle {
@@ -837,6 +840,7 @@ body.dark-mode .rarity-badge {
     color: var(--text-primary);
     cursor: pointer;
     flex: 1;
+    padding-right: 4px;;
 }
 
 .arc-toggle input[type="checkbox"] {
@@ -1026,6 +1030,37 @@ body.dark-mode .rarity-badge {
 .difficulty-desc {
     font-size: 0.85em;
     opacity: 0.8;
+}
+
+/* Scroll to Top Button */
+.scroll-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 30px;
+    height: 40px;
+    background: rgba(96, 191, 245, 0.3);
+    border: 2px solid var(--maya-blue);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    opacity: 0.6;
+}
+
+.scroll-top:hover {
+    opacity: 1;
+    background: rgba(96, 191, 245, 0.5);
+    transform: translateY(-2px);
+}
+
+.scroll-top::before {
+    content: '▲';
+    font-size: 16px;
+    color: var(--maya-blue);
 }
 
 /* Responsive admin panel layouts */
