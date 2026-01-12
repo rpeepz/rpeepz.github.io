@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const collectionScreen = document.getElementById('collection-screen');
     const gameScreen = document.getElementById('game-screen');
     const gameoverScreen = document.getElementById('gameover-screen');
-
+    const teamBattleSelectScreen = document.getElementById('team-battle-select-screen');
+    const teamBattleWagerScreen = document.getElementById('team-battle-wager-screen');
+    const teamBattleGameScreen = document.getElementById('team-battle-game-screen');
+    const teamBattleResultsScreen = document.getElementById('team-battle-results-screen');
     // Login screen elements
     const guestBtn = document.getElementById('guest-btn');
     const claimProfileBtn = document.getElementById('claim-profile-btn');
@@ -79,9 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for lobby code in URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const lobbyCodeFromUrl = urlParams.get('lobby') || urlParams.get('code') || urlParams.get('join');
-    
+    const tbLobbyCodeFromUrl = urlParams.get('tblobby') || urlParams.get('teamlobby');
+
     // Store it to use after login
     let pendingLobbyCode = lobbyCodeFromUrl;
+    let pendingTBLobbyCode = tbLobbyCodeFromUrl;
     let currentFormMode = null;
     let hasPlayedThisRound = false;
 
@@ -344,6 +349,85 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = { winner: gameState.isHost ? 1 : 2, loser: gameState.isHost ? 2 : 1, conceded: true };
                 endGameSession(result);
                 break;
+
+            case 'tbJoin':
+                // Guest joining team battle
+                gameState.opponentData = {
+                    username: data.username,
+                    collection: new Set(data.collection)
+                };
+                connectionStatus.textContent = `${data.username} joined Team Battle! Starting...`;
+                connectionStatus.className = 'connection-status connected';
+                
+                setTimeout(() => {
+                    const hostDeck = teamBattleManager.createTeamDeck(gameState.currentUser);
+                    const guestDeck = teamBattleManager.createTeamDeck(gameState.opponentData);
+                    
+                    gameState.p2p.send({
+                        type: 'tbGameStart',
+                        hostDeck: hostDeck,
+                        guestDeck: guestDeck,
+                        hostUsername: gameState.currentUser.username,
+                        mode: gameState.waitingForTeamBattle.mode,
+                        wager: gameState.waitingForTeamBattle.wager
+                    });
+                    
+                    selectedTeamBattleMode = gameState.waitingForTeamBattle.mode;
+                    selectedWager = gameState.waitingForTeamBattle.wager;
+                    startP2PTeamBattle(hostDeck, guestDeck, gameState.currentUser.username);
+                }, 1000);
+                break;
+
+            case 'tbGameStart':
+                // Guest receives team battle start
+                gameState.opponentData = {
+                    username: data.hostUsername,
+                    collection: new Set()
+                };
+                selectedTeamBattleMode = data.mode;
+                selectedWager = data.wager;
+                startP2PTeamBattle(data.hostDeck, data.guestDeck, data.hostUsername);
+                break;
+
+            case 'tbCardDrawn':
+                // Opponent drew a card - opponent is always player2 from our perspective
+                const opponentPlayer = teamBattleManager.currentGame.player2;
+                opponentPlayer.revealedCard = data.card;
+                renderTeamBattleGame(teamBattleManager.currentGame);
+                break;
+
+            case 'tbCardAssigned':
+                // Opponent assigned a card
+                const game = teamBattleManager.currentGame;
+                // Opponent is always player2 from our perspective (whether we're host or guest)
+                const player = game.player2;
+                
+                player.assignments[data.role] = CARD_DATABASE.find(c => c.id === data.cardId);
+                player.revealedCard = null;
+                game.currentTurn = 1;
+                game.assignmentPhase = data.gameState.assignmentPhase;
+                
+                renderTeamBattleGame(game);
+                
+                if (game.assignmentPhase >= 6) {
+                    finishTeamBattle(game);
+                }
+                break;
+
+            case 'tbConcede':
+                // Opponent conceded team battle
+                const tbResult = {
+                    winner: gameState.currentUser,
+                    loser: gameState.opponentData,
+                    winnerScore: 0,
+                    loserScore: 0,
+                    cardsWon: [],
+                    wager: 0,
+                    conceded: true  // Add this flag
+                };
+                showTeamBattleResults(teamBattleManager.currentGame, tbResult);
+                break;
+
         }
     };
 
@@ -622,8 +706,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             roundNumberSpan.textContent = gameState.currentGame.round;
 
-            player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
-            player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+            player1CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
+            player2CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
         }
     });
 
@@ -705,8 +789,8 @@ document.addEventListener('DOMContentLoaded', () => {
         playCardBtn.disabled = false;
         waitingMessage.classList.add('hidden');
         resultDisplay.classList.add('hidden');
-        player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
-        player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+        player1CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
+        player2CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
     }
     
     function showBothCards() {
@@ -735,20 +819,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-header">
                     <div class="card-name">${result.card1.name}</div>
                     <div class="card-arc">${result.card1.arc}</div>
-                </div>
-                <div class="card-image">${img1HTML}</div>
-                <div class="card-power">${result.card1.power}</div>
+            </div>
+            <div class="card-image">${img1HTML}</div>
+            <div class="card-power">
+                <span class="rarity-badge" style="color: ${RARITY_TIERS[result.card1.rarity].color}">${result.card1.rarity}</span>
+                ${result.card1.power}
             </div>
         `;
-        
+
         player2CardSlot.innerHTML = `
             <div class="card ${p2Class} ${result.winner === 2 ? 'winner' : ''}">
                 <div class="card-header">
                     <div class="card-name">${result.card2.name}</div>
                     <div class="card-arc">${result.card2.arc}</div>
-                </div>
-                <div class="card-image">${img2HTML}</div>
-                <div class="card-power">${result.card2.power}</div>
+            </div>
+            <div class="card-image">${img2HTML}</div>
+            <div class="card-power">
+                <span class="rarity-badge" style="color: ${RARITY_TIERS[result.card2.rarity].color}">${result.card2.rarity}</span>
+                ${result.card2.power}
             </div>
         `;
         
@@ -786,15 +874,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Check if it's a URL or emoji
         const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
-        
+    
         const cardHTML = `
             <div class="card ${isMyCard ? 'my-card' : 'opponent-card'}">
                 <div class="card-header">
                     <div class="card-name">${card.name}</div>
                     <div class="card-arc">${card.arc}</div>
-                </div>
-                <div class="card-image">${imgHTML}</div>
-                <div class="card-power">${card.power}</div>
+            </div>
+            <div class="card-image">${imgHTML}</div>
+            <div class="card-power">
+                <span class="rarity-badge" style="color: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</span>
+                ${card.power}
             </div>
         `;
         
@@ -834,6 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Check if there's a pending lobby code from URL
         handlePendingLobbyCode();
+        handlePendingTBLobbyCode();
         
         showScreen(lobbyScreen);
     }
@@ -963,8 +1054,8 @@ document.addEventListener('DOMContentLoaded', () => {
         player2ScoreSpan.textContent = 0;
         roundNumberSpan.textContent = 1;
         
-        player1CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
-        player2CardSlot.innerHTML = '<div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>';
+        player1CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
+        player2CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
         waitingMessage.classList.add('hidden');
         playCardBtn.disabled = false;
         
@@ -1047,6 +1138,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function handlePendingTBLobbyCode() {
+        if (pendingTBLobbyCode) {
+            // Just navigate to the wager screen after login
+            // The variables will be set there
+            setTimeout(() => {
+                // Set defaults
+                selectedTeamBattleMode = 'CLASSIC_PIRATE';
+                teamBattleOpponentMode = 'p2p';
+                selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;
+                
+                // Navigate to wager screen
+                showScreen(teamBattleWagerScreen);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Show P2P options, hide bot difficulty
+                const difficultyDiv = document.getElementById('team-battle-difficulty');
+                const p2pDiv = document.getElementById('team-battle-p2p-options');
+                if (difficultyDiv) difficultyDiv.classList.add('hidden');
+                if (p2pDiv) p2pDiv.classList.remove('hidden');
+                
+                // Set default wager button as active
+                document.querySelectorAll('.wager-btn').forEach(b => b.classList.remove('active'));
+                const defaultWagerBtn = document.querySelector(`.wager-btn[data-wager="${selectedWager}"]`);
+                if (defaultWagerBtn) defaultWagerBtn.classList.add('active');
+                
+                // Fill in the join code
+                const tbJoinInput = document.getElementById('tb-join-code-input');
+                if (tbJoinInput) {
+                    tbJoinInput.value = pendingTBLobbyCode;
+                    tbJoinInput.focus();
+                    tbJoinInput.style.backgroundColor = 'rgba(255, 206, 0, 0.2)';
+                    setTimeout(() => {
+                        tbJoinInput.style.backgroundColor = '';
+                    }, 2000);
+                }
+                
+                pendingTBLobbyCode = null;
+            }, 100); // Small delay to ensure everything is loaded
+        }
+    }
+
     // Apply developer configuration
     if (typeof applyDebugSettings === 'function') {
         applyDebugSettings();
@@ -1065,17 +1197,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Team Battle Mode handlers
+    // Team Battle Mode handlers - P2P ENABLED
     const playTeamBattleBtn = document.getElementById('play-team-battle-btn');
-    const teamBattleSelectScreen = document.getElementById('team-battle-select-screen');
-    const teamBattleWagerScreen = document.getElementById('team-battle-wager-screen');
-    const teamBattleGameScreen = document.getElementById('team-battle-game-screen');
-    const teamBattleResultsScreen = document.getElementById('team-battle-results-screen');
-
+    
     let selectedTeamBattleMode = null;
     let selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;  // Use config default
     let selectedTBDifficulty = null;
-    let selectedCardForAssignment = null;
+    let teamBattleOpponentMode = null; // 'bot' or 'p2p'
 
     playTeamBattleBtn?.addEventListener('click', () => {
         if (!teamBattleManager.canStartTeamBattle(gameState.currentUser)) {
@@ -1090,14 +1218,30 @@ document.addEventListener('DOMContentLoaded', () => {
         showLobby();
     });
 
+    // Mode selection with Bot/P2P choice
     document.querySelectorAll('.select-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             selectedTeamBattleMode = btn.dataset.mode;
-            selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1; // Reset to default
-            showScreen(teamBattleWagerScreen);
+            selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;
             
-            // Scroll to top
+            // Ask: Bot or P2P?
+            const choice = confirm('Play vs Bot (OK) or vs Player online (Cancel)?');
+            teamBattleOpponentMode = choice ? 'bot' : 'p2p';
+            
+            showScreen(teamBattleWagerScreen);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Show/hide difficulty selector based on mode
+            const difficultyDiv = document.getElementById('team-battle-difficulty');
+            const p2pDiv = document.getElementById('team-battle-p2p-options');
+            
+            if (teamBattleOpponentMode === 'bot') {
+                difficultyDiv.classList.remove('hidden');
+                p2pDiv.classList.add('hidden');
+            } else {
+                difficultyDiv.classList.add('hidden');
+                p2pDiv.classList.remove('hidden');
+            }
             
             // Set default wager button as active
             document.querySelectorAll('.wager-btn').forEach(b => b.classList.remove('active'));
@@ -1118,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Bot difficulty selection
     document.querySelectorAll('#team-battle-difficulty .btn-difficulty').forEach(btn => {
         btn.addEventListener('click', () => {
             selectedTBDifficulty = btn.dataset.difficulty;
@@ -1125,9 +1270,95 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function startTeamBattle() {
-        if (!selectedTeamBattleMode || !selectedTBDifficulty) return;
+    // P2P Team Battle handlers
+    document.getElementById('tb-host-game-btn')?.addEventListener('click', async () => {
+        const hostBtn = document.getElementById('tb-host-game-btn');
+        const lobbyDisplay = document.getElementById('tb-lobby-code-display');
+        const lobbyCodeSpan = document.getElementById('tb-lobby-code');
+        const connectionStatus = document.getElementById('tb-connection-status');
         
+        hostBtn.disabled = true;
+        lobbyDisplay.classList.remove('hidden');
+        connectionStatus.textContent = 'Initializing connection...';
+        connectionStatus.className = 'connection-status loading';
+        
+        try {
+            const code = await gameState.createLobby(gameState.currentUser);
+            lobbyCodeSpan.textContent = code;
+            connectionStatus.textContent = 'Waiting for opponent to join...';
+            connectionStatus.className = 'connection-status';
+            
+            // Mark as waiting for team battle
+            gameState.waitingForTeamBattle = {
+                mode: selectedTeamBattleMode,
+                wager: selectedWager
+            };
+        } catch (err) {
+            connectionStatus.textContent = 'Error: ' + err.message;
+            connectionStatus.className = 'connection-status error';
+            hostBtn.disabled = false;
+        }
+    });
+
+    document.getElementById('tb-join-game-btn')?.addEventListener('click', async () => {
+        const code = document.getElementById('tb-join-code-input').value.trim();
+        if (!code) {
+            alert('Please enter a lobby code');
+            return;
+        }
+        
+        const joinBtn = document.getElementById('tb-join-game-btn');
+        const joinStatus = document.getElementById('tb-join-status');
+        
+        joinBtn.disabled = true;
+        joinStatus.classList.remove('hidden');
+        joinStatus.textContent = 'Connecting...';
+        joinStatus.className = 'connection-status loading';
+        
+        try {
+            // Mark that we're joining for team battle
+            gameState.joiningForTeamBattle = true;
+            
+            await gameState.joinLobby(code, gameState.currentUser);
+            joinStatus.textContent = 'Connected! Starting Team Battle...';
+            joinStatus.className = 'connection-status connected';
+        } catch (err) {
+            joinStatus.textContent = 'Failed: ' + err.message;
+            joinStatus.className = 'connection-status error';
+            joinBtn.disabled = false;
+            gameState.joiningForTeamBattle = false;
+        }
+    });
+
+    const tbCopyLinkBtn = document.getElementById('tb-copy-link-btn');
+    tbCopyLinkBtn?.addEventListener('click', () => {
+        const lobbyCode = document.getElementById('tb-lobby-code').textContent;
+        const currentUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${currentUrl}?tblobby=${lobbyCode}`;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            tbCopyLinkBtn.textContent = '✅ Link Copied!';
+            setTimeout(() => {
+                tbCopyLinkBtn.textContent = '📋 Copy Join Link';
+            }, 2000);
+        }).catch(() => {
+            // Fallback if clipboard API doesn't work
+            prompt('Copy this link to share:', shareUrl);
+        });
+    });
+
+    function startTeamBattle() {
+        if (!selectedTeamBattleMode) return;
+        
+        if (teamBattleOpponentMode === 'bot') {
+            if (!selectedTBDifficulty) return;
+            startBotTeamBattle();
+        }
+        // P2P team battle starts via P2P message handler
+    }
+
+    function startBotTeamBattle() {
         try {
             const game = teamBattleManager.startBotTeamBattle(
                 gameState.currentUser,
@@ -1138,9 +1369,54 @@ document.addEventListener('DOMContentLoaded', () => {
             
             renderTeamBattleGame(game);
             showScreen(teamBattleGameScreen);
-            
-            // Play Team Battle music
             musicManager.play('team-battle');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    function startP2PTeamBattle(hostDeck, guestDeck, hostUsername) {
+        const isHost = gameState.isHost;
+        const hostUser = isHost ? gameState.currentUser : { username: hostUsername, collection: new Set() };
+        const guestUser = isHost ? gameState.opponentData : gameState.currentUser;
+        
+        const game = teamBattleManager.startP2PTeamBattle(
+            hostUser,
+            guestUser,
+            hostDeck,
+            guestDeck,
+            selectedTeamBattleMode,
+            selectedWager,
+            isHost
+        );
+        
+        renderTeamBattleGame(game);
+        showScreen(teamBattleGameScreen);
+        musicManager.play('team-battle');
+    }
+
+    // Keep existing renderTeamBattleGame and other functions...
+    // But update assignCardToRoleSimple to send P2P message:
+
+    function assignCardToRoleSimple(game, role) {
+        try {
+            const result = game.assignCard(1, role);
+            
+            // Send P2P message if not bot game
+            if (!game.isBotGame) {
+                gameState.p2p.send({
+                    type: 'tbCardAssigned',
+                    role: role,
+                    cardId: game.player1.assignments[role].id,
+                    gameState: game.serializeState()
+                });
+            }
+            
+            renderTeamBattleGame(game);
+            
+            if (result.complete) {
+                finishTeamBattle(game);
+            }
         } catch (err) {
             alert(err.message);
         }
@@ -1181,19 +1457,41 @@ document.addEventListener('DOMContentLoaded', () => {
         p2Slots.innerHTML = '';
         
         const roles = game.getRoles();
+
+        // Determine which player data goes to which side
+        // Host always on left (player1 slots), guest always on right (player2 slots)
+        const isHost = gameState.isHost;
+        const leftPlayer = isHost ? game.player1 : game.player2;
+        const rightPlayer = isHost ? game.player2 : game.player1;
         
+        // Update labels based on who's viewing
+        const p1Column = document.getElementById('tb-player1-column');
+        const p2Column = document.getElementById('tb-player2-column');
+        
+        if (isHost) {
+            // Host view: left is "Your Team", right is "Opponent Team"
+            p1Column.querySelector('h4').textContent = 'Your Team';
+            p2Column.querySelector('h4').textContent = 'Opponent Team';
+        } else {
+            // Guest view: left is "Opponent Team" (host), right is "Your Team" (guest)
+            p1Column.querySelector('h4').textContent = 'Opponent Team';
+            p2Column.querySelector('h4').textContent = 'Your Team';
+        }
+
         roles.forEach(role => {
             const roleInfo = ROLE_MODIFIERS[game.mode][role];
             
-            // Player 1 slot
-            const p1Card = game.player1.assignments[role];
-            const p1Slot = createRoleSlot(role, roleInfo, p1Card, true);
-            p1Slots.appendChild(p1Slot);
-            
-            // Player 2 slot
-            const p2Card = game.player2.assignments[role];
-            const p2Slot = createRoleSlot(role, roleInfo, p2Card, !blindMode);
-            p2Slots.appendChild(p2Slot);
+            // Left side - show if it's our team OR if blind mode is off
+            const leftCard = leftPlayer.assignments[role];
+            const showLeftCard = (isHost) || !blindMode;  // Host's cards on left - show if we're host OR blind off
+            const leftSlot = createRoleSlot(role, roleInfo, leftCard, showLeftCard);
+            p1Slots.appendChild(leftSlot);
+
+            // Right side - show if it's our team OR if blind mode is off
+            const rightCard = rightPlayer.assignments[role];
+            const showRightCard = (!isHost) || !blindMode;  // Guest's cards on right - show if we're guest OR blind off
+            const rightSlot = createRoleSlot(role, roleInfo, rightCard, showRightCard);
+            p2Slots.appendChild(rightSlot);
         });
     }
 
@@ -1215,20 +1513,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="card-image-small">${imgHTML}</div>
                     <div class="card-details">
                         <div class="card-name">${card.name}</div>
+                        <span class="rarity-badge" style="color: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</span> 
                         <div class="card-power">⚔️ ${card.power}</div>
                     </div>
                 </div>
             `;
         } else if (card && !showCard) {
+            // Blind mode - show only "?" without name or power
             slot.innerHTML = `
                 <div class="role-header">
                     <span class="role-name">${roleInfo.name}</span>
                     <span class="role-multiplier">×${roleInfo.multiplier}</span>
                 </div>
                 <div class="assigned-card hidden-card">
-                    <div class="card-back-small">?</div>
+                    <div class="card-image-small" style="font-size: 48px; text-align: center; line-height: 80px;">❓</div>
                     <div class="card-details">
-                        <div class="card-name">Hidden</div>
+                        <div class="card-name" style="color: var(--text-secondary);">?</div>
+                        <div class="card-power" style="color: var(--text-secondary);">⚔️ ?</div>
                     </div>
                 </div>
             `;
@@ -1285,7 +1586,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="tb-card-draw-area">
                     <div class="card-slot">
                         <div class="card-back">
-                            <img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back">
+                            <img src="img/back.png" alt="Card Back">
                         </div>
                     </div>
                     <button id="tb-draw-card-btn" class="btn btn-primary btn-large">Draw Card</button>
@@ -1294,6 +1595,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             document.getElementById('tb-draw-card-btn').addEventListener('click', () => {
                 const card = game.drawCard(1);
+                
+                // Send P2P message if not bot game
+                if (!game.isBotGame) {
+                    gameState.p2p.send({
+                        type: 'tbCardDrawn',
+                        card: card
+                    });
+                }
+                
                 renderTeamBattleGame(game);
             });
             
@@ -1313,7 +1623,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="card-arc">${card.arc}</div>
                             </div>
                             <div class="card-image">${imgHTML}</div>
-                            <div class="card-power">${card.power}</div>
+                            <div class="card-power">
+                            <span class="rarity-badge" style="color: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</span>
+                                ${card.power}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1321,20 +1634,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             showRoleSelectionSimple(game, card);
         }
-    }
-
-    function createRevealedCardHTML(card) {
-        const img = CHARACTER_IMAGES[card.name] || '❓';
-        const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
-        
-        return `
-            <div class="hand-card revealed">
-                <div class="card-image">${imgHTML}</div>
-                <div class="card-name">${card.name}</div>
-                <div class="card-power">⚔️ ${card.power}</div>
-                <div class="card-rarity" style="background: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</div>
-            </div>
-        `;
     }
 
     function showRoleSelectionSimple(game, card) {
@@ -1370,7 +1669,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function assignCardToRoleSimple(game, role) {
         try {
             const result = game.assignCard(1, role);
-            
+
+            // Send P2P message if not bot game
+            if (!game.isBotGame) {
+                gameState.p2p.send({
+                    type: 'tbCardAssigned',
+                    role: role,
+                    cardId: game.player1.assignments[role].id,
+                    gameState: game.serializeState()
+                });
+            }
+
             renderTeamBattleGame(game);
             
             if (result.complete) {
@@ -1402,6 +1711,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Both teams scored equally!</p>
                 <p>Final Score: ${result.score1} - ${result.score2}</p>
             `;
+        } else if (result.conceded) {
+            // Show concede message
+            const isWinner = result.winner.username === gameState.currentUser.username;
+            if (isWinner) {
+                titleEl.textContent = '🎉 Victory! 🎉';
+                statsEl.innerHTML = `
+                    <p>${result.loser.username} conceded!</p>
+                    <p>You win by forfeit!</p>
+                `;
+            } else {
+                titleEl.textContent = '💔 You Conceded 💔';
+                statsEl.innerHTML = `
+                    <p>You forfeited the match.</p>
+                `;
+            }
         } else {
             const isWinner = result.winner.username === gameState.currentUser.username;
             titleEl.textContent = isWinner ? '🎉 Victory! 🎉' : '💔 Defeat 💔';
@@ -1491,13 +1815,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tb-concede-btn')?.addEventListener('click', () => {
         if (confirm('Are you sure you want to concede?')) {
             const game = teamBattleManager.currentGame;
+            
+            // Send P2P message if not bot game
+            if (!game.isBotGame) {
+                gameState.p2p.send({
+                    type: 'tbConcede'
+                });
+            }
+            
             const result = teamBattleManager.endTeamBattle({
                 winner: game.player2.user,
                 loser: game.player1.user,
                 winnerScore: 0,
                 loserScore: 0,
                 cardsWon: [],
-                wager: 0
+                wager: 0,
+                conceded: true  // Add this flag
             });
             showTeamBattleResults(game, result);
         }
