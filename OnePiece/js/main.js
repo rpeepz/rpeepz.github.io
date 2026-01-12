@@ -1052,9 +1052,100 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
+            // Add click handler to show modal
+            cardDiv.addEventListener('click', () => {
+                showCardDetailModal(card);
+            });
+            
             collectionGrid.appendChild(cardDiv);
         });
     }
+
+    // Card Detail Modal Functions
+    function showCardDetailModal(card) {
+        const modal = document.getElementById('card-detail-modal');
+        const modalCardDisplay = document.getElementById('modal-card-display');
+        
+        const owned = gameState.currentUser.collection.has(card.id);
+        const img = CHARACTER_IMAGES[card.name] || '❓';
+        const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : `<div style="font-size: 80px;">${img}</div>`;
+        const rarityInfo = CardRaritySystem.getRarityInfo(card.rarity);
+        const typeInfo = CHARACTER_TYPES[card.type] || { name: 'Unknown', icon: '❓', color: '#888888' };
+        
+        modalCardDisplay.innerHTML = `
+            <div class="modal-card ${owned ? '' : 'locked'}" data-rarity="${card.rarity}">
+                <div class="modal-card-header">
+                    <div class="modal-card-name">${card.name}</div>
+                    <div class="modal-card-arc">${card.arc}</div>
+                </div>
+                
+                <div class="modal-card-image ${owned ? '' : 'locked'}">
+                    ${imgHTML}
+                    ${!owned ? '<div style="position:absolute;font-size:80px;color:white;text-shadow:2px 2px 8px black;">🔒</div>' : ''}
+                </div>
+                
+                <div class="modal-card-stats">
+                    <div class="modal-stat-item">
+                        <div class="modal-stat-label">Power</div>
+                        <div class="modal-stat-value">⚔️ ${card.power}</div>
+                    </div>
+                    <div class="modal-stat-item">
+                        <div class="modal-stat-label">Rarity</div>
+                        <div class="modal-stat-value">
+                            <span class="modal-rarity-badge" style="color: ${rarityInfo.color}">${card.rarity}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-stat-item" style="margin-bottom: 15px;">
+                    <div class="modal-stat-label">Type</div>
+                    <div class="modal-type-badge" style="color: ${typeInfo.color}">
+                        <span style="font-size: 20px;">${typeInfo.icon}</span>
+                        <span>${typeInfo.name}</span>
+                    </div>
+                </div>
+                
+                ${card.flavorText ? `
+                    <div class="modal-card-flavor">
+                        <div class="modal-flavor-label">Character Info</div>
+                        <div class="modal-flavor-text">${card.flavorText}</div>
+                    </div>
+                ` : ''}
+                
+                ${DEV_CONFIG.DEBUG.SHOW_CARD_IDS ? `
+                    <div class="modal-card-id">Card ID: ${card.id}</div>
+                ` : ''}
+                
+                <div class="modal-card-id" style="opacity: 0.8; margin-top: 15px;">
+                    ${owned ? '✅ Owned' : '🔒 Locked'}
+                </div>
+            </div>
+        `;
+        
+        modal.classList.add('active');
+    }
+    
+    function closeCardDetailModal() {
+        const modal = document.getElementById('card-detail-modal');
+        modal.classList.remove('active');
+    }
+    
+    // Close modal button handler
+    document.getElementById('close-modal-btn')?.addEventListener('click', closeCardDetailModal);
+    
+    // Close modal when clicking outside
+    document.getElementById('card-detail-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'card-detail-modal') {
+            closeCardDetailModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeCardDetailModal();
+        }
+    });
 
     function startGameSession() {
         hasPlayedThisRound = false;
