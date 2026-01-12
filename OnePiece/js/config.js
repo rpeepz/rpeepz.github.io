@@ -421,7 +421,8 @@ const CardRaritySystem = {
 
     // Generate starter deck (5 cards) - weighted random from available pool
     generateStarterDeck() {
-        return this.drawMultipleCards(5);
+        const startingCards = (typeof DEV_CONFIG !== 'undefined' && DEV_CONFIG.GAME.STARTING_CARDS) || 5;
+        return this.drawMultipleCards(startingCards);
     },
 
     // Get cards by rarity tier
