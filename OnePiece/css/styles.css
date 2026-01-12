@@ -391,6 +391,43 @@ body.dark-mode .music-control {
     background: rgba(42, 42, 42, 0.9);  /* Dark mode - semi-transparent dark */
 }
 
+/* Dark mode adjustments for collection modal */
+body.dark-mode .modal-card.locked {
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.3) 0%, rgba(60, 60, 60, 0.3) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="SSS"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(255, 0, 102, 0.25) 0%, rgba(255, 0, 102, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="SS"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(153, 51, 255, 0.25) 0%, rgba(153, 51, 255, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="S"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(255, 102, 0, 0.25) 0%, rgba(255, 102, 0, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="A"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(255, 204, 0, 0.25) 0%, rgba(255, 204, 0, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="B"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(0, 204, 255, 0.25) 0%, rgba(0, 204, 255, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="C"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(0, 204, 102, 0.25) 0%, rgba(0, 204, 102, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="D"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(139, 115, 85, 0.25) 0%, rgba(139, 115, 85, 0.15) 100%);
+}
+
+body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(184, 184, 184, 0.25) 0%, rgba(184, 184, 184, 0.15) 100%);
+}
+
 .music-control.active {
     display: block;
     width: min-content;
@@ -815,6 +852,7 @@ body.dark-mode .music-control {
     transition: all 0.3s;
     cursor: pointer;
     position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .collection-card::after {
@@ -842,13 +880,13 @@ body.dark-mode .music-control {
 
 .collection-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
 
 .collection-card.locked {
     opacity: 0.6;
     border-color: var(--text-tertiary);
-    cursor: not-allowed;
+    cursor: pointer;
     position: relative;
 }
 
@@ -896,6 +934,284 @@ body.dark-mode .music-control {
 
 body.dark-mode .rarity-badge {
     background: rgba(255, 255, 255, 0.1);
+}
+
+/* Card Detail Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.2s ease-in;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    position: relative;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.card-detail-content {
+    max-width: 500px;
+    width: 100%;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.close-modal-btn:hover {
+    background: rgba(255, 0, 0, 1);
+    transform: scale(1.1);
+}
+
+.modal-card-display {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-card {
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border: 3px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+    position: relative;
+}
+
+/* Locked card - lighter grey background for readability */
+.modal-card.locked {
+    background: linear-gradient(135deg, rgba(180, 180, 180, 0.4) 0%, rgba(150, 150, 150, 0.3) 100%);
+    border-color: var(--text-tertiary);
+}
+
+/* Rarity glow backgrounds for unlocked cards - more vibrant and lighter */
+.modal-card[data-rarity="SSS"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(255, 0, 102, 0.35) 0%, rgba(255, 51, 153, 0.25) 100%);
+    box-shadow: 0 8px 30px rgba(255, 0, 102, 0.5), inset 0 0 80px rgba(255, 0, 102, 0.2);
+    border-color: rgba(255, 0, 102, 0.6);
+}
+
+.modal-card[data-rarity="SS"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(153, 51, 255, 0.35) 0%, rgba(179, 102, 255, 0.25) 100%);
+    box-shadow: 0 8px 30px rgba(153, 51, 255, 0.5), inset 0 0 80px rgba(153, 51, 255, 0.2);
+    border-color: rgba(153, 51, 255, 0.6);
+}
+
+.modal-card[data-rarity="S"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(255, 102, 0, 0.35) 0%, rgba(255, 140, 51, 0.25) 100%);
+    box-shadow: 0 8px 30px rgba(255, 102, 0, 0.5), inset 0 0 80px rgba(255, 102, 0, 0.2);
+    border-color: rgba(255, 102, 0, 0.6);
+}
+
+.modal-card[data-rarity="A"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(255, 204, 0, 0.4) 0%, rgba(255, 220, 77, 0.3) 100%);
+    box-shadow: 0 8px 30px rgba(255, 204, 0, 0.6), inset 0 0 80px rgba(255, 204, 0, 0.25);
+    border-color: rgba(255, 204, 0, 0.7);
+}
+
+.modal-card[data-rarity="B"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(0, 204, 255, 0.35) 0%, rgba(51, 220, 255, 0.25) 100%);
+    box-shadow: 0 8px 30px rgba(0, 204, 255, 0.5), inset 0 0 80px rgba(0, 204, 255, 0.2);
+    border-color: rgba(0, 204, 255, 0.6);
+}
+
+.modal-card[data-rarity="C"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(0, 204, 102, 0.35) 0%, rgba(51, 220, 140, 0.25) 100%);
+    box-shadow: 0 8px 30px rgba(0, 204, 102, 0.5), inset 0 0 80px rgba(0, 204, 102, 0.2);
+    border-color: rgba(0, 204, 102, 0.6);
+}
+
+.modal-card[data-rarity="D"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(139, 115, 85, 0.35) 0%, rgba(160, 140, 110, 0.25) 100%);
+    box-shadow: 0 8px 30px rgba(139, 115, 85, 0.5), inset 0 0 80px rgba(139, 115, 85, 0.2);
+    border-color: rgba(139, 115, 85, 0.6);
+}
+
+.modal-card[data-rarity="F"]:not(.locked) {
+    background: linear-gradient(135deg, rgba(184, 184, 184, 0.4) 0%, rgba(200, 200, 200, 0.3) 100%);
+    box-shadow: 0 8px 30px rgba(184, 184, 184, 0.5), inset 0 0 80px rgba(184, 184, 184, 0.2);
+    border-color: rgba(184, 184, 184, 0.6);
+}
+
+.modal-card:hover {
+    transform: scale(1.02);
+}
+
+.modal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-card-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-tertiary);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.modal-card-arc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.modal-card-image {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.modal-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-card-image.locked {
+    filter: brightness(0.3);
+}
+
+.modal-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.modal-stat-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-tertiary);
+}
+
+.modal-rarity-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.modal-type-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-card-flavor {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+.modal-flavor-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.modal-flavor-text {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.modal-card-id {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    opacity: 0.6;
 }
 
 /* Admin Panel Styles */
