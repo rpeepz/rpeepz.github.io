@@ -185,6 +185,12 @@ function applyDebugSettings() {
         statsBar.style.display = 'none';
     }
 
+    // Hide/show version number in footer
+    const versionInfo = document.getElementById('version-info');
+    if (versionInfo && !DEV_CONFIG.UI.SHOW_VERSION_NUMBER) {
+        versionInfo.style.display = 'none';
+    }
+
     // Override console.log if disabled
     if (!DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
         console.log = function() {};
@@ -197,7 +203,7 @@ function applyDebugSettings() {
         setTimeout(() => {
             const guestBtn = document.getElementById('guest-btn');
             if (guestBtn) guestBtn.click();
-        }, 100);
+        }, 500);
     }
 }
 
