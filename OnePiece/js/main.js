@@ -273,12 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const saved = localStorage.getItem('arcAvailability');
         if (saved) {
             const savedState = JSON.parse(saved);
-            // Update saga controls based on saved state
-            for (const saga in SAGA_CONTROLS) {
-                const allEnabled = SAGA_CONTROLS[saga].arcs.every(arc => savedState[arc]);
-                const allDisabled = SAGA_CONTROLS[saga].arcs.every(arc => !savedState[arc]);
-                if (allEnabled || allDisabled) SAGA_CONTROLS[saga].enabled = allEnabled;
-            }
+            // SAGA_CONTROLS removed - not needed, handled by DEV_CONFIG.SAGA_PRESETS
             Object.assign(ARC_AVAILABILITY, savedState);
         }
     }
@@ -585,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const copyLinkBtn = document.getElementById('copy-link-btn');
-    copyLinkBtn.addEventListener('click', () => {
+    copyLinkBtn?.addEventListener('click', () => {
         const lobbyCode = lobbyCodeSpan.textContent;
         const currentUrl = window.location.origin + window.location.pathname;
         const shareUrl = `${currentUrl}?lobby=${lobbyCode}`;
@@ -600,6 +595,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fallback if clipboard API doesn't work
             prompt('Copy this link to share:', shareUrl);
         });
+    });
+
+    // Regular battle close lobby button
+    const closeLobbyBtn = document.getElementById('close-lobby-btn');
+    closeLobbyBtn?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to close this lobby?')) {
+            gameState.p2p.disconnect();
+            lobbyCodeDisplay.classList.add('hidden');
+            hostGameBtn.disabled = false;
+            connectionStatus.textContent = '';
+        }
     });
 
     viewCollectionBtn.addEventListener('click', () => {
@@ -622,9 +628,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCollection();
     });
 
-    // Add this new event listener
     const ownedOnlyFilter = document.getElementById('owned-only-filter');
     ownedOnlyFilter.addEventListener('change', () => {
+        renderCollection();
+    });
+
+    const sortByPowerFilter = document.getElementById('sort-by-power-filter');
+    sortByPowerFilter.addEventListener('change', () => {
         renderCollection();
     });
 
@@ -957,6 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedArc = arcFilter.value;
         const selectedRarity = rarityFilter.value;
         const ownedOnly = ownedOnlyFilter.checked;
+        const sortByPower = sortByPowerFilter.checked;
         const userCollection = gameState.currentUser.collection;
         
         let cards = CARD_DATABASE;
@@ -983,6 +994,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Filter for owned only if checkbox is checked
         if (ownedOnly) {
             cards = cards.filter(card => userCollection.has(card.id));
+        }
+        
+        // Sort by power if checkbox is checked
+        if (sortByPower) {
+            cards = cards.sort((a, b) => b.power - a.power);
         }
         
         collectionGrid.innerHTML = '';
@@ -1183,9 +1199,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof applyDebugSettings === 'function') {
         applyDebugSettings();
     }
-    if (typeof applySagaConfig === 'function') {
-        applySagaConfig();
-    }
 
     // Scroll to top functionality
     const scrollTopBtn = document.getElementById('scroll-top-btn');
@@ -1346,6 +1359,24 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fallback if clipboard API doesn't work
             prompt('Copy this link to share:', shareUrl);
         });
+    });
+
+    // Team battle close lobby button
+    const tbCloseLobbyBtn = document.getElementById('tb-close-lobby-btn');
+    tbCloseLobbyBtn?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to close this lobby?')) {
+            gameState.p2p.disconnect();
+            const lobbyDisplay = document.getElementById('tb-lobby-code-display');
+            const hostBtn = document.getElementById('tb-host-game-btn');
+            const connectionStatus = document.getElementById('tb-connection-status');
+            
+            lobbyDisplay.classList.add('hidden');
+            hostBtn.disabled = false;
+            connectionStatus.textContent = '';
+            
+            // Clear the waiting flag
+            gameState.waitingForTeamBattle = null;
+        }
     });
 
     function startTeamBattle() {
@@ -1664,30 +1695,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         controlsDiv.classList.remove('hidden');
-    }
-
-    function assignCardToRoleSimple(game, role) {
-        try {
-            const result = game.assignCard(1, role);
-
-            // Send P2P message if not bot game
-            if (!game.isBotGame) {
-                gameState.p2p.send({
-                    type: 'tbCardAssigned',
-                    role: role,
-                    cardId: game.player1.assignments[role].id,
-                    gameState: game.serializeState()
-                });
-            }
-
-            renderTeamBattleGame(game);
-            
-            if (result.complete) {
-                finishTeamBattle(game);
-            }
-        } catch (err) {
-            alert(err.message);
-        }
     }
 
     function finishTeamBattle(game) {
