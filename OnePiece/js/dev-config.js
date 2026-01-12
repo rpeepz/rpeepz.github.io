@@ -73,7 +73,8 @@ const DEV_CONFIG = {
         DECK_SIZE: 3,
         AUTO_SAVE: true,
         TEAM_BATTLE_BLIND_ASSIGNMENT: true,
-        TEAM_BATTLE_DEFAULT_WAGER: 1
+        TEAM_BATTLE_DEFAULT_WAGER: 1,
+        TEAM_BATTLE_TYPE_BONUS: false
     },
 
     // UI Settings
