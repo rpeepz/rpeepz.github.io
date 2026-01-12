@@ -8,6 +8,16 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
     
+    <!-- Meta Information -->
+    <meta name="description" content="One Piece Card War - A strategic card battle game featuring characters from the One Piece universe">
+    <meta name="author" content="rpeepz">
+    <meta name="creator" content="rpeepz">
+    <meta name="copyright" content="© 2026 rpeepz. One Piece © Eiichiro Oda">
+    <meta property="og:title" content="One Piece Card War">
+    <meta property="og:description" content="Strategic card battle game featuring One Piece characters">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
+
     <!-- PeerJS for WebRTC P2P connections -->
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
@@ -495,8 +505,77 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.4</p>
-        <p class="credits">© 2026 One Piece Card War | One Piece © Eiichiro Oda</p>
+        <p id="version-info">v1.5 | Last Updated: January 2026</p>
+        <p class="credits">© 2026 One Piece Card War | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
+        <details style="margin-top: 8px;">
+            <summary style="cursor: pointer; color: var(--maya-blue); font-size: 12px; font-weight: 600; transition: color 0.2s;">📚 Sources, Credits & Acknowledgments</summary>
+            <div style="margin-top: 10px; font-size: 11px; text-align: left; max-width: 700px; margin: 10px auto; line-height: 1.6;">
+                <p style="margin-bottom: 8px;"><strong>🎮 Game Design & Development:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px;">Created by <strong>rpeepz</strong> (2026) • <a href="https://square.link/u/T6XoDQMr" target="_blank" style="color: var(--maya-blue);">Support the Developer</a></p>
+                
+                <p style="margin-bottom: 8px;"><strong>💻 Technology Stack:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px;">
+                    • WebRTC P2P: <a href="https://peerjs.com/" target="_blank" style="color: var(--maya-blue);">PeerJS</a><br>
+                    • Frontend: Vanilla JavaScript, CSS3, HTML5<br>
+                    • Local Storage API for data persistence
+                </p>
+                
+                <p style="margin-bottom: 8px;"><strong>📖 Content & Resources:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px;">
+                    • Manga/Anime: <em>One Piece</em> © Eiichiro Oda/Shueisha, Toei Animation<br>
+                    • Character Data: <a href="https://onepiece.fandom.com/" target="_blank" style="color: var(--maya-blue);">One Piece Wiki (Fandom)</a><br>
+                    • Character Images: Various fan art & official sources<br>
+                    • Card Rarity System: Inspired by TCG/CCG mechanics
+                </p>
+                
+                <p style="margin-bottom: 8px;"><strong>🎵 Audio Assets:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px;">
+                    • Battle Music: <a href="https://quicksounds.com/" target="_blank" style="color: var(--maya-blue);">QuickSounds</a><br>
+                    • Team Battle Music: <a href="https://www.voicemod.net/" target="_blank" style="color: var(--maya-blue);">Voicemod Soundboard</a>
+                </p>
+                
+                <p style="margin-bottom: 8px;"><strong>🎨 Design Elements:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px;">
+                    • Color Palette: Inspired by One Piece aesthetics<br>
+                    • Card Design: Original implementation<br>
+                    • UI/UX: Responsive design for all devices
+                </p>
+                
+                <p style="margin-bottom: 8px;"><strong>⚡ Features:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px;">
+                    • P2P Multiplayer (No Server Required)<br>
+                    • Offline Bot Battles (5 Difficulty Levels)<br>
+                    • Team Battle Mode (Davy Back Fight & Classic Pirate)<br>
+                    • Card Collection System (163 Unique Characters)<br>
+                    • Character Type System with Synergy Bonuses<br>
+                    • Dynamic Rarity Distribution<br>
+                    • Dark/Light Mode Toggle<br>
+                    • Profile System with Local Save
+                </p>
+                
+                <p style="margin-bottom: 8px;"><strong>📜 Legal & Disclaimer:</strong></p>
+                <p style="margin-left: 15px; margin-bottom: 10px; font-size: 10px; opacity: 0.9;">
+                    This is a fan-made, non-commercial project created for entertainment purposes only. 
+                    All One Piece characters, names, and related indicia are trademarks of Eiichiro Oda and Shueisha, Inc. 
+                    This game is not affiliated with, endorsed by, or connected to the official One Piece franchise. 
+                    No copyright infringement is intended.
+                </p>
+                
+                <p style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                    <strong>Special Thanks:</strong> The One Piece community, beta testers, and all players! 🏴‍☠️
+                </p>
+            </div>
+        </details>
     </footer>
+
+    <!-- Card Detail Modal -->
+    <div id="card-detail-modal" class="modal">
+        <div class="modal-content card-detail-content">
+            <button id="close-modal-btn" class="close-modal-btn">✕</button>
+            <div id="modal-card-display" class="modal-card-display">
+                <!-- Card will be rendered here -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
