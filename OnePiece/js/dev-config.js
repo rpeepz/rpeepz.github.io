@@ -19,7 +19,7 @@ const DEV_CONFIG = {
         CLEAR_DATA_BUTTON: false,
         CONSOLE_LOGGING: false,
         SHOW_CARD_IDS: true,
-        SKIP_LOGIN: true,
+        SKIP_LOGIN: false,
         UNLIMITED_CARDS: false
     },
 
@@ -72,7 +72,7 @@ const DEV_CONFIG = {
         STARTING_CARDS: 30,
         DECK_SIZE: 5,
         AUTO_SAVE: true,
-        TEAM_BATTLE_BLIND_ASSIGNMENT: false,
+        TEAM_BATTLE_BLIND_ASSIGNMENT: true,
         TEAM_BATTLE_DEFAULT_WAGER: 1
     },
 
