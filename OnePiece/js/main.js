@@ -296,9 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Host creates decks and starts game
                 setTimeout(() => {
-                    const hostDeck = gameState.createDeck(gameState.currentUser, 5);
-                    const guestDeck = gameState.createDeck(gameState.opponentData, 5);
-                    
+                    const hostDeck = gameState.createDeck(gameState.currentUser, DEV_CONFIG.GAME.DECK_SIZE || 5);
+                    const guestDeck = gameState.createDeck(gameState.opponentData, DEV_CONFIG.GAME.DECK_SIZE || 5);
                     // Send game start to guest
                     gameState.p2p.send({
                         type: 'gameStart',
@@ -662,19 +661,19 @@ document.addEventListener('DOMContentLoaded', () => {
             allowedRarities.includes(card.rarity)
         );
         
-        if (availableCards.length < 5) {
-            alert(`⚠️ ${BOT_DIFFICULTIES[difficulty].name} difficulty is not ready!\n\nThis difficulty needs at least 5 cards from rarities: ${allowedRarities.join(', ')}\n\nCurrently available: ${availableCards.length} cards\n\nPlease enable more arcs in the Admin Panel or choose a different difficulty.`);
+        if (availableCards.length < DEV_CONFIG.GAME.DECK_SIZE) {
+            alert(`⚠️ ${BOT_DIFFICULTIES[difficulty].name} difficulty is not ready!\n\nThis difficulty needs at least ${DEV_CONFIG.GAME.DECK_SIZE} cards from rarities: ${allowedRarities.join(', ')}\n\nCurrently available: ${availableCards.length} cards\n\nPlease enable more arcs in the Admin Panel or choose a different difficulty.`);
             return;
         }
 
         // Create player deck
-        const playerDeck = gameState.createDeck(gameState.currentUser, 5);
-        
+        const playerDeck = gameState.createDeck(gameState.currentUser, DEV_CONFIG.GAME.DECK_SIZE || 5);
+
         // Start bot game (no P2P needed)
         const game = gameState.startBotGame(playerDeck, difficulty);
-        
+
         // Verify bot deck was created successfully
-        if (!game.player2.deck || game.player2.deck.length < 5) {
+        if (!game.player2.deck || game.player2.deck.length < DEV_CONFIG.GAME.DECK_SIZE) {
             alert(`⚠️ Failed to create bot deck for ${BOT_DIFFICULTIES[difficulty].name} difficulty.\n\nPlease enable more arcs in the Admin Panel.`);
             return;
         }
