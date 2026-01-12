@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Piece Card War v1.1</title>
+    <title>One Piece Card War v1.2</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
@@ -25,13 +25,19 @@
         <source src="https://quicksounds.com/uploads/tracks/143341674_950320944_1102458802.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Team Battle Music Audio -->
+    <audio id="team-battle-music" loop>
+        <source src="https://us-tuna-sounds-files.voicemod.net/86e570ed-a8db-490d-abde-cdf5a3ad9a40-1664011058207.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Music Control Widget -->
     <div id="music-control" class="music-control">
-        <h4>🎵 Battle Music</h4>
+        <button id="music-control-close" class="music-control-close">×</button>
+        <!-- <h4>🎵 Battle Music</h4> -->
         <div class="volume-controls">
-            <button id="volume-full" class="volume-btn active">Full</button>
-            <button id="volume-half" class="volume-btn">Half</button>
-            <button id="volume-mute" class="volume-btn">Mute</button>
+            <button id="volume-full" class="volume-btn active">🔊</button>
+            <button id="volume-half" class="volume-btn">🔈</button>
+            <button id="volume-mute" class="volume-btn">🔇</button>
         </div>
     </div>
 
@@ -112,6 +118,18 @@
                 </div>
 
                 <div class="section">
+                    <h3>Join a Game</h3>
+                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="20">
+                    <button id="join-game-btn" class="btn btn-primary">Join Lobby</button>
+                    <p class="connection-status hidden" id="join-status">Connecting...</p>
+                </div>
+
+                <div class="section">
+                    <h3>🏴‍☠️ Team Battle Mode (NEW)</h3>
+                    <button id="play-team-battle-btn" class="btn btn-primary">Play Team Battle</button>
+                </div>
+
+                <div class="section">
                     <h3>Host a Game</h3>
                     <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
                     <div id="lobby-code-display" class="hidden">
@@ -120,20 +138,13 @@
                         <p class="connection-status" id="connection-status">Initializing connection...</p>
                     </div>
                 </div>
-
-                <div class="section">
-                    <h3>Join a Game</h3>
-                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="20">
-                    <button id="join-game-btn" class="btn btn-primary">Join Lobby</button>
-                    <p class="connection-status hidden" id="join-status">Connecting...</p>
-                </div>
-
             </div>
 
             <div class="section">
                 <h3>Your Collection</h3>
                 <button id="view-collection-btn" class="btn btn-secondary">View Cards</button>
                 <button id="view-admin-btn" class="btn btn-secondary">⚙️ Admin Panel</button>
+                <button id="show-music-btn" class="btn btn-secondary hidden">🎵 Show Music Player</button>
             </div>
         </div>
     </div>
@@ -205,6 +216,170 @@
             </div>
         </div>
     </div>
+        <!-- Team Battle Select Screen -->
+    <div id="team-battle-select-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>⚔️ Team Battle Mode ⚔️</h2>
+                <button id="back-from-team-select-btn" class="btn btn-small">Back to Lobby</button>
+            </div>
+            
+            <div class="team-mode-selection">
+                <div class="mode-card" id="davy-back-mode">
+                    <h3>🏴‍☠️ Davy Back Fight</h3>
+                    <p class="mode-description">Balanced team composition</p>
+                    <div class="role-list">
+                        <span class="role-badge captain">Captain (×2.0)</span>
+                        <span class="role-badge vice">Vice-Captain (×1.5)</span>
+                        <span class="role-badge tank">Tank (×1.3)</span>
+                        <span class="role-badge healer">Healer (×1.2)</span>
+                        <span class="role-badge support">Support (×1.1)</span>
+                        <span class="role-badge support">Support (×1.1)</span>
+                    </div>
+                    <button class="btn btn-primary select-mode-btn" data-mode="DAVY_BACK">Select Mode</button>
+                </div>
+                
+                <div class="mode-card" id="classic-pirate-mode">
+                    <h3>💀 Classic Pirate</h3>
+                    <p class="mode-description">High risk, high reward</p>
+                    <div class="role-list">
+                        <span class="role-badge captain">Captain (×2.0)</span>
+                        <span class="role-badge vice">Vice-Captain (×1.5)</span>
+                        <span class="role-badge tank">Tank (×1.3)</span>
+                        <span class="role-badge healer">Healer (×1.2)</span>
+                        <span class="role-badge support">Support (×1.1)</span>
+                        <span class="role-badge traitor">Traitor (×-0.5)</span>
+                    </div>
+                    <button class="btn btn-primary select-mode-btn" data-mode="CLASSIC_PIRATE">Select Mode</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Battle Wager Screen -->
+    <div id="team-battle-wager-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>Set Your Wager</h2>
+                <button id="back-from-wager-btn" class="btn btn-small">Back</button>
+            </div>
+            
+            <p class="wager-description">How many cards should the winner take from the loser?</p>
+            
+            <div class="wager-selector">
+                <button class="btn wager-btn" data-wager="1">1 Card</button>
+                <button class="btn wager-btn" data-wager="2">2 Cards</button>
+                <button class="btn wager-btn" data-wager="3">3 Cards</button>
+                <button class="btn wager-btn" data-wager="5">5 Cards</button>
+            </div>
+            
+            <div class="difficulty-selector" id="team-battle-difficulty">
+                <h4>Select Bot Difficulty:</h4>
+                <div class="difficulty-buttons">
+                    <button class="btn btn-difficulty" data-difficulty="EASY">
+                        <span class="difficulty-icon">😊</span>
+                        <span class="difficulty-name">Easy</span>
+                    </button>
+                    <button class="btn btn-difficulty" data-difficulty="NORMAL">
+                        <span class="difficulty-icon">🙂</span>
+                        <span class="difficulty-name">Normal</span>
+                    </button>
+                    <button class="btn btn-difficulty" data-difficulty="HARD">
+                        <span class="difficulty-icon">😠</span>
+                        <span class="difficulty-name">Hard</span>
+                    </button>
+                    <button class="btn btn-difficulty" data-difficulty="EXPERT">
+                        <span class="difficulty-icon">😈</span>
+                        <span class="difficulty-name">Expert</span>
+                    </button>
+                    <button class="btn btn-difficulty" data-difficulty="LEGENDARY">
+                        <span class="difficulty-icon">💀</span>
+                        <span class="difficulty-name">Legendary</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Battle Assignment Screen -->
+    <div id="team-battle-game-screen" class="screen">
+        <div class="container">
+            <div class="team-battle-header">
+                <div class="team-info">
+                    <h3 id="tb-player1-name">Player 1</h3>
+                    <p class="team-score">Wager: <span id="tb-player1-wager">1</span> card(s)</p>
+                </div>
+                <div class="assignment-phase">
+                    <p>Assignment Phase: <span id="tb-phase">1</span>/6</p>
+                    <p id="tb-turn-indicator">Your Turn</p>
+                </div>
+                <div class="team-info">
+                    <h3 id="tb-player2-name">Player 2</h3>
+                    <p class="team-score">Wager: <span id="tb-player2-wager">1</span> card(s)</p>
+                </div>
+            </div>
+
+            <!-- Card Draw Area (above teams) -->
+            <div id="tb-card-selection" class="tb-card-selection-top">
+                <!-- Card draw area will be rendered here -->
+            </div>
+
+            <!-- Role Assignment Controls -->
+            <div id="tb-assignment-controls" class="assignment-controls hidden">
+                <h3>Assign <span id="tb-selected-card-name"></span> to Role:</h3>
+                <div id="tb-role-buttons" class="role-buttons"></div>
+            </div>
+
+            <!-- Teams Display -->
+            <div class="team-battle-board">
+                <div class="team-column" id="tb-player1-column">
+                    <h4>Your Team</h4>
+                    <div class="role-slots" id="tb-player1-slots"></div>
+                </div>
+                
+                <div class="vs-divider">VS</div>
+                
+                <div class="team-column" id="tb-player2-column">
+                    <h4>Opponent Team</h4>
+                    <div class="role-slots" id="tb-player2-slots"></div>
+                </div>
+            </div>
+
+            <button id="tb-concede-btn" class="btn btn-danger">Concede</button>
+        </div>
+    </div>
+
+    <!-- Team Battle Results Screen -->
+    <div id="team-battle-results-screen" class="screen">
+        <div class="container">
+            <h1 id="tb-result-title"></h1>
+            <div id="tb-result-stats"></div>
+            
+            <div class="team-comparison">
+                <div class="final-team">
+                    <h3 id="tb-final-p1-name">Your Team</h3>
+                    <div id="tb-final-p1-roles" class="final-roles"></div>
+                    <p class="final-score">Total: <span id="tb-final-p1-score"></span></p>
+                </div>
+                
+                <div class="final-team">
+                    <h3 id="tb-final-p2-name">Opponent Team</h3>
+                    <div id="tb-final-p2-roles" class="final-roles"></div>
+                    <p class="final-score">Total: <span id="tb-final-p2-score"></span></p>
+                </div>
+            </div>
+            
+            <div id="tb-cards-won-display" class="hidden">
+                <h3>Cards Won:</h3>
+                <div id="tb-cards-won-grid" class="card-grid"></div>
+            </div>
+            
+            <button id="tb-return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
+            <a href="https://square.link/u/T6XoDQMr" target="_blank" class="support-link">
+                <button class="btn btn-support">☕ Enjoyed the game? Support me!</button>
+            </a>
+        </div>
+    </div>
     
     <!-- Game Screen -->
     <div id="game-screen" class="screen">
@@ -272,13 +447,14 @@
     <script src="js/music.js"></script>
     <script src="js/p2p.js"></script>
     <script src="js/game.js"></script>
+    <script src="js/team-battle.js"></script>
     <script src="js/main.js"></script>
     <!-- Scroll to Top Button -->
     <div id="scroll-top-btn" class="scroll-top"></div>
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.1</p>
+        <p id="version-info">v1.2</p>
         <p class="credits">© 2026 One Piece Card War | One Piece © Eiichiro Oda</p>
     </footer>
 </body>
