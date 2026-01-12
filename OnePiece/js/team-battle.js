@@ -2,7 +2,7 @@
 // Davy Back Fight & Classic Pirate modes
 
 const ROLE_MODIFIERS = {
-    DAVY_BACK: {
+    CLASSIC_PIRATE: {
         captain: { multiplier: 2.0, name: "Captain", description: "Leader of the crew" },
         viceCaptain: { multiplier: 1.5, name: "Vice-Captain", description: "Second in command" },
         tank: { multiplier: 1.3, name: "Tank", description: "Defensive powerhouse" },
@@ -10,7 +10,7 @@ const ROLE_MODIFIERS = {
         support1: { multiplier: 1.1, name: "Support", description: "Team supporter" },
         support2: { multiplier: 1.1, name: "Support", description: "Team supporter" }
     },
-    CLASSIC_PIRATE: {
+    DAVY_BACK: {
         captain: { multiplier: 2.0, name: "Captain", description: "Leader of the crew" },
         viceCaptain: { multiplier: 1.5, name: "Vice-Captain", description: "Second in command" },
         tank: { multiplier: 1.3, name: "Tank", description: "Defensive powerhouse" },
@@ -30,6 +30,9 @@ class TeamBattleGame {
         this.assignmentPhase = 0; // 0-5 for 6 assignments
         this.isBotGame = false;
         this.botDifficulty = null;
+        this.player1Skips = 0;  // Track skips used
+        this.player2Skips = 0;
+        this.maxSkips = 1;  // Max skips allowed per player
     }
 
 startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficulty = null) {
@@ -58,6 +61,9 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
         revealedCard: null,  // NEW
         score: 0
     };
+
+    this.player1Skips = 0;
+    this.player2Skips = 0;
 
     return this;
 }
@@ -285,6 +291,79 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
 
         return this.assignCard(2, selectedRole);
     }
+
+    canSkip(playerNum) {
+        const skipsUsed = playerNum === 1 ? this.player1Skips : this.player2Skips;
+        return this.mode === 'CLASSIC_PIRATE' && skipsUsed < this.maxSkips;
+    }
+
+    skipTurn(playerNum) {
+        if (!this.canSkip(playerNum)) {
+            throw new Error('Cannot skip - no skips remaining or not available in this mode');
+        }
+        
+        const player = playerNum === 1 ? this.player1 : this.player2;
+        
+        // Clear revealed card (put it back)
+        if (player.revealedCard) {
+            player.revealedCard = null;
+        }
+        
+        // Increment skip counter
+        if (playerNum === 1) {
+            this.player1Skips++;
+        } else {
+            this.player2Skips++;
+        }
+        
+        // Switch turns
+        this.currentTurn = this.currentTurn === 1 ? 2 : 1;
+        
+        // Check if both players have same number of assignments
+        const p1Assigned = Object.keys(this.player1.assignments).length;
+        const p2Assigned = Object.keys(this.player2.assignments).length;
+        
+        // If assignments are unequal, we're in catch-up phase
+        if (p1Assigned !== p2Assigned) {
+            // Don't increment phase, let the other player catch up
+            return {
+                nextTurn: this.currentTurn,
+                phase: this.assignmentPhase,
+                complete: this.assignmentPhase >= 6,
+                skipped: true
+            };
+        } else {
+            // Both have same assignments, phase complete
+            this.assignmentPhase++;
+            return {
+                nextTurn: this.currentTurn,
+                phase: this.assignmentPhase,
+                complete: this.assignmentPhase >= 6,
+                skipped: true
+            };
+        }
+    }
+
+    serializeState() {
+        return {
+            mode: this.mode,
+            wager: this.wager,
+            currentTurn: this.currentTurn,
+            assignmentPhase: this.assignmentPhase,
+            player1: {
+                username: this.player1.user.username,
+                assignments: this.player1.assignments,
+                revealedCard: this.player1.revealedCard,
+                score: this.player1.score
+            },
+            player2: {
+                username: this.player2.user.username,
+                assignments: this.player2.assignments,
+                revealedCard: this.player2.revealedCard,
+                score: this.player2.score
+            }
+        };
+    }
 }
 
 // Team Battle Manager for GameState integration
@@ -341,6 +420,23 @@ class TeamBattleManager {
             difficulty
         );
 
+        return this.currentGame;
+    }
+
+    startP2PTeamBattle(hostUser, guestUser, hostDeck, guestDeck, mode, wager, isHost) {
+        this.currentGame = new TeamBattleGame();
+        this.currentGame.startGame(
+            { user: isHost ? hostUser : guestUser, deck: isHost ? hostDeck : guestDeck },
+            { user: isHost ? guestUser : hostUser, deck: isHost ? guestDeck : hostDeck },
+            mode,
+            wager,
+            false, // Not bot game
+            null
+        );
+        
+        if (!isHost) {
+            this.currentGame.currentTurn = 2;
+        }
         return this.currentGame;
     }
 
