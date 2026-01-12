@@ -42,14 +42,25 @@ class GameState {
     }
 
     giveStartingCards(user) {
-        // Generate 5 random cards using weighted rarity system
-        const starterCards = CardRaritySystem.generateStarterDeck();
-        starterCards.forEach(card => {
-            user.collection.add(card.id);
-        });
-        
-        if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
-            console.log('🎴 Starter deck generated:', starterCards.map(c => `${c.name} (${c.rarity})`));
+        if (DEV_CONFIG.DEBUG.UNLIMITED_CARDS) {
+            // Grant ALL cards from enabled arcs
+            CARD_DATABASE.forEach(card => {
+                if (ARC_AVAILABILITY[card.arc] === true && card.available) {
+                    user.collection.add(card.id);
+                }
+            })
+            if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                console.log('🎴 UNLIMITED_CARDS: Granted all available cards')
+            }
+        } else {
+            // Normal starter deck generation
+            const starterCards = CardRaritySystem.generateStarterDeck();
+            starterCards.forEach(card => {
+                user.collection.add(card.id);
+            })
+            if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                console.log('🎴 Starter deck generated:', starterCards.map(c => `${c.name} (${c.rarity})`));
+            }
         }
     }
 
@@ -144,7 +155,7 @@ class GameState {
                 cardsWon: []
             },
             round: 1,
-            maxRounds: 5,
+            maxRounds: DEV_CONFIG.GAME.MAX_ROUNDS,
             player1Played: false,
             player2Played: false,
             player1Card: null,
@@ -160,7 +171,7 @@ class GameState {
         this.isHost = true;
 
         const botUser = BotManager.createBot(botDifficulty);
-        const botDeck = BotManager.generateBotDeck(botDifficulty, 5);
+        const botDeck = BotManager.generateBotDeck(botDifficulty, DEV_CONFIG.GAME.DECK_SIZE);
         
         this.currentGame = {
             player1: {
@@ -176,7 +187,7 @@ class GameState {
                 cardsWon: []
             },
             round: 1,
-            maxRounds: 5,
+            maxRounds: DEV_CONFIG.GAME.MAX_ROUNDS,
             player1Played: false,
             player2Played: false,
             player1Card: null,
