@@ -62,9 +62,42 @@ body {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
+.site-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(var(--bg-secondary-rgb), 0.9);
+}
+
+.site-footer p {
+    margin: 3px 0;
+    line-height: 1.4;
+}
+
+#version-info {
+    font-weight: 600;
+    color: var(--maya-blue);
+    font-size: 11px;
+}
+
+.site-footer .credits {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
 .screen {
     display: none;
     padding: 20px;
+    padding-bottom: 60px;
     min-height: 100vh;
 }
 
@@ -174,6 +207,35 @@ h3 {
 .btn-large {
     padding: 16px 48px;
     font-size: 20px;
+}
+
+.btn-support {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    margin-top: 15px;
+    font-size: 14px;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-support:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.support-link {
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.support-link:focus {
+    outline: 2px solid var(--maya-blue);
+    outline-offset: 4px;
+    border-radius: 8px;
 }
 
 .login-options {
@@ -649,6 +711,32 @@ h3 {
     color: var(--text-primary);
 }
 
+#saga-filter {
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 300px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#saga-filter:hover,
+#arc-filter:hover {
+    border-color: var(--maya-blue);
+    background: var(--bg-secondary);
+}
+
+#saga-filter:focus,
+#arc-filter:focus {
+    outline: none;
+    border-color: var(--maya-blue);
+    box-shadow: 0 0 0 3px rgba(102, 204, 255, 0.2);
+}
+
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1035,7 +1123,7 @@ body.dark-mode .rarity-badge {
 /* Scroll to Top Button */
 .scroll-top {
     position: fixed;
-    bottom: 20px;
+    bottom: 10px;
     right: 20px;
     width: 30px;
     height: 40px;
