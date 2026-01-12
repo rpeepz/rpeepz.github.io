@@ -133,9 +133,13 @@
                     <h3>Host a Game</h3>
                     <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
                     <div id="lobby-code-display" class="hidden">
-                        <p>Lobby Code: <strong id="lobby-code"></strong></p>
-                        <button id="copy-link-btn" class="btn btn-secondary btn-small" style="margin-top: 10px;">📋 Copy Join Link</button>
-                        <p class="connection-status" id="connection-status">Initializing connection...</p>
+                        <p>Share this code with your opponent:</p>
+                        <div class="lobby-code-box">
+                            <span id="lobby-code"></span>
+                            <button id="copy-link-btn" class="btn btn-secondary">📋 Copy Join Link</button>
+                            <button id="close-lobby-btn" class="btn btn-danger">❌ Close Lobby</button>
+                        </div>
+                        <p id="connection-status"></p>
                     </div>
                 </div>
             </div>
@@ -166,6 +170,10 @@
                 <label class="filter-checkbox">
                     <input type="checkbox" id="owned-only-filter">
                     <span>Show Only Owned Cards</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" id="sort-by-power-filter">
+                    <span>Sort by Highest Power</span>
                 </label>
                 <select id="rarity-filter" class="filter-select">
                     <option value="all">All Rarities</option>
@@ -310,7 +318,6 @@
                 </div>
             </div>
 
-            <!-- ADD to team-battle-wager-screen in index.html -->
 <div id="team-battle-p2p-options" class="section hidden">
     <h4>Online Team Battle:</h4>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
@@ -320,6 +327,7 @@
             <div id="tb-lobby-code-display" class="hidden" style="margin-top: 15px;">
                 <p>Lobby Code: <strong id="tb-lobby-code"></strong></p>
                 <button id="tb-copy-link-btn" class="btn btn-secondary" style="margin-bottom: 10px;">📋 Copy Join Link</button>
+                <button id="tb-close-lobby-btn" class="btn btn-danger" style="margin-bottom: 10px;">❌ Close Lobby</button>
                 <p class="connection-status" id="tb-connection-status">Waiting...</p>
             </div>
         </div>
@@ -487,7 +495,7 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.2</p>
+        <p id="version-info">v1.4</p>
         <p class="credits">© 2026 One Piece Card War | One Piece © Eiichiro Oda</p>
     </footer>
 </body>
