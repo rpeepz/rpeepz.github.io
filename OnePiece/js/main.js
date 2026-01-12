@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const teamBattleResultsScreen = document.getElementById('team-battle-results-screen');
     // Login screen elements
     const guestBtn = document.getElementById('guest-btn');
-    const claimProfileBtn = document.getElementById('claim-profile-btn');
+    const createProfileBtn = document.getElementById('create-profile-btn');
     const loginBtn = document.getElementById('login-btn');
     const profileForm = document.getElementById('profile-form');
     const usernameInput = document.getElementById('username-input');
@@ -446,8 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showLobby();
     });
 
-    claimProfileBtn.addEventListener('click', () => {
-        currentFormMode = 'claim';
+    createProfileBtn.addEventListener('click', () => {
+        currentFormMode = 'create';
         profileForm.classList.remove('hidden');
         usernameInput.value = '';
         passwordInput.value = '';
@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (currentFormMode === 'claim') {
+        if (currentFormMode === 'create') {
             if (!password) {
                 alert('Please enter a password');
                 return;
