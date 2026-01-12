@@ -10,7 +10,8 @@ const DEV_CONFIG = {
         MUSIC_PLAYER: true,
         THEME_TOGGLE: true,
         SCROLL_TO_TOP: true,
-        COLLECTION_VIEWER: true
+        COLLECTION_VIEWER: true,
+        TEAM_BATTLE_MODE: true
     },
 
     // Debug Options
@@ -68,9 +69,11 @@ const DEV_CONFIG = {
     // Game Settings
     GAME: {
         MAX_ROUNDS: 5,
-        STARTING_CARDS: 5,
+        STARTING_CARDS: 6,
         DECK_SIZE: 5,
-        AUTO_SAVE: true
+        AUTO_SAVE: true,
+        TEAM_BATTLE_BLIND_ASSIGNMENT: false,
+        TEAM_BATTLE_DEFAULT_WAGER: 1
     },
 
     // UI Settings
@@ -177,6 +180,12 @@ function applyDebugSettings() {
     const collectionBtn = document.getElementById('view-collection-btn');
     if (collectionBtn && !DEV_CONFIG.FEATURES.COLLECTION_VIEWER) {
         collectionBtn.style.display = 'none';
+    }
+
+    // Hide/show team battle mode
+    const teamBattleBtn = document.getElementById('play-team-battle-btn');
+    if (teamBattleBtn && !DEV_CONFIG.FEATURES.TEAM_BATTLE_MODE) {
+        teamBattleBtn.style.display = 'none';
     }
 
     // Hide/show stats bar
