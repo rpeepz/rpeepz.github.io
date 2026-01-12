@@ -127,6 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('volume-mute').classList.add('active');
     });
     
+    // Helper to calculate total enabled cards based on dev config
+    function getTotalEnabledCards() {
+        return CARD_DATABASE.filter(card => 
+            ARC_AVAILABILITY[card.arc] === true && card.available
+        ).length;
+    }
 
     // Admin panel functions
     function showAdmin() {
@@ -226,11 +232,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadArcAvailability() {
-        const saved = localStorage.getItem('arcAvailability');
-        if (saved) {
-            Object.assign(ARC_AVAILABILITY, JSON.parse(saved));
+    const saved = localStorage.getItem('arcAvailability');
+    if (saved) {
+        const savedState = JSON.parse(saved);
+        // Update saga controls based on saved state
+        for (const saga in SAGA_CONTROLS) {
+            const allEnabled = SAGA_CONTROLS[saga].arcs.every(arc => savedState[arc]);
+            const allDisabled = SAGA_CONTROLS[saga].arcs.every(arc => !savedState[arc]);
+            if (allEnabled || allDisabled) SAGA_CONTROLS[saga].enabled = allEnabled;
         }
+        Object.assign(ARC_AVAILABILITY, savedState);
     }
+}
 
     // Load arc availability on startup
     loadArcAvailability();
@@ -762,8 +775,10 @@ document.addEventListener('DOMContentLoaded', () => {
         playerNameSpan.textContent = user.username;
         winsSpan.textContent = user.wins;
         lossesSpan.textContent = user.losses;
-        cardsCollectedSpan.textContent = user.collection.size;
         
+        const totalEnabled = getTotalEnabledCards();
+        cardsCollectedSpan.textContent = `${user.collection.size}/${totalEnabled}`;
+    
         lobbyCodeDisplay.classList.add('hidden');
         joinStatus.classList.add('hidden');
         hostGameBtn.disabled = false;
@@ -805,6 +820,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ? CARD_DATABASE 
             : CARD_DATABASE.filter(card => card.arc === selectedArc);
         
+        // Filter out cards from disabled arcs
+        cards = cards.filter(card => ARC_AVAILABILITY[card.arc] === true && card.available);
+        
         // Filter for owned only if checkbox is checked
         if (ownedOnly) {
             cards = cards.filter(card => userCollection.has(card.id));
@@ -818,12 +836,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         cards.forEach(card => {
-            const owned = userCollection.has(card.id); // Define owned first
+            const owned = userCollection.has(card.id);
             
             const cardDiv = document.createElement('div');
             cardDiv.style = `border: 1px solid;padding: 3px;margin: 3px;`;
             cardDiv.className = `collection-card ${owned ? '' : 'locked'}`;
-            cardDiv.setAttribute('data-rarity', card.rarity); // Add this line
+            cardDiv.setAttribute('data-rarity', card.rarity);
             
             if (!owned) {
                 cardDiv.style = `border: 1px solid;
@@ -842,6 +860,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="card-name">${card.name}</div>
                     <div class="card-arc">${card.arc}</div>
                 </div>
+                ${DEV_CONFIG.DEBUG.SHOW_CARD_IDS ? `<div style="position:absolute;top:20px;left:2px;background:rgba(0,0,0,0.3);color:white;padding:2px 5px;font-size:10px;border-radius:3px;">ID: ${card.id}</div>` : ''}
                 <div class="card-image">
                     ${imgHTML}
                 </div>
@@ -923,14 +942,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const img = CHARACTER_IMAGES[card.name] || '❓';
                 const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
                 const cardDiv = document.createElement('div');
+                cardDiv.setAttribute('data-rarity', card.rarity);
                 cardDiv.className = 'collection-card';
                 cardDiv.innerHTML = `
                     <div class="card-header">
                         <div class="card-name">${card.name}</div>
                         <div class="card-arc">${card.arc}</div>
                     </div>
-                    <div class="card-image">${imgHTML}</div>
-                    <div class="card-power">${card.power}</div>
+                    ${DEV_CONFIG.DEBUG.SHOW_CARD_IDS ? `<div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.7);color:white;padding:2px 5px;font-size:10px;border-radius:3px;">ID: ${card.id}</div>` : ''}
+                    <div class="card-image">
+                        ${imgHTML}
+                    </div>
+                    <div class="card-power">
+                        <span class="rarity-badge" style="color: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</span>
+                        ${card.power}
+                    </div>
                 `;
                 cardsWonGrid.appendChild(cardDiv);
             });
@@ -954,4 +980,22 @@ document.addEventListener('DOMContentLoaded', () => {
             pendingLobbyCode = null; // Clear it after use
         }
     }
+
+    // Apply developer configuration
+    if (typeof applyDebugSettings === 'function') {
+        applyDebugSettings();
+    }
+    if (typeof applySagaConfig === 'function') {
+        applySagaConfig();
+    }
+
+    // Scroll to top functionality
+    const scrollTopBtn = document.getElementById('scroll-top-btn');
+
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
 });
