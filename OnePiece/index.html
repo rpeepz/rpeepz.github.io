@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Piece Card War v1.3</title>
+    <title>One Piece Card War v1.4</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
@@ -245,7 +245,7 @@
                         <span class="role-badge tank">Tank (×1.3)</span>
                         <span class="role-badge healer">Healer (×1.2)</span>
                         <span class="role-badge support">Support (×1.1)</span>
-                        <span class="role-badge support">Support (×1.1)</span>
+                        <span class="role-badge traitor">Traitor (×-0.5)</span>
                     </div>
                     <button class="btn btn-primary select-mode-btn" data-mode="DAVY_BACK">Select Mode</button>
                 </div>
@@ -259,7 +259,7 @@
                         <span class="role-badge tank">Tank (×1.3)</span>
                         <span class="role-badge healer">Healer (×1.2)</span>
                         <span class="role-badge support">Support (×1.1)</span>
-                        <span class="role-badge traitor">Traitor (×-0.5)</span>
+                        <span class="role-badge support">Support (×1.1)</span>
                     </div>
                     <button class="btn btn-primary select-mode-btn" data-mode="CLASSIC_PIRATE">Select Mode</button>
                 </div>
@@ -309,6 +309,28 @@
                     </button>
                 </div>
             </div>
+
+            <!-- ADD to team-battle-wager-screen in index.html -->
+<div id="team-battle-p2p-options" class="section hidden">
+    <h4>Online Team Battle:</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+        <div>
+            <h5>Host Game:</h5>
+            <button id="tb-host-game-btn" class="btn btn-primary">Create Lobby</button>
+            <div id="tb-lobby-code-display" class="hidden" style="margin-top: 15px;">
+                <p>Lobby Code: <strong id="tb-lobby-code"></strong></p>
+                <button id="tb-copy-link-btn" class="btn btn-secondary" style="margin-bottom: 10px;">📋 Copy Join Link</button>
+                <p class="connection-status" id="tb-connection-status">Waiting...</p>
+            </div>
+        </div>
+        <div>
+            <h5>Join Game:</h5>
+            <input type="text" id="tb-join-code-input" placeholder="Enter lobby code" style="width: 100%; margin-bottom: 10px;">
+            <button id="tb-join-game-btn" class="btn btn-primary">Join Lobby</button>
+            <p class="connection-status hidden" id="tb-join-status">Connecting...</p>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
@@ -413,11 +435,11 @@
 
             <div class="game-board">
                 <div class="card-slot" id="player1-card-slot">
-                    <div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>
+                    <div class="card-back"><img src="img/back.png" alt="Card Back"></div>
                 </div>
                 <div class="vs">VS</div>
                 <div class="card-slot" id="player2-card-slot">
-                    <div class="card-back"><img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back"></div>
+                    <div class="card-back"><img src="img/back.png" alt="Card Back"></div>
                 </div>
             </div>
 
