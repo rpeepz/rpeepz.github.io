@@ -52,9 +52,9 @@ const DEV_CONFIG = {
     SAGA_PRESETS: {
         EAST_BLUE: null,        // null = use individual arc settings above
         BAROQUE_WORKS: null,
-        SKY_ISLAND: false,
-        WATER_SEVEN: false,
-        SUMMIT_WAR: false
+        SKY_ISLAND: null,
+        WATER_SEVEN: null,
+        SUMMIT_WAR: null
     },
 
     // Saga definitions (for preset toggles)
@@ -69,7 +69,7 @@ const DEV_CONFIG = {
     // Game Settings
     GAME: {
         MAX_ROUNDS: 5,
-        STARTING_CARDS: 5,
+        STARTING_CARDS: 30,
         DECK_SIZE: 5,
         AUTO_SAVE: true,
         TEAM_BATTLE_BLIND_ASSIGNMENT: false,
