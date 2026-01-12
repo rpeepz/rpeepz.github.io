@@ -308,6 +308,18 @@ h3 {
     color: var(--text-primary);
 }
 
+#tb-join-code-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
 #lobby-code-display {
     margin-top: 20px;
     padding: 20px;
