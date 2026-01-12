@@ -720,6 +720,30 @@ body.dark-mode .music-control {
     color: var(--text-primary);
 }
 
+#rarity-filter {
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 300px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#rarity-filter:hover {
+    border-color: var(--maya-blue);
+    background: var(--bg-secondary);
+}
+
+#rarity-filter:focus {
+    outline: none;
+    border-color: var(--maya-blue);
+    box-shadow: 0 0 0 3px rgba(102, 204, 255, 0.2);
+}
+
 #saga-filter {
     padding: 10px;
     border: 2px solid var(--border-color);
@@ -2030,6 +2054,12 @@ body.dark-mode .rarity-badge {
     }
 
     #arc-filter {
+        padding: 8px;
+        font-size: 14px;
+        max-width: 100%;
+    }
+
+    #rarity-filter {
         padding: 8px;
         font-size: 14px;
         max-width: 100%;
