@@ -48,7 +48,9 @@ class GameState {
             user.collection.add(card.id);
         });
         
-        console.log('🎴 Starter deck generated:', starterCards.map(c => `${c.name} (${c.rarity})`));
+        if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+            console.log('🎴 Starter deck generated:', starterCards.map(c => `${c.name} (${c.rarity})`));
+        }
     }
 
     saveUser(user) {
