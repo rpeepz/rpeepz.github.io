@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const player1ScoreSpan = document.getElementById('player1-score');
     const player2ScoreSpan = document.getElementById('player2-score');
     const roundNumberSpan = document.getElementById('round-number');
-    const player1CardSlot = document.getElementById('player1-card-slot');
+    const maxRoundsSpan = document.getElementById('max-rounds');const player1CardSlot = document.getElementById('player1-card-slot');
     const player2CardSlot = document.getElementById('player2-card-slot');
     const playCardBtn = document.getElementById('play-card-btn');
     const concedeBtn = document.getElementById('concede-btn');
@@ -270,10 +270,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadArcAvailability() {
+        // if (DEV_CONFIG.DEBUG.UNLIMITED_CARDS) {
+        //     // Skip localStorage, use dev-config only
+        //     return;
+        // }
+
         const saved = localStorage.getItem('arcAvailability');
         if (saved) {
             const savedState = JSON.parse(saved);
-            // SAGA_CONTROLS removed - not needed, handled by DEV_CONFIG.SAGA_PRESETS
             Object.assign(ARC_AVAILABILITY, savedState);
         }
     }
@@ -785,6 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
         player1ScoreSpan.textContent = game.player1.score;
         player2ScoreSpan.textContent = game.player2.score;
         roundNumberSpan.textContent = game.round;
+        maxRoundsSpan.textContent = game.maxRounds;
         
         // Mark players
         document.getElementById('player1-info').classList.add('my-player');
@@ -1064,11 +1069,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         player1NameSpan.textContent = gameState.currentGame.player1.user.username;
         player2NameSpan.textContent = gameState.currentGame.player2.user.username;
-        player1CardsSpan.textContent = 5;
-        player2CardsSpan.textContent = 5;
+        player1CardsSpan.textContent = gameState.currentGame.player1.deck.length;
+        player2CardsSpan.textContent = gameState.currentGame.player2.deck.length;
         player1ScoreSpan.textContent = 0;
         player2ScoreSpan.textContent = 0;
         roundNumberSpan.textContent = 1;
+        maxRoundsSpan.textContent = DEV_CONFIG.GAME.MAX_ROUNDS;
         
         player1CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
         player2CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
