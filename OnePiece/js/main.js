@@ -34,9 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Collection screen elements
     const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
+    const sagaFilter = document.getElementById('saga-filter');
     const arcFilter = document.getElementById('arc-filter');
     const collectionGrid = document.getElementById('collection-grid');
-
+    
     // Game screen elements
     const player1NameSpan = document.getElementById('player1-name');
     const player2NameSpan = document.getElementById('player2-name');
@@ -498,6 +499,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCollection();
     });
 
+    sagaFilter.addEventListener('change', () => {
+        renderCollection();
+    });
+
     // Add this new event listener
     const ownedOnlyFilter = document.getElementById('owned-only-filter');
     ownedOnlyFilter.addEventListener('change', () => {
@@ -799,6 +804,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showCollection() {
+        // Populate saga filter
+        sagaFilter.innerHTML = '<option value="all">All Sagas</option>';
+        for (const saga in DEV_CONFIG.SAGA_DEFINITIONS) {
+            const option = document.createElement('option');
+            option.value = saga;
+            option.textContent = saga.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            sagaFilter.appendChild(option);
+        }
+        
+        // Populate arc filter
         arcFilter.innerHTML = '<option value="all">All Arcs</option>';
         ARCS.forEach(arc => {
             const option = document.createElement('option');
@@ -812,13 +827,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCollection() {
+        const selectedSaga = sagaFilter.value;
         const selectedArc = arcFilter.value;
         const ownedOnly = ownedOnlyFilter.checked;
         const userCollection = gameState.currentUser.collection;
         
-        let cards = selectedArc === 'all' 
-            ? CARD_DATABASE 
-            : CARD_DATABASE.filter(card => card.arc === selectedArc);
+        let cards = CARD_DATABASE;
+        
+        // Filter by saga if selected
+        if (selectedSaga !== 'all') {
+            const sagaArcs = DEV_CONFIG.SAGA_DEFINITIONS[selectedSaga];
+            cards = cards.filter(card => sagaArcs.includes(card.arc));
+        }
+        
+        // Filter by arc if selected
+        if (selectedArc !== 'all') {
+            cards = cards.filter(card => card.arc === selectedArc);
+        }
         
         // Filter out cards from disabled arcs
         cards = cards.filter(card => ARC_AVAILABILITY[card.arc] === true && card.available);
