@@ -16,10 +16,10 @@ const DEV_CONFIG = {
 
     // Debug Options
     DEBUG: {
-        CLEAR_DATA_BUTTON: true,
-        CONSOLE_LOGGING: true,
+        CLEAR_DATA_BUTTON: false,
+        CONSOLE_LOGGING: false,
         SHOW_CARD_IDS: true,
-        SKIP_LOGIN: true,
+        SKIP_LOGIN: false,
         UNLIMITED_CARDS: false
     },
 
