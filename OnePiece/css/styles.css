@@ -94,6 +94,47 @@ body {
     opacity: 0.8;
 }
 
+/* Footer details open state styling */
+details[open] > summary {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode details[open] > summary {
+    color: var(--maya-blue) !important;
+}
+
+/* Footer details scrollable content */
+.site-footer details > div {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Custom scrollbar for footer (optional) */
+.site-footer details > div::-webkit-scrollbar {
+    width: 8px;
+}
+
+.site-footer details > div::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.site-footer details > div::-webkit-scrollbar-thumb {
+    background: var(--maya-blue);
+    border-radius: 4px;
+}
+
+.site-footer details > div::-webkit-scrollbar-thumb:hover {
+    background: var(--maya-blue-dark);
+}
+
+/* For Firefox */
+.site-footer details > div {
+    scrollbar-width: thin;
+    scrollbar-color: var(--maya-blue) rgba(0, 0, 0, 0.1);
+}
+
 .screen {
     display: none;
     padding: 20px;
