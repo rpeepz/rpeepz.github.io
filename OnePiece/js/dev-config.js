@@ -52,9 +52,9 @@ const DEV_CONFIG = {
     SAGA_PRESETS: {
         EAST_BLUE: null,        // null = use individual arc settings above
         BAROQUE_WORKS: null,
-        SKY_ISLAND: null,
-        WATER_SEVEN: null,
-        SUMMIT_WAR: null
+        SKY_ISLAND: false,
+        WATER_SEVEN: false,
+        SUMMIT_WAR: false
     },
 
     // Saga definitions (for preset toggles)
@@ -114,21 +114,6 @@ function generateArcAvailabilityFromConfig() {
 
 // This will be used instead of the hardcoded ARC_AVAILABILITY
 const ARC_AVAILABILITY = generateArcAvailabilityFromConfig();
-
-// Apply saga settings to ARC_AVAILABILITY
-function applySagaConfig() {
-    if (typeof SAGA_CONTROLS !== 'undefined') {
-        for (const saga in DEV_CONFIG.SAGAS) {
-            if (SAGA_CONTROLS[saga]) {
-                SAGA_CONTROLS[saga].enabled = DEV_CONFIG.SAGAS[saga];
-            }
-        }
-        // Regenerate ARC_AVAILABILITY
-        if (typeof generateArcAvailability === 'function') {
-            Object.assign(ARC_AVAILABILITY, generateArcAvailability());
-        }
-    }
-}
 
 // Apply debug settings
 function applyDebugSettings() {
@@ -214,17 +199,6 @@ function applyDebugSettings() {
             if (guestBtn) guestBtn.click();
         }, 500);
     }
-}
-
-// Helper function to check if a feature is enabled
-function isFeatureEnabled(feature) {
-    const keys = feature.split('.');
-    let value = DEV_CONFIG;
-    for (const key of keys) {
-        value = value[key];
-        if (value === undefined) return false;
-    }
-    return value;
 }
 
 // Export for use in other files
