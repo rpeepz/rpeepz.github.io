@@ -127,7 +127,38 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById('volume-mute').classList.add('active');
     });
-    
+
+    // Music control close button
+    document.getElementById('music-control-close')?.addEventListener('click', () => {
+        const musicControl = document.getElementById('music-control');
+        musicControl.style.display = 'none';
+        localStorage.setItem('musicControlDismissed', 'true');
+        
+        // Show the "Show Music Player" button
+        const showMusicBtn = document.getElementById('show-music-btn');
+        if (showMusicBtn) showMusicBtn.classList.remove('hidden');
+    });
+
+    // Show music control button
+    document.getElementById('show-music-btn')?.addEventListener('click', () => {
+        const musicControl = document.getElementById('music-control');
+        musicControl.style.display = '';
+        localStorage.setItem('musicControlDismissed', 'false');
+        
+        // Hide the button again
+        document.getElementById('show-music-btn').classList.add('hidden');
+    });
+
+    // Check if music control was previously dismissed
+    if (localStorage.getItem('musicControlDismissed') === 'true') {
+        const musicControl = document.getElementById('music-control');
+        if (musicControl) musicControl.style.display = 'none';
+        
+        // Show the "Show Music Player" button
+        const showMusicBtn = document.getElementById('show-music-btn');
+        if (showMusicBtn) showMusicBtn.classList.remove('hidden');
+    }
+
     // Helper to calculate total enabled cards based on dev config
     function getTotalEnabledCards() {
         return CARD_DATABASE.filter(card => 
@@ -233,18 +264,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadArcAvailability() {
-    const saved = localStorage.getItem('arcAvailability');
-    if (saved) {
-        const savedState = JSON.parse(saved);
-        // Update saga controls based on saved state
-        for (const saga in SAGA_CONTROLS) {
-            const allEnabled = SAGA_CONTROLS[saga].arcs.every(arc => savedState[arc]);
-            const allDisabled = SAGA_CONTROLS[saga].arcs.every(arc => !savedState[arc]);
-            if (allEnabled || allDisabled) SAGA_CONTROLS[saga].enabled = allEnabled;
+        const saved = localStorage.getItem('arcAvailability');
+        if (saved) {
+            const savedState = JSON.parse(saved);
+            // Update saga controls based on saved state
+            for (const saga in SAGA_CONTROLS) {
+                const allEnabled = SAGA_CONTROLS[saga].arcs.every(arc => savedState[arc]);
+                const allDisabled = SAGA_CONTROLS[saga].arcs.every(arc => !savedState[arc]);
+                if (allEnabled || allDisabled) SAGA_CONTROLS[saga].enabled = allEnabled;
+            }
+            Object.assign(ARC_AVAILABILITY, savedState);
         }
-        Object.assign(ARC_AVAILABILITY, savedState);
     }
-}
 
     // Load arc availability on startup
     loadArcAvailability();
@@ -663,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Show game screen
         showScreen(gameScreen);
-        musicManager.play();
+        musicManager.play('battle');
         
         // Reset game state
         hasPlayedThisRound = false;
@@ -903,7 +934,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hasPlayedThisRound = false;
         
         // Start battle music
-        musicManager.play();
+        musicManager.play('battle');
         
         // Mark which player is "you"
         if (gameState.isHost) {
@@ -1022,5 +1053,443 @@ document.addEventListener('DOMContentLoaded', () => {
             top: 0,
             behavior: 'smooth'
         });
+    });
+    
+    // Team Battle Mode handlers
+    const playTeamBattleBtn = document.getElementById('play-team-battle-btn');
+    const teamBattleSelectScreen = document.getElementById('team-battle-select-screen');
+    const teamBattleWagerScreen = document.getElementById('team-battle-wager-screen');
+    const teamBattleGameScreen = document.getElementById('team-battle-game-screen');
+    const teamBattleResultsScreen = document.getElementById('team-battle-results-screen');
+
+    let selectedTeamBattleMode = null;
+    let selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;  // Use config default
+    let selectedTBDifficulty = null;
+    let selectedCardForAssignment = null;
+
+    playTeamBattleBtn?.addEventListener('click', () => {
+        if (!teamBattleManager.canStartTeamBattle(gameState.currentUser)) {
+            alert('⚠️ You need at least 6 cards to play Team Battle!\n\nPlay some regular games to build your collection first.');
+            return;
+        }
+        showScreen(teamBattleSelectScreen);
+    });
+
+    document.getElementById('back-from-team-select-btn')?.addEventListener('click', () => {
+        selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1; // Reset to default
+        showLobby();
+    });
+
+    document.querySelectorAll('.select-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedTeamBattleMode = btn.dataset.mode;
+            selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1; // Reset to default
+            showScreen(teamBattleWagerScreen);
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Set default wager button as active
+            document.querySelectorAll('.wager-btn').forEach(b => b.classList.remove('active'));
+            const defaultWagerBtn = document.querySelector(`.wager-btn[data-wager="${selectedWager}"]`);
+            if (defaultWagerBtn) defaultWagerBtn.classList.add('active');
+        });
+    });
+
+    document.getElementById('back-from-wager-btn')?.addEventListener('click', () => {
+        showScreen(teamBattleSelectScreen);
+    });
+
+    document.querySelectorAll('.wager-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedWager = parseInt(btn.dataset.wager);
+            document.querySelectorAll('.wager-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    document.querySelectorAll('#team-battle-difficulty .btn-difficulty').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedTBDifficulty = btn.dataset.difficulty;
+            startTeamBattle();
+        });
+    });
+
+    function startTeamBattle() {
+        if (!selectedTeamBattleMode || !selectedTBDifficulty) return;
+        
+        try {
+            const game = teamBattleManager.startBotTeamBattle(
+                gameState.currentUser,
+                selectedTeamBattleMode,
+                selectedWager,
+                selectedTBDifficulty
+            );
+            
+            renderTeamBattleGame(game);
+            showScreen(teamBattleGameScreen);
+            
+            // Play Team Battle music
+            musicManager.play('team-battle');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    function renderTeamBattleGame(game) {
+        const blindMode = DEV_CONFIG.GAME.TEAM_BATTLE_BLIND_ASSIGNMENT;
+        
+        document.getElementById('tb-player1-name').textContent = game.player1.user.username;
+        document.getElementById('tb-player2-name').textContent = game.player2.user.username;
+        document.getElementById('tb-phase').textContent = game.assignmentPhase + 1;
+        
+        // Update wager display
+        document.getElementById('tb-player1-wager').textContent = game.wager;
+        document.getElementById('tb-player2-wager').textContent = game.wager;
+        
+        updateTurnIndicator(game);
+        renderTeamRoleSlots(game, blindMode);
+        renderCardDrawArea(game);
+    }
+
+    function updateTurnIndicator(game) {
+        const indicator = document.getElementById('tb-turn-indicator');
+        if (game.currentTurn === 1) {
+            indicator.textContent = '👉 Your Turn';
+            indicator.style.color = 'var(--success)';
+        } else {
+            indicator.textContent = 'Opponent\'s Turn';
+            indicator.style.color = 'var(--text-secondary)';
+        }
+    }
+
+    function renderTeamRoleSlots(game, blindMode) {
+        const p1Slots = document.getElementById('tb-player1-slots');
+        const p2Slots = document.getElementById('tb-player2-slots');
+        
+        p1Slots.innerHTML = '';
+        p2Slots.innerHTML = '';
+        
+        const roles = game.getRoles();
+        
+        roles.forEach(role => {
+            const roleInfo = ROLE_MODIFIERS[game.mode][role];
+            
+            // Player 1 slot
+            const p1Card = game.player1.assignments[role];
+            const p1Slot = createRoleSlot(role, roleInfo, p1Card, true);
+            p1Slots.appendChild(p1Slot);
+            
+            // Player 2 slot
+            const p2Card = game.player2.assignments[role];
+            const p2Slot = createRoleSlot(role, roleInfo, p2Card, !blindMode);
+            p2Slots.appendChild(p2Slot);
+        });
+    }
+
+    function createRoleSlot(role, roleInfo, card, showCard) {
+        const slot = document.createElement('div');
+        slot.className = 'role-slot';
+        slot.setAttribute('data-role', role);
+        
+        if (card && showCard) {
+            const img = CHARACTER_IMAGES[card.name] || '❓';
+            const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+            
+            slot.innerHTML = `
+                <div class="role-header">
+                    <span class="role-name">${roleInfo.name}</span>
+                    <span class="role-multiplier">×${roleInfo.multiplier}</span>
+                </div>
+                <div class="assigned-card">
+                    <div class="card-image-small">${imgHTML}</div>
+                    <div class="card-details">
+                        <div class="card-name">${card.name}</div>
+                        <div class="card-power">⚔️ ${card.power}</div>
+                    </div>
+                </div>
+            `;
+        } else if (card && !showCard) {
+            slot.innerHTML = `
+                <div class="role-header">
+                    <span class="role-name">${roleInfo.name}</span>
+                    <span class="role-multiplier">×${roleInfo.multiplier}</span>
+                </div>
+                <div class="assigned-card hidden-card">
+                    <div class="card-back-small">?</div>
+                    <div class="card-details">
+                        <div class="card-name">Hidden</div>
+                    </div>
+                </div>
+            `;
+        } else {
+            slot.innerHTML = `
+                <div class="role-header">
+                    <span class="role-name">${roleInfo.name}</span>
+                    <span class="role-multiplier">×${roleInfo.multiplier}</span>
+                </div>
+                <div class="empty-slot">
+                    <span>Empty</span>
+                </div>
+            `;
+        }
+        
+        return slot;
+    }
+
+    function renderCardDrawArea(game) {
+        const container = document.getElementById('tb-card-selection');
+        const controlsDiv = document.getElementById('tb-assignment-controls');
+        
+        // Bot's turn
+        if (game.currentTurn !== 1) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Opponent is thinking...</p>';
+            controlsDiv.classList.add('hidden');
+            
+            if (game.isBotGame && game.assignmentPhase < 6) {
+                setTimeout(() => {
+                    const result = game.botDrawAndAssign();
+                    if (result) {
+                        renderTeamBattleGame(game);
+                        
+                        if (result.complete) {
+                            finishTeamBattle(game);
+                        }
+                    }
+                }, 1500);
+            }
+            return;
+        }
+        
+        // Player's turn
+        if (game.assignmentPhase >= 6) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">All cards assigned!</p>';
+            controlsDiv.classList.add('hidden');
+            return;
+        }
+        
+        // Show draw button or revealed card
+        if (!game.player1.revealedCard) {
+            // Show card back with draw button (like regular game)
+            container.innerHTML = `
+                <div class="tb-card-draw-area">
+                    <div class="card-slot">
+                        <div class="card-back">
+                            <img src="https://toppng.com/uploads/thumbnail/jolly-roger-anime-one-manga-anime-straw-hats-straw-hat-pirates-jolly-roger-11562951369qechcoicmy.png" alt="Card Back">
+                        </div>
+                    </div>
+                    <button id="tb-draw-card-btn" class="btn btn-primary btn-large">Draw Card</button>
+                </div>
+            `;
+            
+            document.getElementById('tb-draw-card-btn').addEventListener('click', () => {
+                const card = game.drawCard(1);
+                renderTeamBattleGame(game);
+            });
+            
+            controlsDiv.classList.add('hidden');
+        } else {
+            // Show revealed card (like regular game card display)
+            const card = game.player1.revealedCard;
+            const img = CHARACTER_IMAGES[card.name] || '❓';
+            const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+            
+            container.innerHTML = `
+                <div class="tb-card-draw-area">
+                    <div class="card-slot">
+                        <div class="card revealed-card">
+                            <div class="card-header">
+                                <div class="card-name">${card.name}</div>
+                                <div class="card-arc">${card.arc}</div>
+                            </div>
+                            <div class="card-image">${imgHTML}</div>
+                            <div class="card-power">${card.power}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showRoleSelectionSimple(game, card);
+        }
+    }
+
+    function createRevealedCardHTML(card) {
+        const img = CHARACTER_IMAGES[card.name] || '❓';
+        const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+        
+        return `
+            <div class="hand-card revealed">
+                <div class="card-image">${imgHTML}</div>
+                <div class="card-name">${card.name}</div>
+                <div class="card-power">⚔️ ${card.power}</div>
+                <div class="card-rarity" style="background: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</div>
+            </div>
+        `;
+    }
+
+    function showRoleSelectionSimple(game, card) {
+        const controlsDiv = document.getElementById('tb-assignment-controls');
+        const roleButtonsDiv = document.getElementById('tb-role-buttons');
+        const cardNameSpan = document.getElementById('tb-selected-card-name');
+        
+        cardNameSpan.textContent = card.name;
+        roleButtonsDiv.innerHTML = '';
+        
+        const availableRoles = game.getAvailableRoles(1);
+        
+        availableRoles.forEach(role => {
+            const roleInfo = ROLE_MODIFIERS[game.mode][role];
+            
+            const btn = document.createElement('button');
+            btn.className = 'btn role-assign-btn-simple';
+            btn.innerHTML = `
+                <span class="role-name-large">${roleInfo.name}</span>
+                <span class="role-desc">${roleInfo.description}</span>
+            `;
+            
+            btn.addEventListener('click', () => {
+                assignCardToRoleSimple(game, role);
+            });
+            
+            roleButtonsDiv.appendChild(btn);
+        });
+        
+        controlsDiv.classList.remove('hidden');
+    }
+
+    function assignCardToRoleSimple(game, role) {
+        try {
+            const result = game.assignCard(1, role);
+            
+            renderTeamBattleGame(game);
+            
+            if (result.complete) {
+                finishTeamBattle(game);
+            }
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    function finishTeamBattle(game) {
+        setTimeout(() => {
+            const result = game.determineWinner();
+            const finalResult = teamBattleManager.endTeamBattle(result);
+            showTeamBattleResults(game, finalResult);
+        }, 1000);
+    }
+
+    function showTeamBattleResults(game, result) {
+        const titleEl = document.getElementById('tb-result-title');
+        const statsEl = document.getElementById('tb-result-stats');
+        
+        // Stop Team Battle music
+        musicManager.stop();
+        
+        if (result.tie) {
+            titleEl.textContent = "🤝 It's a Tie! 🤝";
+            statsEl.innerHTML = `
+                <p>Both teams scored equally!</p>
+                <p>Final Score: ${result.score1} - ${result.score2}</p>
+            `;
+        } else {
+            const isWinner = result.winner.username === gameState.currentUser.username;
+            titleEl.textContent = isWinner ? '🎉 Victory! 🎉' : '💔 Defeat 💔';
+            
+            statsEl.innerHTML = `
+                <p>${result.winner.username} wins!</p>
+                <p>Final Score: ${result.winnerScore} - ${result.loserScore}</p>
+                <p>Cards Wagered: ${result.wager}</p>
+            `;
+        }
+        
+        // Show final teams
+        renderFinalTeam(game, 1, 'tb-final-p1-name', 'tb-final-p1-roles', 'tb-final-p1-score');
+        renderFinalTeam(game, 2, 'tb-final-p2-name', 'tb-final-p2-roles', 'tb-final-p2-score');
+        
+        // Show cards won
+        if (result.cardsWon && result.cardsWon.length > 0 && result.winner.username === gameState.currentUser.username) {
+            const cardsWonDisplay = document.getElementById('tb-cards-won-display');
+            const cardsWonGrid = document.getElementById('tb-cards-won-grid');
+            
+            cardsWonDisplay.classList.remove('hidden');
+            cardsWonGrid.innerHTML = '';
+            
+            result.cardsWon.forEach(card => {
+                const cardDiv = createCollectionCard(card);
+                cardsWonGrid.appendChild(cardDiv);
+            });
+        } else {
+            document.getElementById('tb-cards-won-display').classList.add('hidden');
+        }
+        
+        showScreen(teamBattleResultsScreen);
+    }
+
+    function renderFinalTeam(game, playerNum, nameId, rolesId, scoreId) {
+        const player = playerNum === 1 ? game.player1 : game.player2;
+        
+        document.getElementById(nameId).textContent = player.user.username;
+        document.getElementById(scoreId).textContent = player.score;
+        
+        const rolesContainer = document.getElementById(rolesId);
+        rolesContainer.innerHTML = '';
+        
+        for (const role in player.assignments) {
+            const card = player.assignments[role];
+            const roleInfo = ROLE_MODIFIERS[game.mode][role];
+            const roleScore = Math.round(card.power * roleInfo.multiplier);
+            
+            const roleDiv = document.createElement('div');
+            roleDiv.className = 'final-role-item';
+            roleDiv.innerHTML = `
+                <span class="role-label">${roleInfo.name}:</span>
+                <span class="card-name">${card.name}</span>
+                <span class="role-calculation">(${card.power} × ${roleInfo.multiplier} = ${roleScore})</span>
+            `;
+            rolesContainer.appendChild(roleDiv);
+        }
+    }
+
+    function createCollectionCard(card) {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'collection-card';
+        cardDiv.setAttribute('data-rarity', card.rarity);
+        
+        const img = CHARACTER_IMAGES[card.name] || '❓';
+        const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+        
+        cardDiv.innerHTML = `
+            <div class="card-header">
+                <div class="card-name">${card.name}</div>
+                <div class="card-arc">${card.arc}</div>
+            </div>
+            <div class="card-image">${imgHTML}</div>
+            <div class="card-power">
+                <span class="rarity-badge" style="color: ${RARITY_TIERS[card.rarity].color}">${card.rarity}</span>
+                ${card.power}
+            </div>
+        `;
+        
+        return cardDiv;
+    }
+
+    document.getElementById('tb-return-lobby-btn')?.addEventListener('click', () => {
+        showLobby();
+    });
+
+    document.getElementById('tb-concede-btn')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to concede?')) {
+            const game = teamBattleManager.currentGame;
+            const result = teamBattleManager.endTeamBattle({
+                winner: game.player2.user,
+                loser: game.player1.user,
+                winnerScore: 0,
+                loserScore: 0,
+                cardsWon: [],
+                wager: 0
+            });
+            showTeamBattleResults(game, result);
+        }
     });
 });
