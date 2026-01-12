@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
     const sagaFilter = document.getElementById('saga-filter');
     const arcFilter = document.getElementById('arc-filter');
+    const rarityFilter = document.getElementById('rarity-filter');
     const collectionGrid = document.getElementById('collection-grid');
     
     // Game screen elements
@@ -533,6 +534,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCollection();
     });
 
+    rarityFilter.addEventListener('change', () => {
+        renderCollection();
+    });
+
     // Add this new event listener
     const ownedOnlyFilter = document.getElementById('owned-only-filter');
     ownedOnlyFilter.addEventListener('change', () => {
@@ -722,9 +727,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Check if it's a URL or emoji
-        const img1HTML = img1.startsWith('http') ? `<img src="${img1}" alt="${result.card1.name}">` : img1;
-        const img2HTML = img2.startsWith('http') ? `<img src="${img2}" alt="${result.card2.name}">` : img2;
-        
+        const img1HTML = img1 !== '❓' ? `<img src="${img1}" alt="${result.card1.name}">` : img1;
+        const img2HTML = img2 !== '❓' ? `<img src="${img2}" alt="${result.card2.name}">` : img2;
+
         player1CardSlot.innerHTML = `
             <div class="card ${p1Class} ${result.winner === 1 ? 'winner' : ''}">
                 <div class="card-header">
@@ -780,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Check if it's a URL or emoji
-        const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+        const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
         
         const cardHTML = `
             <div class="card ${isMyCard ? 'my-card' : 'opponent-card'}">
@@ -859,6 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCollection() {
         const selectedSaga = sagaFilter.value;
         const selectedArc = arcFilter.value;
+        const selectedRarity = rarityFilter.value;
         const ownedOnly = ownedOnlyFilter.checked;
         const userCollection = gameState.currentUser.collection;
         
@@ -875,6 +881,11 @@ document.addEventListener('DOMContentLoaded', () => {
             cards = cards.filter(card => card.arc === selectedArc);
         }
         
+        // Filter by rarity if selected
+        if (selectedRarity !== 'all') {
+            cards = cards.filter(card => card.rarity === selectedRarity);
+        }
+
         // Filter out cards from disabled arcs
         cards = cards.filter(card => ARC_AVAILABILITY[card.arc] === true && card.available);
         
@@ -906,8 +917,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const img = CHARACTER_IMAGES[card.name] || '❓';
-            const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
-
+            const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
+            
             const rarityInfo = CardRaritySystem.getRarityInfo(card.rarity);
 
             cardDiv.innerHTML = `
@@ -995,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cardsWonGrid.innerHTML = '';
             result.cardsWon.forEach(card => {
                 const img = CHARACTER_IMAGES[card.name] || '❓';
-                const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+                const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
                 const cardDiv = document.createElement('div');
                 cardDiv.setAttribute('data-rarity', card.rarity);
                 cardDiv.className = 'collection-card';
@@ -1193,7 +1204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (card && showCard) {
             const img = CHARACTER_IMAGES[card.name] || '❓';
-            const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+            const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
             
             slot.innerHTML = `
                 <div class="role-header">
@@ -1291,7 +1302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show revealed card (like regular game card display)
             const card = game.player1.revealedCard;
             const img = CHARACTER_IMAGES[card.name] || '❓';
-            const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+            const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
             
             container.innerHTML = `
                 <div class="tb-card-draw-area">
@@ -1314,7 +1325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createRevealedCardHTML(card) {
         const img = CHARACTER_IMAGES[card.name] || '❓';
-        const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+        const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
         
         return `
             <div class="hand-card revealed">
@@ -1456,7 +1467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cardDiv.setAttribute('data-rarity', card.rarity);
         
         const img = CHARACTER_IMAGES[card.name] || '❓';
-        const imgHTML = img.startsWith('http') ? `<img src="${img}" alt="${card.name}">` : img;
+        const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
         
         cardDiv.innerHTML = `
             <div class="card-header">
