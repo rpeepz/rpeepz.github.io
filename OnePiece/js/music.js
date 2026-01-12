@@ -1,4 +1,4 @@
-// Music Manager
+// Music Manager (Simple HTML5 Audio - No Web Audio API)
 class MusicManager {
     constructor() {
         this.audio = null;
