@@ -108,13 +108,19 @@ class GameState {
         };
         
         // Send join message with user data
+        // Check if joining for team battle
+        const messageType = this.joiningForTeamBattle ? 'tbJoin' : 'join';
+        
         this.p2p.send({
-            type: 'join',
+            type: messageType,
             username: guestUser.username,
             collection: Array.from(guestUser.collection)
         });
-        
-        return true;
+     
+        // Clear the flag after sending
+        if (this.joiningForTeamBattle) {
+            this.joiningForTeamBattle = false;
+        }
     }
 
     // Game management with P2P sync
