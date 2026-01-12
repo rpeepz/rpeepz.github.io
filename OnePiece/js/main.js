@@ -90,8 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFormMode = null;
     let hasPlayedThisRound = false;
 
-    // Initialize music
-    musicManager.initialize();
+    // Initialize music only if enabled
+    if (DEV_CONFIG.FEATURES.MUSIC_PLAYER) {
+        musicManager.initialize();
+    }
 
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
@@ -115,54 +117,56 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    // Music control handlers
-    document.getElementById('volume-full').addEventListener('click', () => {
-        musicManager.setVolume(1.0);
-        document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('volume-full').classList.add('active');
-    });
+    // Music control handlers - only add if music player is enabled
+    if (DEV_CONFIG.FEATURES.MUSIC_PLAYER) {
+        document.getElementById('volume-full')?.addEventListener('click', () => {
+            musicManager.setVolume(1.0);
+            document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('volume-full').classList.add('active');
+        });
 
-    document.getElementById('volume-half').addEventListener('click', () => {
-        musicManager.setVolume(0.2);
-        document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('volume-half').classList.add('active');
-    });
+        document.getElementById('volume-half')?.addEventListener('click', () => {
+            musicManager.setVolume(0.2);
+            document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('volume-half').classList.add('active');
+        });
 
-    document.getElementById('volume-mute').addEventListener('click', () => {
-        musicManager.setVolume(0);
-        document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('volume-mute').classList.add('active');
-    });
+        document.getElementById('volume-mute')?.addEventListener('click', () => {
+            musicManager.setVolume(0);
+            document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('volume-mute').classList.add('active');
+        });
 
-    // Music control close button
-    document.getElementById('music-control-close')?.addEventListener('click', () => {
-        const musicControl = document.getElementById('music-control');
-        musicControl.style.display = 'none';
-        localStorage.setItem('musicControlDismissed', 'true');
-        
-        // Show the "Show Music Player" button
-        const showMusicBtn = document.getElementById('show-music-btn');
-        if (showMusicBtn) showMusicBtn.classList.remove('hidden');
-    });
+        // Music control close button
+        document.getElementById('music-control-close')?.addEventListener('click', () => {
+            const musicControl = document.getElementById('music-control');
+            musicControl.style.display = 'none';
+            localStorage.setItem('musicControlDismissed', 'true');
+            
+            // Show the "Show Music Player" button
+            const showMusicBtn = document.getElementById('show-music-btn');
+            if (showMusicBtn) showMusicBtn.classList.remove('hidden');
+        });
 
-    // Show music control button
-    document.getElementById('show-music-btn')?.addEventListener('click', () => {
-        const musicControl = document.getElementById('music-control');
-        musicControl.style.display = '';
-        localStorage.setItem('musicControlDismissed', 'false');
-        
-        // Hide the button again
-        document.getElementById('show-music-btn').classList.add('hidden');
-    });
+        // Show music control button
+        document.getElementById('show-music-btn')?.addEventListener('click', () => {
+            const musicControl = document.getElementById('music-control');
+            musicControl.style.display = '';
+            localStorage.setItem('musicControlDismissed', 'false');
+            
+            // Hide the button again
+            document.getElementById('show-music-btn').classList.add('hidden');
+        });
 
-    // Check if music control was previously dismissed
-    if (localStorage.getItem('musicControlDismissed') === 'true') {
-        const musicControl = document.getElementById('music-control');
-        if (musicControl) musicControl.style.display = 'none';
-        
-        // Show the "Show Music Player" button
-        const showMusicBtn = document.getElementById('show-music-btn');
-        if (showMusicBtn) showMusicBtn.classList.remove('hidden');
+        // Check if music control was previously dismissed
+        if (localStorage.getItem('musicControlDismissed') === 'true') {
+            const musicControl = document.getElementById('music-control');
+            if (musicControl) musicControl.style.display = 'none';
+            
+            // Show the "Show Music Player" button
+            const showMusicBtn = document.getElementById('show-music-btn');
+            if (showMusicBtn) showMusicBtn.classList.remove('hidden');
+        }
     }
 
     // Helper to calculate total enabled cards based on dev config
