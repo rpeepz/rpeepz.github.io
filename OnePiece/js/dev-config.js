@@ -68,9 +68,9 @@ const DEV_CONFIG = {
 
     // Game Settings
     GAME: {
-        MAX_ROUNDS: 5,
-        STARTING_CARDS: 30,
-        DECK_SIZE: 5,
+        MAX_ROUNDS: 3,
+        STARTING_CARDS: 5,
+        DECK_SIZE: 3,
         AUTO_SAVE: true,
         TEAM_BATTLE_BLIND_ASSIGNMENT: true,
         TEAM_BATTLE_DEFAULT_WAGER: 1
