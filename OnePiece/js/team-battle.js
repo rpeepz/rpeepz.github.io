@@ -116,24 +116,119 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
         };
     }
 
+    // Calculate score for a single card in a role (with type bonuses)
+    calculateRoleScore(card, role) {
+        const modifier = ROLE_MODIFIERS[this.mode][role].multiplier;
+        let finalModifier = modifier;
+        
+        // Apply type bonus if enabled
+        if (typeof DEV_CONFIG !== 'undefined' && DEV_CONFIG.GAME.TEAM_BATTLE_TYPE_BONUS && card.type) {
+            const typeInfo = CHARACTER_TYPES[card.type];
+            if (typeInfo) {
+                finalModifier *= typeInfo.bonus;
+                
+                // Check for synergy
+                if (ROLE_TYPE_SYNERGY[role] && ROLE_TYPE_SYNERGY[role].includes(card.type)) {
+                    finalModifier *= SYNERGY_BONUS;
+                }
+            }
+        }
+        
+        return Math.round(card.power * finalModifier);
+    }
+    
+    // Get type bonus info for display (returns object with bonus details)
+    getTypeBonusInfo(card, role) {
+        if (!card.type) return null;
+        
+        const typeInfo = CHARACTER_TYPES[card.type];
+        if (!typeInfo) return null;
+        
+        const hasSynergy = ROLE_TYPE_SYNERGY[role] && ROLE_TYPE_SYNERGY[role].includes(card.type);
+        const totalBonus = typeInfo.bonus * (hasSynergy ? SYNERGY_BONUS : 1.0);
+        
+        return {
+            type: typeInfo.name,
+            icon: typeInfo.icon,
+            color: typeInfo.color,
+            baseBonus: typeInfo.bonus,
+            hasSynergy: hasSynergy,
+            totalBonus: totalBonus,
+            synergyBonus: SYNERGY_BONUS
+        };
+    }
+
     calculateTeamScore(playerNum) {
         const player = playerNum === 1 ? this.player1 : this.player2;
         let totalScore = 0;
-
+        
+        if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+            console.log(`\n=== Calculating Score for Player ${playerNum} ===`);
+        }
+        
         for (const role in player.assignments) {
             const card = player.assignments[role];
-            const modifier = ROLE_MODIFIERS[this.mode][role].multiplier;
-            const roleScore = Math.round(card.power * modifier);
+            if (!card) continue;
+            
+            const roleInfo = ROLE_MODIFIERS[this.mode][role];
+            let roleModifier = roleInfo.multiplier;
+            let finalModifier = roleModifier;
+            let typeBonus = 1;
+            let synergyBonus = 1;
+            
+            if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                console.log(`\n🎴 ${card.name} in ${roleInfo.name}:`);
+                console.log(`  Base Power: ${card.power}`);
+                console.log(`  Role Multiplier: ${roleModifier}x`);
+            }
+            
+            // Apply type bonus if enabled
+            if (DEV_CONFIG.GAME.TEAM_BATTLE_TYPE_BONUS && card.type) {
+                typeBonus = CHARACTER_TYPES[card.type]?.bonus || 1;
+
+                if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                    console.log(`  Card Type: ${card.type}`);
+                    console.log(`  Type Bonus: ${typeBonus}x`);
+                }
+                
+                finalModifier *= typeBonus;
+                
+                // Check for synergy bonus
+                if (ROLE_TYPE_SYNERGY[role]?.includes(card.type)) {
+                    synergyBonus = SYNERGY_BONUS;
+                    finalModifier *= synergyBonus;
+                    if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                        console.log(`  ⚡ SYNERGY BONUS: ${synergyBonus}x (${card.type} matches ${role}!)`);
+                    }
+                }
+            } else {
+
+                if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                    console.log(`  Type Bonus: DISABLED or no type on card`);
+                }
+            }
+            
+            const roleScore = Math.floor(card.power * finalModifier);
+            if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                console.log(`  Final Multiplier: ${finalModifier}x`);
+                console.log(`  Final Score: ${roleScore}`);
+            }
+            
             totalScore += roleScore;
         }
-
-        player.score = totalScore;
+        if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+            console.log(`\n📊 Player ${playerNum} Total Score: ${totalScore}\n`);
+        }
+        
         return totalScore;
     }
 
     determineWinner() {
         const score1 = this.calculateTeamScore(1);
         const score2 = this.calculateTeamScore(2);
+
+        this.player1.score = score1;
+        this.player2.score = score2;
 
         let winner, loser;
         if (score1 > score2) {
@@ -152,8 +247,8 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
         return {
             winner: winner.user,
             loser: loser.user,
-            winnerScore: winner.score,
-            loserScore: loser.score,
+            winnerScore: score1,
+            loserScore: score2,
             cardsWon,
             wager: this.wager
         };
