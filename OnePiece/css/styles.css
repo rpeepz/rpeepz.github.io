@@ -399,6 +399,23 @@ h3 {
     box-shadow: 0 0 15px rgba(215, 0, 0, 0.5);
 }
 
+/* Add colored borders to face-down cards in player slots */
+#player1-card-slot .card-back {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border: 3px solid var(--maya-blue);
+    box-shadow: 0 0 15px rgba(96, 191, 245, 0.5), 0 10px 30px rgba(0,0,0,0.3);
+}
+
+#player1-card-slot .card-back:hover {
+    transform: scale(1.05);
+}
+
+#player2-card-slot .card-back {
+    border: 3px solid var(--red);
+    box-shadow: 0 0 15px rgba(215, 0, 0, 0.5), 0 10px 30px rgba(0,0,0,0.3);
+}
+
 .claim-profile-link {
     color: #667eea;
     cursor: pointer;
@@ -756,6 +773,122 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
     font-size: 24px;
     margin-bottom: 15px;
     color: var(--text-primary);
+}
+
+/* Card Shop Styles */
+.shop-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.shop-stat-item {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid var(--maya-blue);
+}
+
+.shop-stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.shop-stat-value {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--maya-blue);
+}
+
+.shop-info {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.shop-info h3 {
+    margin-bottom: 15px;
+}
+
+.shop-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.shop-info li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.shop-inventory {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.shop-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.shop-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.shop-card.locked {
+    opacity: 0.6;
+}
+
+.shop-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.shop-card-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tangerine);
+    margin: 15px 0;
+}
+
+.shop-card-stock {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+.shop-buy-btn {
+    width: 100%;
+}
+
+.points-earned {
+    background: linear-gradient(135deg, rgba(96, 191, 245, 0.2) 0%, rgba(255, 206, 0, 0.2) 100%);
+    border: 2px solid var(--maya-blue);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.points-earned h3 {
+    color: var(--tangerine);
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.points-earned p {
+    margin: 8px 0;
+    font-size: 16px;
 }
 
 
@@ -1296,6 +1429,46 @@ body.dark-mode .rarity-badge {
     font-size: 1.3em;
 }
 
+/* Points Granter Styles */
+.points-granter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.points-granter-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.points-granter-display {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding: 15px 30px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--maya-blue);
+    border-radius: 8px;
+    min-width: 200px;
+    text-align: center;
+}
+
+.points-granter-controls .btn {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+#points-granter-section {
+    display: none; /* Hidden by default, shown via JS if flag is true */
+}
+
 .help-text {
     color: var(--text-secondary);
     font-size: 0.9em;
@@ -1553,8 +1726,8 @@ body.dark-mode .rarity-badge {
     color: var(--maya-blue);
 }
 
-/* Team Battle Styles */
-.team-mode-selection {
+/* Draft War Styles */
+draft-war-mode-selection {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
@@ -1663,7 +1836,7 @@ body.dark-mode .rarity-badge {
     color: white;
 }
 
-.team-battle-header {
+.draft-war-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1673,16 +1846,16 @@ body.dark-mode .rarity-badge {
     border-radius: 12px;
 }
 
-.team-info {
+draft-war-info {
     flex: 1;
 }
 
-.team-info h3 {
+draft-war-info h3 {
     margin: 0 0 5px 0;
     color: var(--text-primary);
 }
 
-.team-score {
+draft-war-score {
     font-size: 18px;
     font-weight: 600;
     color: var(--maya-blue);
@@ -1703,14 +1876,14 @@ body.dark-mode .rarity-badge {
     font-size: 18px;
 }
 
-.team-battle-board {
+.draft-war-board {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     gap: 30px;
     margin: 30px 0;
 }
 
-.team-column h4 {
+draft-war-column h4 {
     text-align: center;
     margin-bottom: 20px;
     color: var(--text-primary);
@@ -1948,7 +2121,7 @@ body.dark-mode .rarity-badge {
     color: var(--text-secondary);
 }
 
-.team-comparison {
+draft-war-comparison {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
@@ -2010,7 +2183,7 @@ body.dark-mode .rarity-badge {
     border-top: 2px solid var(--border-color);
 }
 
-/* Team Battle Card Draw Area (matches regular game) */
+/* Draft War Card Draw Area (matches regular game) */
 .tb-card-selection-top {
     margin: 30px 0;
     padding: 30px;
@@ -2160,7 +2333,7 @@ body.dark-mode .rarity-badge {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .team-battle-board {
+    .draft-war-board {
         grid-template-columns: 1fr;
     }
     
@@ -2169,7 +2342,7 @@ body.dark-mode .rarity-badge {
         margin: 20px 0;
     }
     
-    .team-battle-header {
+    .draft-war-header {
         flex-direction: column;
         gap: 15px;
     }
