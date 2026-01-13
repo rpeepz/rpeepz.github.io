@@ -38,7 +38,7 @@ const DEV_CONFIG = {
         "Alabasta": true,
         "Jaya": true,
         "Skypiea": true,
-        "Long Ring Long Long": true,
+        "Long Ring Long Land": true,
         "Water 7": true,
         "Enies Lobby": true,
         "Thriller Bark": true,
