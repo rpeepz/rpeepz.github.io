@@ -86,7 +86,13 @@
             </div>
             
             <div class="stats">
-                <p>Points: <span id="user-points">0</span> ⭐ | Wins: <span id="wins">0</span> | Losses: <span id="losses">0</span> | Cards Collected: <span id="cards-collected">0</span> | Win Streak: <span id="user-streak">0</span> 🔥</p>
+                <p>Points: <span id="user-points">0</span> ⭐ | Wins: <span id="wins">0</span> | Losses: <span id="losses">0</span> | Cards Collected: <span id="cards-collected">0</span> | Win Streak: <span id="user-streak">0</span> 🔥 | Arcs Unlocked: <span id="arcs-unlocked">3</span>/20 🏝️</p>
+            </div>
+
+            <div class="pool-status-lobby hidden" id="pool-status-lobby">
+                <span class="pool-status-label">Card Pool:</span>
+                <span id="lobby-pool-count">0</span> / 25 cards selected
+                <!-- <span class="pool-status-hint">(Games will use your pool if set)</span> -->
             </div>
 
             <div class="lobby-actions">
@@ -199,8 +205,27 @@
                 </ul>
             </div>
             
+            <h3>🎴 Available Cards:</h3>
             <div class="shop-inventory" id="shop-inventory">
                 <!-- Cards will be generated here -->
+            </div>
+
+            <!-- Arc Shop Section -->
+            <div class="arc-shop-section">
+                <h3>🏝️ Story Arc Unlocks 🏝️</h3>
+                <p class="arc-shop-description">Unlock new story arcs to access exclusive cards and expand your collection!</p>
+                <div class="arc-shop-grid" id="arc-shop-grid">
+                    <!-- Arc unlock cards will be generated here -->
+                </div>
+            </div>
+
+            <!-- Arc Card Packs Section -->
+            <div class="arc-packs-section" id="arc-packs-section">
+                <h3>📦 Arc Card Packs 📦</h3>
+                <p class="arc-packs-description">Purchase random cards from unlocked arcs!</p>
+                <div class="arc-packs-grid" id="arc-packs-grid">
+                    <!-- Arc pack cards will be generated here -->
+                </div>
             </div>
         </div>
     </div>
@@ -227,6 +252,14 @@
                     <input type="checkbox" id="sort-by-power-filter">
                     <span>Sort by Highest Power</span>
                 </label>
+                <label class="filter-checkbox hidden" id="pool-first-sort-container">
+                    <input type="checkbox" id="pool-first-sort">
+                    <span>⭐ Pool Cards First</span>
+                </label>
+                <label class="filter-checkbox pool-mode-toggle hidden" id="pool-mode-toggle">
+                    <input type="checkbox" id="pool-selection-mode">
+                    <span>⭐ Pool Selection Mode</span>
+                </label>
                 <select id="rarity-filter" class="filter-select">
                     <option value="all">All Rarities</option>
                     <option value="SSS">SSS - Legendary</option>
@@ -238,6 +271,9 @@
                     <option value="D">D - Basic</option>
                     <option value="F">F - Starter</option>
                 </select>
+            </div>
+            <div class="pool-status hidden" id="pool-status-display">
+                <span id="pool-count">0</span> / <span id="pool-max">25</span> cards in pool
             </div>
             <div id="collection-grid" class="card-grid"></div>
         </div>
@@ -567,7 +603,7 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.0 | Last Updated: January 2026</p>
+        <p id="version-info">v1.1 | Last Updated: January 2026</p>
         <p class="credits">© 2026 Grand Line Duels | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
         <details style="margin-top: 8px;">
             <summary style="cursor: pointer; color: var(--maya-blue); font-size: 12px; font-weight: 600; transition: color 0.2s;">📚 Sources, Credits & Acknowledgments</summary>
