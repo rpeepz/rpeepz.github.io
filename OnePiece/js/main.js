@@ -625,6 +625,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('shop-user-streak').textContent = streak + ' 🔥';
         
         renderShopInventory();
+        renderArcShop();
+        renderArcPacks();
         showScreen(shopScreen);
     }
 
@@ -633,7 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inventoryDiv = document.getElementById('shop-inventory');
         const userPoints = pointsManager.getPoints(gameState.currentUser.username);
         
-        inventoryDiv.innerHTML = '<h3>Available Cards:</h3>';
+        inventoryDiv.innerHTML = '';
         
         Object.entries(inventory).reverse().forEach(([rarity, info]) => {
             const canAfford = userPoints >= info.price;
@@ -663,11 +665,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function purchaseCard(rarity) {
         const username = gameState.currentUser.username;
-        const result = pointsManager.purchaseCard(username, rarity, gameState.currentUser.collection);
+        const unlockedArcs = gameState.currentUser.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
+        const result = pointsManager.purchaseCard(username, rarity, gameState.currentUser.collection, unlockedArcs);
         
         if (result.success) {
             // Add card to user's collection
             gameState.currentUser.collection.add(result.card.id);
+            autoUpdatePool(gameState.currentUser);
             gameState.saveUser(gameState.currentUser);
             
             alert(`🎉 You purchased ${result.card.name} (${rarity})!\n\nPoints remaining: ${result.pointsRemaining}`);
@@ -677,6 +681,204 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert(result.message);
         }
+    }
+
+    // Arc unlock pricing (expensive progression system)
+    const ARC_UNLOCK_PRICES = {
+        'Baratie': 1500,
+        'Arlong Park': 3000,
+        'Loguetown': 5000,
+        'Whiskey Peak': 8000,
+        'Little Garden': 12000,
+        'Drum Island': 18000,
+        'Alabasta': 25000,
+        'Jaya': 35000,
+        'Skypiea': 50000,
+        'Long Ring Long Land': 70000,
+        'Water 7': 95000,
+        'Enies Lobby': 125000,
+        'Thriller Bark': 160000,
+        'Sabaody Archipelago': 200000,
+        'Amazon Lily': 250000,
+        'Impel Down': 320000,
+        'Marineford': 500000
+    };
+
+    // Arc pack prices (buy random card from specific arc)
+    const ARC_PACK_PRICES = {
+        'Romance Dawn': 150,
+        'Orange Town': 150,
+        'Syrup Village': 150,
+        'Baratie': 250,
+        'Arlong Park': 400,
+        'Loguetown': 600,
+        'Whiskey Peak': 800,
+        'Little Garden': 1200,
+        'Drum Island': 1800,
+        'Alabasta': 2500,
+        'Jaya': 3500,
+        'Skypiea': 5000,
+        'Long Ring Long Land': 7000,
+        'Water 7': 10000,
+        'Enies Lobby': 14000,
+        'Thriller Bark': 18000,
+        'Sabaody Archipelago': 25000,
+        'Amazon Lily': 32000,
+        'Impel Down': 42000,
+        'Marineford': 60000
+    };
+
+    function renderArcShop() {
+        const arcShopGrid = document.getElementById('arc-shop-grid');
+        const userPoints = pointsManager.getPoints(gameState.currentUser.username);
+        const unlockedArcs = gameState.currentUser.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
+        
+        arcShopGrid.innerHTML = '';
+        
+        Object.entries(ARC_UNLOCK_PRICES).forEach(([arc, price]) => {
+            // Only show arcs that are enabled in dev-config
+            if (ARC_AVAILABILITY[arc] !== true) return;
+            
+            const isUnlocked = unlockedArcs.has(arc);
+            const canAfford = userPoints >= price;
+            const arcImage = ARC_IMAGES[arc] || 'img/placeholder-arc.jpg';
+            
+            const arcCard = document.createElement('div');
+            arcCard.className = `arc-shop-card ${isUnlocked ? 'unlocked' : ''} ${!canAfford && !isUnlocked ? 'locked' : ''}`;
+            arcCard.innerHTML = `
+                <div class="arc-card-image">
+                    <img src="${arcImage}" alt="${arc}" onerror="this.src='img/placeholder-arc.jpg'">
+                </div>
+                <div class="arc-card-content">
+                    <h4 class="arc-card-title">${arc}</h4>
+                    <div class="arc-card-price">💰 ${price.toLocaleString()} pts</div>
+                    ${isUnlocked ? 
+                        '<div class="arc-card-status unlocked">✓ UNLOCKED</div>' :
+                        `<button class="btn btn-primary arc-unlock-btn" data-arc="${arc}" ${!canAfford ? 'disabled' : ''}>
+                            ${canAfford ? 'Unlock Arc' : 'Not Enough Points'}
+                        </button>`
+                    }
+                </div>
+            `;
+            
+            if (!isUnlocked) {
+                const unlockBtn = arcCard.querySelector('.arc-unlock-btn');
+                unlockBtn?.addEventListener('click', () => {
+                    unlockArc(arc, price);
+                });
+            }
+            
+            arcShopGrid.appendChild(arcCard);
+        });
+    }
+
+    function renderArcPacks() {
+        const arcPacksGrid = document.getElementById('arc-packs-grid');
+        const userPoints = pointsManager.getPoints(gameState.currentUser.username);
+        const unlockedArcs = gameState.currentUser.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
+        
+        arcPacksGrid.innerHTML = '';
+        
+        Object.entries(ARC_PACK_PRICES).forEach(([arc, price]) => {
+            // Only show packs for unlocked arcs AND arcs enabled in dev-config
+            if (!unlockedArcs.has(arc) || ARC_AVAILABILITY[arc] !== true) return;
+            
+            const canAfford = userPoints >= price;
+            const arcCards = CARD_DATABASE.filter(card => card.arc === arc && card.available);
+            const ownedCards = arcCards.filter(card => gameState.currentUser.collection.has(card.id)).length;
+            const arcImage = ARC_IMAGES[arc] || 'img/placeholder-arc.jpg';
+            
+            const packCard = document.createElement('div');
+            packCard.className = `arc-pack-card ${!canAfford ? 'locked' : ''}`;
+            packCard.innerHTML = `
+                <div class="arc-pack-image">
+                    <img src="${arcImage}" alt="${arc}" onerror="this.src='img/placeholder-arc.jpg'">
+                </div>
+                <div class="arc-pack-content">
+                    <div class="arc-pack-header">
+                        <h4>${arc} Pack</h4>
+                        <span class="arc-pack-collection">${ownedCards}/${arcCards.length} owned</span>
+                    </div>
+                    <div class="arc-pack-price">💰 ${price.toLocaleString()} pts</div>
+                    <div class="arc-pack-info">Random card from ${arc}</div>
+                    <button class="btn btn-primary arc-pack-buy-btn" data-arc="${arc}" ${!canAfford || ownedCards === arcCards.length ? 'disabled' : ''}>
+                        ${ownedCards === arcCards.length ? 'Complete ✓' : canAfford ? 'Buy Pack' : 'Not Enough Points'}
+                    </button>
+                </div>
+            `;
+            
+            const buyBtn = packCard.querySelector('.arc-pack-buy-btn');
+            buyBtn?.addEventListener('click', () => {
+                purchaseArcPack(arc, price);
+            });
+            
+            arcPacksGrid.appendChild(packCard);
+        });
+    }
+
+    function unlockArc(arc, price) {
+        const username = gameState.currentUser.username;
+        const userPoints = pointsManager.getPoints(username);
+        
+        if (userPoints < price) {
+            alert('Not enough points!');
+            return;
+        }
+        
+        if (gameState.currentUser.unlockedArcs.has(arc)) {
+            alert('Arc already unlocked!');
+            return;
+        }
+        
+        // Deduct points
+        const remaining = pointsManager.spendPoints(username, price);
+        
+        // Unlock arc
+        gameState.currentUser.unlockedArcs.add(arc);
+        gameState.saveUser(gameState.currentUser);
+        
+        alert(`🎊 ${arc} Unlocked! 🎊\n\nNew cards are now available in this arc!\n\nPoints remaining: ${remaining}`);
+        
+        // Refresh shop
+        showShop();
+    }
+
+    function purchaseArcPack(arc, price) {
+        const username = gameState.currentUser.username;
+        const userPoints = pointsManager.getPoints(username);
+        
+        if (userPoints < price) {
+            alert('Not enough points!');
+            return;
+        }
+        
+        // Get available cards from this arc that user doesn't own
+        const arcCards = CARD_DATABASE.filter(card => 
+            card.arc === arc && 
+            card.available && 
+            !gameState.currentUser.collection.has(card.id)
+        );
+        
+        if (arcCards.length === 0) {
+            alert('You already own all cards from this arc!');
+            return;
+        }
+        
+        // Pick random card
+        const randomCard = arcCards[Math.floor(Math.random() * arcCards.length)];
+        
+        // Deduct points
+        const remaining = pointsManager.spendPoints(username, price);
+        
+        // Add card to collection
+        gameState.currentUser.collection.add(randomCard.id);
+        autoUpdatePool(gameState.currentUser);
+        gameState.saveUser(gameState.currentUser);
+        
+        alert(`🎉 You got ${randomCard.name} (${randomCard.rarity}) from ${arc}!\n\nPoints remaining: ${remaining}`);
+        
+        // Refresh shop
+        showShop();
     }
 
     document.getElementById('claim-profile-link').addEventListener('click', (e) => {
@@ -794,6 +996,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sortByPowerFilter = document.getElementById('sort-by-power-filter');
     sortByPowerFilter.addEventListener('change', () => {
+        renderCollection();
+    });
+
+    const poolFirstSort = document.getElementById('pool-first-sort');
+    poolFirstSort.addEventListener('change', () => {
+        renderCollection();
+    });
+
+    // Pool selection mode toggle
+    const poolSelectionMode = document.getElementById('pool-selection-mode');
+    const poolCountSpan = document.getElementById('pool-count');
+    const poolMaxSpan = document.getElementById('pool-max');
+    
+    poolSelectionMode.addEventListener('change', () => {
+        const isActive = poolSelectionMode.checked;
+        if (isActive) {
+            collectionGrid.parentElement.classList.add('pool-selection-active');
+        } else {
+            collectionGrid.parentElement.classList.remove('pool-selection-active');
+        }
         renderCollection();
     });
 
@@ -1086,6 +1308,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showLobby() {
         const user = gameState.currentUser;
+        
+        // Auto-update pool with best cards
+        autoUpdatePool(user);
+        gameState.saveUser(user);
+        
         playerNameSpan.textContent = user.username;
         winsSpan.textContent = user.wins;
         lossesSpan.textContent = user.losses;
@@ -1098,6 +1325,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const streak = pointsManager.getStreak(user.username);
         document.getElementById('user-points').textContent = points;
         document.getElementById('user-streak').textContent = streak;
+        
+        // Display unlocked arcs count
+        const unlockedArcs = user.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
+        document.getElementById('arcs-unlocked').textContent = unlockedArcs.size;
+        
+        // Update pool status display
+        const userPool = user.pool || new Set();
+        const poolStatusLobby = document.getElementById('pool-status-lobby');
+        const hasEnoughCards = user.collection.size >= POOL_MAX_SIZE;
+        
+        if (hasEnoughCards) {
+            poolStatusLobby.classList.remove('hidden');
+            document.getElementById('lobby-pool-count').textContent = userPool.size;
+        } else {
+            poolStatusLobby.classList.add('hidden');
+        }
         
         lobbyCodeDisplay.classList.add('hidden');
         joinStatus.classList.add('hidden');
@@ -1120,6 +1363,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showCollection() {
+        // Ensure pool is initialized and updated
+        if (!gameState.currentUser.pool) {
+            gameState.currentUser.pool = new Set();
+        }
+        autoUpdatePool(gameState.currentUser);
+        gameState.saveUser(gameState.currentUser);
+        
+        // Show/hide pool features based on collection size
+        const hasEnoughCards = gameState.currentUser.collection.size >= POOL_MAX_SIZE;
+        const poolModeToggle = document.getElementById('pool-mode-toggle');
+        const poolStatusDisplay = document.getElementById('pool-status-display');
+        const poolFirstSortContainer = document.getElementById('pool-first-sort-container');
+        
+        if (hasEnoughCards) {
+            poolModeToggle.classList.remove('hidden');
+            poolStatusDisplay.classList.remove('hidden');
+            poolFirstSortContainer.classList.remove('hidden');
+        } else {
+            poolModeToggle.classList.add('hidden');
+            poolStatusDisplay.classList.add('hidden');
+            poolFirstSortContainer.classList.add('hidden');
+            // Ensure pool mode is off if not enough cards
+            poolSelectionMode.checked = false;
+            collectionGrid.parentElement.classList.remove('pool-selection-active');
+        }
+        
         // Populate saga filter
         sagaFilter.innerHTML = '<option value="all">All Sagas</option>';
         for (const saga in DEV_CONFIG.SAGA_DEFINITIONS) {
@@ -1129,13 +1398,16 @@ document.addEventListener('DOMContentLoaded', () => {
             sagaFilter.appendChild(option);
         }
         
-        // Populate arc filter
+        // Populate arc filter - only show unlocked arcs
+        const unlockedArcs = gameState.currentUser.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
         arcFilter.innerHTML = '<option value="all">All Arcs</option>';
         ARCS.forEach(arc => {
-            const option = document.createElement('option');
-            option.value = arc;
-            option.textContent = arc;
-            arcFilter.appendChild(option);
+            if (unlockedArcs.has(arc)) {
+                const option = document.createElement('option');
+                option.value = arc;
+                option.textContent = arc;
+                arcFilter.appendChild(option);
+            }
         });
         
         renderCollection();
@@ -1148,7 +1420,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedRarity = rarityFilter.value;
         const ownedOnly = ownedOnlyFilter.checked;
         const sortByPower = sortByPowerFilter.checked;
+        const poolFirstSort = document.getElementById('pool-first-sort').checked;
+        const poolMode = poolSelectionMode.checked;
         const userCollection = gameState.currentUser.collection;
+        const userPool = gameState.currentUser.pool || new Set();
+        
+        // Update pool count display
+        poolCountSpan.textContent = userPool.size;
+        poolMaxSpan.textContent = POOL_MAX_SIZE;
         
         let cards = CARD_DATABASE;
         
@@ -1168,8 +1447,17 @@ document.addEventListener('DOMContentLoaded', () => {
             cards = cards.filter(card => card.rarity === selectedRarity);
         }
 
-        // Filter out cards from disabled arcs
-        cards = cards.filter(card => ARC_AVAILABILITY[card.arc] === true && card.available);
+        // Ensure unlockedArcs exists
+        if (!gameState.currentUser.unlockedArcs) {
+            gameState.currentUser.unlockedArcs = new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
+        }
+
+        // Filter out cards from disabled arcs and locked arcs
+        cards = cards.filter(card => 
+            ARC_AVAILABILITY[card.arc] === true && 
+            card.available && 
+            gameState.currentUser.unlockedArcs.has(card.arc)
+        );
         
         // Filter for owned only if checkbox is checked
         if (ownedOnly) {
@@ -1181,6 +1469,21 @@ document.addEventListener('DOMContentLoaded', () => {
             cards = cards.sort((a, b) => b.power - a.power);
         }
         
+        // Sort by pool first, then alphabetically
+        if (poolFirstSort) {
+            cards = cards.sort((a, b) => {
+                const aInPool = userPool.has(a.id);
+                const bInPool = userPool.has(b.id);
+                
+                // Pool cards come first
+                if (aInPool && !bInPool) return -1;
+                if (!aInPool && bInPool) return 1;
+                
+                // Within same group (both in pool or both not), sort alphabetically
+                return a.name.localeCompare(b.name);
+            });
+        }
+        
         collectionGrid.innerHTML = '';
         
         if (cards.length === 0) {
@@ -1190,11 +1493,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         cards.forEach(card => {
             const owned = userCollection.has(card.id);
+            const inPool = userPool.has(card.id);
             
             const cardDiv = document.createElement('div');
             cardDiv.style = `border: 1px solid;padding: 3px;margin: 3px;`;
-            cardDiv.className = `collection-card ${owned ? '' : 'locked'}`;
+            cardDiv.className = `collection-card ${owned ? '' : 'locked'} ${inPool ? 'in-pool' : ''}`;
             cardDiv.setAttribute('data-rarity', card.rarity);
+            cardDiv.setAttribute('data-card-id', card.id);
             
             if (!owned) {
                 cardDiv.style = `border: 1px solid;
@@ -1223,13 +1528,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            // Add click handler to show modal
+            // Add click handler
             cardDiv.addEventListener('click', () => {
-                showCardDetailModal(card);
+                if (poolMode && owned) {
+                    // Pool selection mode - toggle card in/out of pool
+                    toggleCardInPool(card.id);
+                } else {
+                    // Normal mode - show card detail modal
+                    showCardDetailModal(card);
+                }
             });
             
             collectionGrid.appendChild(cardDiv);
         });
+    }
+
+    // Pool management functions
+    function toggleCardInPool(cardId) {
+        const userPool = gameState.currentUser.pool || new Set();
+        
+        if (userPool.has(cardId)) {
+            // Remove from pool
+            userPool.delete(cardId);
+        } else {
+            // Add to pool if under limit
+            if (userPool.size >= POOL_MAX_SIZE) {
+                alert(`Pool is full! Maximum ${POOL_MAX_SIZE} cards allowed.`);
+                return;
+            }
+            userPool.add(cardId);
+        }
+        
+        // Save to localStorage
+        gameState.currentUser.pool = userPool;
+        gameState.saveUser(gameState.currentUser);
+        
+        // Re-render collection
+        renderCollection();
+    }
+
+    // Auto-populate pool with best cards (highest rarity -> power -> name)
+    function autoUpdatePool(user) {
+        if (!user.pool) {
+            user.pool = new Set();
+        }
+
+        // Get all owned cards as full card objects
+        const ownedCards = Array.from(user.collection)
+            .map(id => CARD_DATABASE.find(card => card.id === id))
+            .filter(card => card); // Remove any undefined
+
+        // Define rarity order
+        const rarityOrder = ['SSS', 'SS', 'S', 'A', 'B', 'C', 'D', 'F'];
+
+        // Sort by: rarity (highest first), then power (highest first), then name (alphabetical)
+        ownedCards.sort((a, b) => {
+            const rarityDiff = rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+            if (rarityDiff !== 0) return rarityDiff;
+            
+            const powerDiff = b.power - a.power;
+            if (powerDiff !== 0) return powerDiff;
+            
+            return a.name.localeCompare(b.name);
+        });
+
+        // Take top POOL_MAX_SIZE cards
+        const topCards = ownedCards.slice(0, POOL_MAX_SIZE);
+        user.pool = new Set(topCards.map(card => card.id));
     }
 
     // Card Detail Modal Functions
@@ -1356,6 +1721,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const result = gameState.endGame(gameOver);
         
+        // Check for newly unlocked arcs
+        const unlockedArcs = gameState.checkArcProgression(gameState.currentUser);
+        let arcUnlockNotification = '';
+        if (unlockedArcs && unlockedArcs.length > 0) {
+            arcUnlockNotification = `
+                <div class="arc-unlock-notification">
+                    <h3>🎊 New Arc${unlockedArcs.length > 1 ? 's' : ''} Unlocked! 🎊</h3>
+                    ${unlockedArcs.map(arc => `<p>🏝️ ${arc}</p>`).join('')}
+                    <p>New cards are now available!</p>
+                </div>
+            `;
+        }
+        
         // Calculate and award points
         const isPlayerWinner = result.winner && result.winner.username === gameState.currentUser.username;
         const isPlayerLoser = result.loser && result.loser.username === gameState.currentUser.username;
@@ -1384,6 +1762,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             
             gameoverStats.innerHTML += pointsNotification;
+        }
+        
+        // Add arc unlock notification if any
+        if (arcUnlockNotification) {
+            gameoverStats.innerHTML += arcUnlockNotification;
         }
         
         if (result.tie) {
@@ -2108,14 +2491,35 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const role in player.assignments) {
             const card = player.assignments[role];
             const roleInfo = ROLE_MODIFIERS[game.mode][role];
-            const roleScore = Math.round(card.power * roleInfo.multiplier);
+            let roleScore = game.calculateRoleScore(card, role);
             
             const roleDiv = document.createElement('div');
             roleDiv.className = 'final-role-item';
+            
+            let calculationHTML = `(${card.power} × ${roleInfo.multiplier}`;
+            let bonusHTML = '';
+            
+            // Show type bonus and synergy if enabled
+            if (DEV_CONFIG.GAME.TEAM_BATTLE_TYPE_BONUS && card.type) {
+                const bonusInfo = game.getTypeBonusInfo(card, role);
+                if (bonusInfo) {
+                    calculationHTML += ` × ${bonusInfo.baseBonus}`;
+                    bonusHTML = `<span class="type-bonus" style="color: ${bonusInfo.color}">${bonusInfo.icon} ${bonusInfo.type}</span>`;
+                    
+                    if (bonusInfo.hasSynergy) {
+                        calculationHTML += ` × ${bonusInfo.synergyBonus}`;
+                        bonusHTML += `<span class="synergy-bonus">✨ Synergy!</span>`;
+                    }
+                }
+            }
+            
+            calculationHTML += ` = ${roleScore})`;
+            
             roleDiv.innerHTML = `
                 <span class="role-label">${roleInfo.name}:</span>
                 <span class="card-name">${card.name}</span>
-                <span class="role-calculation">(${card.power} × ${roleInfo.multiplier} = ${roleScore})</span>
+                ${bonusHTML}
+                <span class="role-calculation">${calculationHTML}</span>
             `;
             rolesContainer.appendChild(roleDiv);
         }
