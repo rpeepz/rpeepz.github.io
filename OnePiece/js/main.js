@@ -1,5 +1,3 @@
-const DEV_CONFIG = require("./dev-config");
-
 // Main application logic
 document.addEventListener('DOMContentLoaded', () => {
     // Screen elements
@@ -768,6 +766,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             gameState.currentUser = gameState.createUser(username, password, false);
+            
+            // Award starting points to new account
+            pointsManager.awardPoints(username, FIRST_LOGIN_BONUS_POINTS);
+
             showLobby();
         } else if (currentFormMode === 'login') {
             const user = gameState.loadUser(username, password);
@@ -1103,11 +1105,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const users = JSON.parse(localStorage.getItem('onePieceUsers') || '{}');
         if (users[username]) { alert('Username exists!'); return; }
     
+        // Get current points from guest account
+        const oldUsername = gameState.currentUser.username;
+        const currentPoints = pointsManager.getPoints(oldUsername);
+        
+        // Update username
         gameState.currentUser.username = username;
         gameState.currentUser.password = password;
         gameState.currentUser.isGuest = false;
+
+        // Transfer existing points + bonus to new username
+        pointsManager.awardPoints(username, currentPoints + FIRST_LOGIN_BONUS_POINTS);
+        
         gameState.saveUser(gameState.currentUser);
-        alert('Profile claimed!');
+        alert(`Profile claimed! You now have ${currentPoints + FIRST_LOGIN_BONUS_POINTS} points (${currentPoints} transferred + ${FIRST_LOGIN_BONUS_POINTS} bonus)!`);
         showLobby();
     })
 
