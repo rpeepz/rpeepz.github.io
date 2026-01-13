@@ -1813,6 +1813,17 @@ body.dark-mode .rarity-badge {
     display: none; /* Hidden by default, shown via JS if flag is true */
 }
 
+/* Win Simulator Styles */
+.win-simulator {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.win-simulator .btn {
+    font-weight: 600;
+}
+
 .help-text {
     color: var(--text-secondary);
     font-size: 0.9em;
