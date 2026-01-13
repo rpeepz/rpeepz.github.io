@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Piece Card War</title>
+    <title>Grand Line Duels</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
     
     <!-- Meta Information -->
-    <meta name="description" content="One Piece Card War - A strategic card battle game featuring characters from the One Piece universe">
+    <meta name="description" content="Grand Line Duels - A strategic card battle game featuring characters from the One Piece universe">
     <meta name="author" content="rpeepz">
     <meta name="creator" content="rpeepz">
     <meta name="copyright" content="© 2026 rpeepz. One Piece © Eiichiro Oda">
-    <meta property="og:title" content="One Piece Card War">
+    <meta property="og:title" content="Grand Line Duels">
     <meta property="og:description" content="Strategic card battle game featuring One Piece characters">
     <meta property="og:type" content="website">
     <meta name="robots" content="index, follow">
@@ -35,8 +35,8 @@
         <source src="https://quicksounds.com/uploads/tracks/143341674_950320944_1102458802.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Team Battle Music Audio -->
-    <audio id="team-battle-music" loop>
+    <!-- Draft War Music Audio -->
+    <audio id="draft-war-music" loop>
         <source src="https://us-tuna-sounds-files.voicemod.net/86e570ed-a8db-490d-abde-cdf5a3ad9a40-1664011058207.mp3" type="audio/mpeg">
     </audio>
 
@@ -54,7 +54,7 @@
     <!-- Login/Profile Screen -->
     <div id="login-screen" class="screen active">
         <div class="container">
-            <h1>⚔️ One Piece Card War ⚔️</h1>
+            <h1>⚔️ Grand Line Duels ⚔️</h1>
             <div class="login-options">
                 <button id="guest-btn" class="btn btn-primary">Play as Guest</button>
                 <button id="create-profile-btn" class="btn btn-secondary">Create Profile</button>
@@ -86,14 +86,21 @@
             </div>
             
             <div class="stats">
-                <p>Wins: <span id="wins">0</span> | Losses: <span id="losses">0</span> | Cards Collected: <span id="cards-collected">0</span></p>
+                <p>Points: <span id="user-points">0</span> ⭐ | Wins: <span id="wins">0</span> | Losses: <span id="losses">0</span> | Cards Collected: <span id="cards-collected">0</span> | Win Streak: <span id="user-streak">0</span> 🔥</p>
             </div>
 
             <div class="lobby-actions">
-                <!-- Bot Mode Section (NEW) -->
+
+                <!-- Play Draft War -->
                 <div class="section">
-                    <h3>🤖 Play vs Bot (Offline)</h3>
-                    <button id="play-bot-btn" class="btn btn-primary">Play vs Bot</button>
+                    <h3>🏴‍☠️ Draft War Mode (NEW)</h3>
+                    <button id="play-draft-war-btn" class="btn btn-primary">Play Draft War</button>
+                </div>
+                
+                <!-- Duel against a Bot -->
+                <div class="section">
+                    <h3>🤖 Duel vs Bot (Offline)</h3>
+                    <button id="play-bot-btn" class="btn btn-primary">Duel vs Bot</button>
                     <div id="difficulty-selector" class="hidden">
                         <h4>Select Difficulty:</h4>
                         <div class="difficulty-buttons">
@@ -127,20 +134,17 @@
                     </div>
                 </div>
 
+                <!-- Join Duel Lobby -->
                 <div class="section">
-                    <h3>Join a Game</h3>
-                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="20">
+                    <h3>Join a Duel</h3>
+                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="30">
                     <button id="join-game-btn" class="btn btn-primary">Join Lobby</button>
                     <p class="connection-status hidden" id="join-status">Connecting...</p>
                 </div>
 
+                <!-- Host Duel Lobby -->
                 <div class="section">
-                    <h3>🏴‍☠️ Team Battle Mode (NEW)</h3>
-                    <button id="play-team-battle-btn" class="btn btn-primary">Play Team Battle</button>
-                </div>
-
-                <div class="section">
-                    <h3>Host a Game</h3>
+                    <h3>Host a Duel</h3>
                     <button id="host-game-btn" class="btn btn-primary">Create Lobby</button>
                     <div id="lobby-code-display" class="hidden">
                         <p>Share this code with your opponent:</p>
@@ -154,15 +158,53 @@
                 </div>
             </div>
 
+            <!-- Collection -->
             <div class="section">
                 <h3>Your Collection</h3>
-                <button id="view-collection-btn" class="btn btn-secondary">View Cards</button>
-                <button id="view-admin-btn" class="btn btn-secondary">⚙️ Admin Panel</button>
-                <button id="show-music-btn" class="btn btn-secondary hidden">🎵 Show Music Player</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="view-collection-btn" class="btn btn-secondary">View Cards</button>
+                    <button id="view-admin-btn" class="btn btn-secondary">⚙️ Admin Panel</button>
+                    <button id="show-music-btn" class="btn btn-secondary hidden">🎵 Show Music Player</button>
+                </div>
             </div>
         </div>
     </div>
-
+    
+    <!-- Card Shop Screen -->
+    <div id="shop-screen" class="screen">
+        <div class="container">
+            <div class="header">
+                <h2>⭐ Card Shop ⭐</h2>
+                <button id="back-to-lobby-shop-btn" class="btn btn-small">Back to Lobby</button>
+            </div>
+            
+            <div class="shop-stats">
+                <div class="shop-stat-item">
+                    <div class="shop-stat-label">Your Points</div>
+                    <div class="shop-stat-value" id="shop-user-points">0</div>
+                </div>
+                <div class="shop-stat-item">
+                    <div class="shop-stat-label">Win Streak</div>
+                    <div class="shop-stat-value" id="shop-user-streak">0 🔥</div>
+                </div>
+            </div>
+            
+            <div class="shop-info">
+                <h3>💰 Earn Points:</h3>
+                <ul>
+                    <li>Duel Win: 10 pts (×performance grade)</li>
+                    <li>Draft War Win: 25 pts (×performance grade)</li>
+                    <li>Loss: 2-5 pts (consolation)</li>
+                    <li>Win Streak Bonus: Up to ×2.0 at 20 streak!</li>
+                </ul>
+            </div>
+            
+            <div class="shop-inventory" id="shop-inventory">
+                <!-- Cards will be generated here -->
+            </div>
+        </div>
+    </div>
+    
     <!-- Collection Screen -->
     <div id="collection-screen" class="screen">
         <div class="container">
@@ -226,8 +268,8 @@
                 </div>
             </section>
 
-            <!-- Two columns for Card Pool Status and Test Deck -->
-            <div class="admin-bottom-grid">
+            <!-- Three columns for Card Pool Status, Test Deck, and Points Granter -->
+            <div class="admin-bottom-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
                 <section class="admin-section">
                     <h3>Card Pool Status</h3>
                     <div id="pool-stats" class="pool-stats">
@@ -242,18 +284,37 @@
                     <button id="test-deck-btn" class="btn btn-primary">Generate Test Deck</button>
                     <div id="test-deck-display" class="test-deck-display"></div>
                 </section>
+                
+                <section class="admin-section" id="points-granter-section">
+                    <h3>💰 Points Granter</h3>
+                    <div class="points-granter">
+                        <div class="points-granter-controls">
+                            <button id="points-minus-btn" class="btn btn-danger">-</button>
+                            <div class="points-granter-display">
+                                <span id="points-multiplier">1</span> × 10 = <strong id="points-grant-value">10</strong> pts
+                            </div>
+                            <button id="points-plus-btn" class="btn btn-primary">+</button>
+                        </div>
+                        <button id="grant-points-btn" class="btn btn-primary" style="margin-top: 15px; width: 100%;">Grant Points</button>
+                        <p style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                            Current Balance: <strong id="current-points-balance">0</strong> pts
+                        </p>
+                    </div>
+                </section>
             </div>
+            
         </div>
     </div>
-        <!-- Team Battle Select Screen -->
-    <div id="team-battle-select-screen" class="screen">
+
+    <!-- Draft War Select Screen -->
+    <div id="draft-war-select-screen" class="screen">
         <div class="container">
             <div class="header">
-                <h2>⚔️ Team Battle Mode ⚔️</h2>
+                <h2>⚔️ Draft War Mode ⚔️</h2>
                 <button id="back-from-team-select-btn" class="btn btn-small">Back to Lobby</button>
             </div>
             
-            <div class="team-mode-selection">
+            <div class="draft-war-mode-selection">
                 <div class="mode-card" id="davy-back-mode">
                     <h3>🏴‍☠️ Davy Back Fight</h3>
                     <p class="mode-description">High risk, high reward</p>
@@ -265,7 +326,7 @@
                         <span class="role-badge support">Support (×1.1)</span>
                         <span class="role-badge traitor">Traitor (×-0.5)</span>
                     </div>
-                    <button class="btn btn-primary select-mode-btn" data-mode="DAVY_BACK">Select Mode</button>
+                    <button class="btn btn-primary select-mode-btn" data-mode="DAVY_BACK">Play</button>
                 </div>
                 
                 <div class="mode-card" id="classic-pirate-mode">
@@ -279,14 +340,14 @@
                         <span class="role-badge support">Support (×1.1)</span>
                         <span class="role-badge support">Support (×1.1)</span>
                     </div>
-                    <button class="btn btn-primary select-mode-btn" data-mode="CLASSIC_PIRATE">Select Mode</button>
+                    <button class="btn btn-primary select-mode-btn" data-mode="CLASSIC_PIRATE">Play</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Team Battle Wager Screen -->
-    <div id="team-battle-wager-screen" class="screen">
+    <!-- Draft War Wager Screen -->
+    <div id="draft-war-wager-screen" class="screen">
         <div class="container">
             <div class="header">
                 <h2>Set Your Wager</h2>
@@ -299,10 +360,10 @@
                 <button class="btn wager-btn" data-wager="1">1 Card</button>
                 <button class="btn wager-btn" data-wager="2">2 Cards</button>
                 <button class="btn wager-btn" data-wager="3">3 Cards</button>
-                <button class="btn wager-btn" data-wager="5">5 Cards</button>
+                <!-- <button class="btn wager-btn" data-wager="5">5 Cards</button> -->
             </div>
             
-            <div class="difficulty-selector" id="team-battle-difficulty">
+            <div class="difficulty-selector" id="draft-war-difficulty">
                 <h4>Select Bot Difficulty:</h4>
                 <div class="difficulty-buttons">
                     <button class="btn btn-difficulty" data-difficulty="EASY">
@@ -328,8 +389,8 @@
                 </div>
             </div>
 
-<div id="team-battle-p2p-options" class="section hidden">
-    <h4>Online Team Battle:</h4>
+<div id="draft-war-p2p-options" class="section hidden">
+    <h4>Online Draft War:</h4>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
         <div>
             <h5>Host Game:</h5>
@@ -352,21 +413,21 @@
         </div>
     </div>
 
-    <!-- Team Battle Assignment Screen -->
-    <div id="team-battle-game-screen" class="screen">
+    <!-- Draft War Assignment Screen -->
+    <div id="draft-war-game-screen" class="screen">
         <div class="container">
-            <div class="team-battle-header">
-                <div class="team-info">
+            <div class="draft-war-header">
+                <div class="draft-war-info">
                     <h3 id="tb-player1-name">Player 1</h3>
-                    <p class="team-score">Wager: <span id="tb-player1-wager">1</span> card(s)</p>
+                    <p class="draft-war-score">Wager: <span id="tb-player1-wager">1</span> card(s)</p>
                 </div>
                 <div class="assignment-phase">
                     <p>Assignment Phase: <span id="tb-phase">1</span>/6</p>
                     <p id="tb-turn-indicator">Your Turn</p>
                 </div>
-                <div class="team-info">
+                <div class="draft-war-info">
                     <h3 id="tb-player2-name">Player 2</h3>
-                    <p class="team-score">Wager: <span id="tb-player2-wager">1</span> card(s)</p>
+                    <p class="draft-war-score">Wager: <span id="tb-player2-wager">1</span> card(s)</p>
                 </div>
             </div>
 
@@ -382,15 +443,15 @@
             </div>
 
             <!-- Teams Display -->
-            <div class="team-battle-board">
-                <div class="team-column" id="tb-player1-column">
+            <div class="draft-war-board">
+                <div class="draft-war-column" id="tb-player1-column">
                     <h4>Your Team</h4>
                     <div class="role-slots" id="tb-player1-slots"></div>
                 </div>
                 
                 <div class="vs-divider">VS</div>
                 
-                <div class="team-column" id="tb-player2-column">
+                <div class="draft-war-column" id="tb-player2-column">
                     <h4>Opponent Team</h4>
                     <div class="role-slots" id="tb-player2-slots"></div>
                 </div>
@@ -400,13 +461,13 @@
         </div>
     </div>
 
-    <!-- Team Battle Results Screen -->
-    <div id="team-battle-results-screen" class="screen">
+    <!-- Draft War Results Screen -->
+    <div id="draft-war-results-screen" class="screen">
         <div class="container">
             <h1 id="tb-result-title"></h1>
             <div id="tb-result-stats"></div>
             
-            <div class="team-comparison">
+            <div class="draft-war-comparison">
                 <div class="final-team">
                     <h3 id="tb-final-p1-name">Your Team</h3>
                     <div id="tb-final-p1-roles" class="final-roles"></div>
@@ -495,6 +556,7 @@
 
     <script src="js/dev-config.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/points-system.js"></script>
     <script src="js/music.js"></script>
     <script src="js/p2p.js"></script>
     <script src="js/game.js"></script>
@@ -505,8 +567,8 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.5 | Last Updated: January 2026</p>
-        <p class="credits">© 2026 One Piece Card War | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
+        <p id="version-info">v1.0 | Last Updated: January 2026</p>
+        <p class="credits">© 2026 Grand Line Duels | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
         <details style="margin-top: 8px;">
             <summary style="cursor: pointer; color: var(--maya-blue); font-size: 12px; font-weight: 600; transition: color 0.2s;">📚 Sources, Credits & Acknowledgments</summary>
             <div style="margin-top: 10px; font-size: 11px; text-align: left; max-width: 700px; margin: 10px auto; line-height: 1.6;">
@@ -531,7 +593,7 @@
                 <p style="margin-bottom: 8px;"><strong>🎵 Audio Assets:</strong></p>
                 <p style="margin-left: 15px; margin-bottom: 10px;">
                     • Battle Music: <a href="https://quicksounds.com/" target="_blank" style="color: var(--maya-blue);">QuickSounds</a><br>
-                    • Team Battle Music: <a href="https://www.voicemod.net/" target="_blank" style="color: var(--maya-blue);">Voicemod Soundboard</a>
+                    • Draft War Music: <a href="https://www.voicemod.net/" target="_blank" style="color: var(--maya-blue);">Voicemod Soundboard</a>
                 </p>
                 
                 <p style="margin-bottom: 8px;"><strong>🎨 Design Elements:</strong></p>
@@ -545,7 +607,7 @@
                 <p style="margin-left: 15px; margin-bottom: 10px;">
                     • P2P Multiplayer (No Server Required)<br>
                     • Offline Bot Battles (5 Difficulty Levels)<br>
-                    • Team Battle Mode (Davy Back Fight & Classic Pirate)<br>
+                    • Draft War Mode (Davy Back Fight & Classic Pirate)<br>
                     • Card Collection System (163 Unique Characters)<br>
                     • Character Type System with Synergy Bonuses<br>
                     • Dynamic Rarity Distribution<br>
