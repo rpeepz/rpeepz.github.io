@@ -891,6 +891,274 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
     font-size: 16px;
 }
 
+/* Arc unlock notification */
+.arc-unlock-notification {
+    background: linear-gradient(135deg, rgba(255, 0, 102, 0.2) 0%, rgba(153, 51, 255, 0.2) 100%);
+    border: 2px solid var(--success);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.arc-unlock-notification h3 {
+    color: var(--success);
+    margin-bottom: 15px;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(96, 191, 245, 0.5);
+}
+
+.arc-unlock-notification p {
+    margin: 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(96, 191, 245, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(96, 191, 245, 0.6);
+    }
+}
+
+/* Arc Shop Sections */
+.arc-shop-section,
+.arc-packs-section {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 3px solid var(--border-color);
+}
+
+.arc-shop-section h3,
+.arc-packs-section h3 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: var(--maya-blue);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.arc-shop-description,
+.arc-packs-description {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    font-size: 16px;
+}
+
+.arc-shop-grid,
+.arc-packs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Arc Shop Cards */
+.arc-shop-card {
+    background: var(--bg-secondary);
+    border: 3px solid var(--border-color);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.arc-shop-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px var(--shadow-heavy);
+    border-color: var(--maya-blue);
+}
+
+.arc-shop-card.locked {
+    opacity: 0.7;
+    filter: grayscale(50%);
+}
+
+.arc-shop-card.unlocked {
+    border-color: var(--success);
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(96, 191, 245, 0.1) 100%);
+}
+
+.arc-card-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, var(--lapis) 0%, var(--maya-blue) 100%);
+}
+
+.arc-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.arc-shop-card:hover .arc-card-image img {
+    transform: scale(1.1);
+}
+
+.arc-card-content {
+    padding: 20px;
+}
+
+.arc-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.arc-card-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--tangerine);
+    text-align: center;
+    margin: 12px 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.arc-card-status {
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.arc-card-status.unlocked {
+    background: var(--success);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.arc-unlock-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Arc Pack Cards */
+.arc-pack-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px var(--shadow);
+}
+
+.arc-pack-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--shadow-heavy);
+    border-color: var(--tangerine);
+}
+
+.arc-pack-card.locked {
+    opacity: 0.6;
+}
+
+.arc-pack-image {
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, var(--lapis) 0%, var(--maya-blue) 100%);
+}
+
+.arc-pack-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.arc-pack-card:hover .arc-pack-image img {
+    transform: scale(1.1);
+}
+
+.arc-pack-content {
+    padding: 15px;
+}
+
+.arc-pack-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.arc-pack-header h4 {
+    font-size: 16px;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.arc-pack-collection {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.arc-pack-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--tangerine);
+    text-align: center;
+    margin: 10px 0;
+}
+
+.arc-pack-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.arc-pack-buy-btn {
+    width: 100%;
+}
+
+/* Pool status in lobby */
+.pool-status-lobby {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 12px;
+    margin: 15px 0;
+    background: linear-gradient(135deg, rgba(77, 171, 247, 0.1) 0%, rgba(255, 206, 0, 0.1) 100%);
+    border: 2px solid rgba(77, 171, 247, 0.3);
+    border-radius: 8px;
+}
+
+.pool-status-label {
+    color: var(--maya-blue);
+    margin-right: 8px;
+}
+
+#lobby-pool-count {
+    color: var(--tangerine);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.pool-status-hint {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 10px;
+}
 
 /* Collection Screen */
 .filter-section {
@@ -930,6 +1198,39 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
     font-weight: 500;
     color: var(--text-primary);
     user-select: none;
+}
+
+/* Pool selection mode toggle */
+.pool-mode-toggle {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    border: 2px solid var(--maya-blue);
+}
+
+.pool-mode-toggle:hover {
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    box-shadow: 0 0 10px rgba(77, 171, 247, 0.3);
+}
+
+/* Pool status display */
+.pool-status {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 12px;
+    margin: 10px 0;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+}
+
+#pool-count {
+    color: var(--maya-blue);
+    font-size: 24px;
+}
+
+#pool-max {
+    color: var(--text-secondary);
 }
 
 #arc-filter {
@@ -1055,6 +1356,49 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
 .collection-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+/* Pool indicator badge */
+.collection-card.in-pool::before {
+    content: '⭐';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Pool selection mode - show checkbox */
+.pool-selection-active .collection-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.pool-selection-active .collection-card::after {
+    content: '☐';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 28px;
+    color: var(--text-secondary);
+    z-index: 10;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.pool-selection-active .collection-card.in-pool::after {
+    content: '☑';
+    color: var(--maya-blue);
+}
+
+.pool-selection-active .collection-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pool-selection-active .collection-card:not(.locked):hover {
+    border-color: var(--maya-blue);
+    box-shadow: 0 0 15px rgba(77, 171, 247, 0.5);
 }
 
 .collection-card.locked {
@@ -2153,8 +2497,9 @@ draft-war-comparison {
     background: var(--bg-tertiary);
     border-radius: 6px;
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     font-size: 14px;
 }
 
@@ -2168,9 +2513,44 @@ draft-war-comparison {
     color: var(--text-primary);
 }
 
+.final-role-item .type-bonus {
+    font-weight: 700;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.final-role-item .synergy-bonus {
+    font-weight: 700;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #000;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    animation: synergyPulse 2s ease-in-out infinite;
+}
+
+@keyframes synergyPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    }
+}
+
 .final-role-item .role-calculation {
     color: var(--text-secondary);
     font-size: 12px;
+    width: 100%;
+    text-align: right;
 }
 
 .final-score {
