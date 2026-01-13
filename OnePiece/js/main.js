@@ -97,6 +97,145 @@ document.addEventListener('DOMContentLoaded', () => {
         musicManager.initialize();
     }
 
+    // Initialize Lobby Manager
+    lobbyManager.initialize();
+
+    // Lobby browser state
+    let currentLobbyFilter = 'duel'; // 'duel' or 'draft-war'
+
+    // Lobby browser elements
+    const lobbyList = document.getElementById('lobby-list');
+    const lobbyTabBtns = document.querySelectorAll('.lobby-tab-btn');
+    const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn');
+
+    // Lobby tab switching
+    lobbyTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            lobbyTabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLobbyFilter = btn.dataset.type;
+            refreshLobbyList();
+        });
+    });
+
+    // Refresh lobbies button
+    refreshLobbiesBtn?.addEventListener('click', () => {
+        refreshLobbyList();
+    });
+
+    // Function to render lobby list
+    function refreshLobbyList() {
+        const lobbies = lobbyManager.getOpenLobbies(currentLobbyFilter);
+        
+        if (lobbies.length === 0) {
+            lobbyList.innerHTML = '<p class="lobby-list-empty">No open lobbies found. Create one!</p>';
+            return;
+        }
+        
+        lobbyList.innerHTML = '';
+        
+        lobbies.forEach(lobby => {
+            const lobbyItem = document.createElement('div');
+            lobbyItem.className = 'lobby-item';
+            
+            const timeAgo = getTimeAgo(lobby.timestamp);
+            const gameTypeLabel = lobby.gameType === 'draft-war' ? '🏴‍☠️ Draft War' : '⚔️ Duel';
+            
+            lobbyItem.innerHTML = `
+                <div class="lobby-info">
+                    <div class="lobby-host">${lobby.host}</div>
+                    <div class="lobby-details">
+                        <span class="lobby-game-type">${gameTypeLabel}</span>
+                        <span class="lobby-time">Created ${timeAgo}</span>
+                    </div>
+                </div>
+                <button class="lobby-join-btn" data-code="${lobby.code}">Join</button>
+            `;
+            
+            const joinBtn = lobbyItem.querySelector('.lobby-join-btn');
+            joinBtn.addEventListener('click', () => {
+                if (lobby.gameType === 'draft-war') {
+                    // Join draft war lobby
+                    document.getElementById('tb-join-code-input').value = lobby.code;
+                    document.getElementById('tb-join-game-btn').click();
+                } else {
+                    // Join duel lobby
+                    joinCodeInput.value = lobby.code;
+                    joinGameBtn.click();
+                }
+            });
+            
+            lobbyList.appendChild(lobbyItem);
+        });
+    }
+
+    // Helper function to get time ago
+    function getTimeAgo(timestamp) {
+        const seconds = Math.floor((Date.now() - timestamp) / 1000);
+        if (seconds < 60) return 'just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        return `${hours}h ago`;
+    }
+
+    // Refresh lobby list every 10 seconds when on lobby screen
+    setInterval(() => {
+        if (lobbyScreen.classList.contains('active')) {
+            refreshLobbyList();
+        }
+    }, 10000);
+
+    // Check for restorable lobby on load
+    function checkRestorableLobby() {
+        const myLobby = lobbyManager.getMyLobby();
+        if (myLobby && gameState.currentUser) {
+            showLobbyRestoreBanner(myLobby);
+        }
+    }
+
+    // Show lobby restore banner
+    function showLobbyRestoreBanner(lobby) {
+        const existingBanner = document.querySelector('.lobby-restore-banner');
+        if (existingBanner) existingBanner.remove();
+        
+        const banner = document.createElement('div');
+        banner.className = 'lobby-restore-banner';
+        banner.innerHTML = `
+            <div class="lobby-restore-info">
+                <div class="lobby-restore-title">🔄 Active Lobby Found</div>
+                <div class="lobby-restore-desc">You have an active ${lobby.gameType === 'draft-war' ? 'Draft War' : 'Duel'} lobby (${lobby.code})</div>
+            </div>
+            <div class="lobby-restore-actions">
+                <button class="btn btn-primary btn-small" id="restore-lobby-btn">Restore</button>
+                <button class="btn btn-danger btn-small" id="dismiss-lobby-btn">Dismiss</button>
+            </div>
+        `;
+        
+        const lobbyActions = document.querySelector('.lobby-actions');
+        lobbyActions.insertBefore(banner, lobbyActions.firstChild);
+        
+        document.getElementById('restore-lobby-btn').addEventListener('click', () => {
+            if (lobby.gameType === 'draft-war') {
+                // Restore draft war lobby
+                selectedDraftWarMode = 'CLASSIC_PIRATE';
+                draftWarOpponentMode = 'p2p';
+                selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;
+                showScreen(draftWarWagerScreen);
+                document.getElementById('tb-host-game-btn').click();
+            } else {
+                // Restore duel lobby
+                hostGameBtn.click();
+            }
+            banner.remove();
+        });
+        
+        document.getElementById('dismiss-lobby-btn').addEventListener('click', () => {
+            lobbyManager.closeLobby(lobby.code);
+            banner.remove();
+        });
+    }
+
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
@@ -977,6 +1116,10 @@ document.addEventListener('DOMContentLoaded', () => {
             lobbyCodeSpan.textContent = code;
             connectionStatus.textContent = 'Waiting for opponent to join...';
             connectionStatus.className = 'connection-status';
+            
+            // Register lobby in lobby manager
+            lobbyManager.createLobby(code, gameState.currentUser.username, 'duel');
+            refreshLobbyList();
         } catch (err) {
             connectionStatus.textContent = 'Error creating lobby: ' + err.message;
             connectionStatus.className = 'connection-status error';
@@ -1029,10 +1172,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeLobbyBtn = document.getElementById('close-lobby-btn');
     closeLobbyBtn?.addEventListener('click', () => {
         if (confirm('Are you sure you want to close this lobby?')) {
+            const lobbyCode = lobbyCodeSpan.textContent;
             gameState.p2p.disconnect();
             lobbyCodeDisplay.classList.add('hidden');
             hostGameBtn.disabled = false;
             connectionStatus.textContent = '';
+            
+            // Remove from lobby manager
+            lobbyManager.closeLobby(lobbyCode);
+            refreshLobbyList();
         }
     });
 
@@ -1425,6 +1573,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if there's a pending lobby code from URL
         handlePendingLobbyCode();
         handlePendingTBLobbyCode();
+        
+        // Refresh lobby list
+        refreshLobbyList();
+        
+        // Check for restorable lobby
+        checkRestorableLobby();
         
         showScreen(lobbyScreen);
     }
@@ -2060,6 +2214,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 mode: selectedDraftWarMode,
                 wager: selectedWager
             };
+            
+            // Register lobby in lobby manager
+            lobbyManager.createLobby(code, gameState.currentUser.username, 'draft-war');
+            refreshLobbyList();
         } catch (err) {
             connectionStatus.textContent = 'Error: ' + err.message;
             connectionStatus.className = 'connection-status error';
@@ -2119,6 +2277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tbCloseLobbyBtn = document.getElementById('tb-close-lobby-btn');
     tbCloseLobbyBtn?.addEventListener('click', () => {
         if (confirm('Are you sure you want to close this lobby?')) {
+            const lobbyCode = document.getElementById('tb-lobby-code').textContent;
             gameState.p2p.disconnect();
             const lobbyDisplay = document.getElementById('tb-lobby-code-display');
             const hostBtn = document.getElementById('tb-host-game-btn');
@@ -2130,6 +2289,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Clear the waiting flag
             gameState.waitingForDraftWar = null;
+            
+            // Remove from lobby manager
+            lobbyManager.closeLobby(lobbyCode);
+            refreshLobbyList();
         }
     });
 
