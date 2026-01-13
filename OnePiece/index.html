@@ -162,6 +162,19 @@
                         <p id="connection-status"></p>
                     </div>
                 </div>
+
+                <!-- Open Lobbies Browser -->
+                <div class="section">
+                    <h3>🌐 Open Lobbies</h3>
+                    <div class="lobby-browser-tabs">
+                        <button class="lobby-tab-btn active" data-type="duel">⚔️ Duels</button>
+                        <button class="lobby-tab-btn" data-type="draft-war">🏴‍☠️ Draft Wars</button>
+                    </div>
+                    <div class="lobby-list" id="lobby-list">
+                        <p class="lobby-list-empty">No open lobbies found. Create one!</p>
+                    </div>
+                    <button id="refresh-lobbies-btn" class="btn btn-secondary btn-small">🔄 Refresh</button>
+                </div>
             </div>
 
             <!-- Collection -->
@@ -334,6 +347,21 @@
                         <button id="grant-points-btn" class="btn btn-primary" style="margin-top: 15px; width: 100%;">Grant Points</button>
                         <p style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
                             Current Balance: <strong id="current-points-balance">0</strong> pts
+                        </p>
+                    </div>
+                </section>
+
+                <section class="admin-section">
+                    <h3>🏆 Win Simulator</h3>
+                    <div class="win-simulator">
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+                            Test arc unlock notifications by simulating wins
+                        </p>
+                        <button id="simulate-win-btn" class="btn btn-success" style="width: 100%; margin-bottom: 8px;">+1 Win</button>
+                        <button id="simulate-5-wins-btn" class="btn btn-success" style="width: 100%; margin-bottom: 8px;">+5 Wins</button>
+                        <button id="simulate-10-wins-btn" class="btn btn-success" style="width: 100%;">+10 Wins</button>
+                        <p style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                            Current Wins: <strong id="current-wins-count">0</strong>
                         </p>
                     </div>
                 </section>
@@ -594,6 +622,7 @@
     <script src="js/config.js"></script>
     <script src="js/points-system.js"></script>
     <script src="js/music.js"></script>
+    <script src="js/lobby-manager.js"></script>
     <script src="js/p2p.js"></script>
     <script src="js/game.js"></script>
     <script src="js/team-battle.js"></script>
@@ -603,7 +632,7 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.1 | Last Updated: January 2026</p>
+        <p id="version-info">v1.2 | Last Updated: January 2026</p>
         <p class="credits">© 2026 Grand Line Duels | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
         <details style="margin-top: 8px;">
             <summary style="cursor: pointer; color: var(--maya-blue); font-size: 12px; font-weight: 600; transition: color 0.2s;">📚 Sources, Credits & Acknowledgments</summary>
