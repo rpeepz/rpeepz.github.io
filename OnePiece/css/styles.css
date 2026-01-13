@@ -2053,32 +2053,33 @@ body.dark-mode .rarity-badge {
 /* Scroll to Top Button */
 .scroll-top {
     position: fixed;
-    bottom: 10px;
-    right: 20px;
-    width: 30px;
-    height: 40px;
-    background: rgba(96, 191, 245, 0.3);
-    border: 2px solid var(--maya-blue);
-    border-radius: 50%;
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--maya-blue), var(--persian-blue));
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
     z-index: 1001;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
-    opacity: 0.6;
+    transition: all 0.3s ease;
+    opacity: 0.85;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .scroll-top:hover {
     opacity: 1;
-    background: rgba(96, 191, 245, 0.5);
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(96, 191, 245, 0.5);
 }
 
 .scroll-top::before {
-    content: '▲';
-    font-size: 16px;
-    color: var(--maya-blue);
+    content: '⬆️';
+    font-size: 24px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 /* Draft War Styles */
