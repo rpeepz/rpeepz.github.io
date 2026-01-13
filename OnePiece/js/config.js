@@ -46,6 +46,8 @@ const SYNERGY_BONUS = 1.1; // Additional 10% when type matches role perfectly
 
 // Pool system configuration
 const POOL_MAX_SIZE = 25; // Maximum number of cards a player can have in their preferred pool
+// First Login Points Bonus
+const FIRST_LOGIN_BONUS_POINTS = 200; // Points awarded on first login
 
 const CHARACTER_IMAGES = {
     "Monkey D. Luffy": "img/luffy.png",
