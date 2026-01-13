@@ -473,7 +473,23 @@ class DraftWarManager {
     }
 
     createTeamDeck(user, size = 6) {
-        const userCards = Array.from(user.collection).map(id => 
+        const userPool = user.pool || new Set();
+        
+        // Use pool if it has enough cards, otherwise use full collection
+        let cardIds;
+        if (userPool.size >= size) {
+            cardIds = Array.from(userPool);
+        } else if (userPool.size > 0) {
+            // Use pool cards + fill from collection
+            cardIds = Array.from(userPool);
+            const remainingCards = Array.from(user.collection).filter(id => !userPool.has(id));
+            cardIds.push(...remainingCards);
+        } else {
+            // No pool, use full collection
+            cardIds = Array.from(user.collection);
+        }
+        
+        const userCards = cardIds.map(id => 
             CARD_DATABASE.find(card => card.id === id)
         );
 
@@ -481,7 +497,7 @@ class DraftWarManager {
             throw new Error(`Need at least ${size} cards to play draft war`);
         }
 
-        // Randomly select cards from collection
+        // Randomly select cards
         const shuffled = userCards.sort(() => Math.random() - 0.5);
         return shuffled.slice(0, size);
     }
@@ -541,6 +557,7 @@ class DraftWarManager {
         }
 
         // Update user stats
+        let newlyUnlockedArcs = [];
         if (result.winner.username === gameState.currentUser.username) {
             gameState.currentUser.wins++;
             
@@ -548,6 +565,9 @@ class DraftWarManager {
             result.cardsWon.forEach(card => {
                 gameState.currentUser.collection.add(card.id);
             });
+            
+            // Check for arc progression
+            newlyUnlockedArcs = gameState.checkArcProgression(gameState.currentUser);
         } else {
             gameState.currentUser.losses++;
         }
@@ -560,7 +580,8 @@ class DraftWarManager {
             winnerScore: result.winnerScore,
             loserScore: result.loserScore,
             cardsWon: result.cardsWon,
-            wager: result.wager
+            wager: result.wager,
+            newlyUnlockedArcs: newlyUnlockedArcs
         };
     }
 }
