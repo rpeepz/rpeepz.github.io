@@ -1,4 +1,4 @@
-// Team Battle Game Mode
+// Draft War Game Mode
 // Davy Back Fight & Classic Pirate modes
 
 const ROLE_MODIFIERS = {
@@ -20,7 +20,7 @@ const ROLE_MODIFIERS = {
     }
 };
 
-class TeamBattleGame {
+class DraftWarGame {
     constructor() {
         this.mode = null; // 'DAVY_BACK' or 'CLASSIC_PIRATE'
         this.wager = 1; // Number of cards to bet
@@ -264,7 +264,7 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
         return availableCards.slice(0, count);
     }
 
-    // Bot AI for team battle
+    // Bot AI for draft war
     botAssignCard() {
         if (!this.isBotGame || this.currentTurn !== 2) return null;
 
@@ -461,13 +461,13 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
     }
 }
 
-// Team Battle Manager for GameState integration
-class TeamBattleManager {
+// Draft War Manager for GameState integration
+class DraftWarManager {
     constructor() {
         this.currentGame = null;
     }
 
-    canStartTeamBattle(user) {
+    canStartDraftWar(user) {
         // Need at least 6 cards
         return user.collection.size >= 6;
     }
@@ -478,7 +478,7 @@ class TeamBattleManager {
         );
 
         if (userCards.length < size) {
-            throw new Error(`Need at least ${size} cards to play team battle`);
+            throw new Error(`Need at least ${size} cards to play draft war`);
         }
 
         // Randomly select cards from collection
@@ -500,12 +500,12 @@ class TeamBattleManager {
         return shuffled.slice(0, size);
     }
 
-    startBotTeamBattle(user, mode, wager, difficulty) {
+    startBotDraftWar(user, mode, wager, difficulty) {
         const playerDeck = this.createTeamDeck(user);
         const botDeck = this.createBotTeamDeck(difficulty);
         const botUser = BotManager.createBot(difficulty);
 
-        this.currentGame = new TeamBattleGame();
+        this.currentGame = new DraftWarGame();
         this.currentGame.startGame(
             { user, deck: playerDeck },
             { user: botUser, deck: botDeck },
@@ -518,8 +518,8 @@ class TeamBattleManager {
         return this.currentGame;
     }
 
-    startP2PTeamBattle(hostUser, guestUser, hostDeck, guestDeck, mode, wager, isHost) {
-        this.currentGame = new TeamBattleGame();
+    startP2PDraftWar(hostUser, guestUser, hostDeck, guestDeck, mode, wager, isHost) {
+        this.currentGame = new DraftWarGame();
         this.currentGame.startGame(
             { user: isHost ? hostUser : guestUser, deck: isHost ? hostDeck : guestDeck },
             { user: isHost ? guestUser : hostUser, deck: isHost ? guestDeck : hostDeck },
@@ -535,7 +535,7 @@ class TeamBattleManager {
         return this.currentGame;
     }
 
-    endTeamBattle(result) {
+    endDraftWar(result) {
         if (result.tie) {
             return { tie: true, ...result };
         }
@@ -566,4 +566,4 @@ class TeamBattleManager {
 }
 
 // Global instance
-const teamBattleManager = new TeamBattleManager();
+const draftWarManager = new DraftWarManager();
