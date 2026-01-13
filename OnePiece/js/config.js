@@ -10,9 +10,9 @@ const RARITY_TIERS = {
     F: { weight: 1440, label: 'F - Starter', color: '#b8b8b8' }           // 14.4% chance - Medium Gray (distinct from brown)
 };
 
-// Character types for team battle bonuses
+// Character types for draft war bonuses
 const CHARACTER_TYPES = {
-    SWORDSMAN: { name: 'Swordsman', bonus: 1.15, icon: '⚔️', color: '#c0c0c0' },
+    SWORDSMAN: { name: 'Swordsman', bonus: 1.15, icon: '⚔️', color: '#352e45ff' },
     BRAWLER: { name: 'Brawler', bonus: 1.15, icon: '👊', color: '#ff6b35' },
     DEVIL_FRUIT: { name: 'Devil Fruit User', bonus: 1.2, icon: '😈', color: '#9933ff' },
     MARKSMAN: { name: 'Marksman', bonus: 1.15, icon: '🎯', color: '#00cc66' },
@@ -43,6 +43,9 @@ const ROLE_TYPE_SYNERGY = {
 };
 
 const SYNERGY_BONUS = 1.1; // Additional 10% when type matches role perfectly
+
+// Pool system configuration
+const POOL_MAX_SIZE = 25; // Maximum number of cards a player can have in their preferred pool
 
 const CHARACTER_IMAGES = {
     "Monkey D. Luffy": "img/luffy.png",
@@ -418,18 +421,51 @@ const CARD_DATABASE = [
 // Get all unique arcs
 const ARCS = [...new Set(CARD_DATABASE.map(card => card.arc))];
 
+// Arc images for shop display
+const ARC_IMAGES = {
+    'Romance Dawn': 'img/arcs/romance-dawn.webp',
+    'Orange Town': 'img/arcs/orange-town.png',
+    'Syrup Village': 'img/arcs/syrup-village.webp',
+    'Baratie': 'img/arcs/baratie.jpg',
+    'Arlong Park': 'img/arcs/arlong-park.webp',
+    'Loguetown': 'img/arcs/loguetown.jpg',
+    'Whiskey Peak': 'img/arcs/whiskey-peak.png',
+    'Little Garden': 'img/arcs/little-garden.webp',
+    'Drum Island': 'img/arcs/drum-island.webp',
+    'Alabasta': 'img/arcs/alabasta.webp',
+    'Jaya': 'img/arcs/jaya.webp',
+    'Skypiea': 'img/arcs/skypiea.jpg',
+    'Long Ring Long Land': 'img/arcs/long-ring-long-land.jpg',
+    'Water 7': 'img/arcs/water-7.jpg',
+    'Enies Lobby': 'img/arcs/enies-lobby.webp',
+    'Thriller Bark': 'img/arcs/thriller-bark.png',
+    'Sabaody Archipelago': 'img/arcs/sabaody-archipelago.jpg',
+    'Amazon Lily': 'img/arcs/amazon-lily.jpg',
+    'Impel Down': 'img/arcs/impel-down.jpg',
+    'Marineford': 'img/arcs/marineford.jpg'
+};
+
 // Helper functions for the rarity system
 const CardRaritySystem = {
-    // Get available card pool based on arc availability and card availability
-    getAvailablePool() {
-        return CARD_DATABASE.filter(card => 
-            card.available && ARC_AVAILABILITY[card.arc]
-        );
+    // Get available card pool based on arc availability, card availability, and user's unlocked arcs
+    getAvailablePool(userUnlockedArcs = null) {
+        return CARD_DATABASE.filter(card => {
+            // Must be available and arc must be enabled in dev config
+            if (!card.available || !ARC_AVAILABILITY[card.arc]) {
+                return false;
+            }
+            // If user unlocked arcs provided, check if arc is unlocked
+            if (userUnlockedArcs) {
+                return userUnlockedArcs.has(card.arc);
+            }
+            // Otherwise, allow all enabled arcs (for bots, shop, etc)
+            return true;
+        });
     },
 
     // Weighted random selection based on rarity weights
-    drawRandomCard(excludeIds = []) {
-        const pool = this.getAvailablePool().filter(card => !excludeIds.includes(card.id));
+    drawRandomCard(excludeIds = [], userUnlockedArcs = null) {
+        const pool = this.getAvailablePool(userUnlockedArcs).filter(card => !excludeIds.includes(card.id));
         if (pool.length === 0) return null;
 
         // Calculate total weight
@@ -450,12 +486,12 @@ const CardRaritySystem = {
     },
 
     // Draw multiple unique cards
-    drawMultipleCards(count, excludeIds = []) {
+    drawMultipleCards(count, excludeIds = [], userUnlockedArcs = null) {
         const drawn = [];
         const excluded = new Set(excludeIds);
         
         for (let i = 0; i < count; i++) {
-            const card = this.drawRandomCard([...excluded]);
+            const card = this.drawRandomCard([...excluded], userUnlockedArcs);
             if (!card) break;
             drawn.push(card);
             excluded.add(card.id);
@@ -465,14 +501,14 @@ const CardRaritySystem = {
     },
 
     // Generate starter deck (5 cards) - weighted random from available pool
-    generateStarterDeck() {
+    generateStarterDeck(userUnlockedArcs = null) {
         const startingCards = (typeof DEV_CONFIG !== 'undefined' && DEV_CONFIG.GAME.STARTING_CARDS) || 5;
-        return this.drawMultipleCards(startingCards);
+        return this.drawMultipleCards(startingCards, [], userUnlockedArcs);
     },
 
     // Get cards by rarity tier
-    getCardsByRarity(rarity) {
-        return this.getAvailablePool().filter(card => card.rarity === rarity);
+    getCardsByRarity(rarity, userUnlockedArcs = null) {
+        return this.getAvailablePool(userUnlockedArcs).filter(card => card.rarity === rarity);
     },
 
     // Get rarity info
