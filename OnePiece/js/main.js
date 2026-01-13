@@ -122,19 +122,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Music control handlers - only add if music player is enabled
     if (DEV_CONFIG.FEATURES.MUSIC_PLAYER) {
         document.getElementById('volume-full')?.addEventListener('click', () => {
+            musicManager.unmute();
             musicManager.setVolume(1.0);
             document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('volume-full').classList.add('active');
         });
 
         document.getElementById('volume-half')?.addEventListener('click', () => {
+            musicManager.unmute();
             musicManager.setVolume(0.2);
             document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('volume-half').classList.add('active');
         });
 
         document.getElementById('volume-mute')?.addEventListener('click', () => {
-            musicManager.setVolume(0);
+            musicManager.mute();
             document.querySelectorAll('.volume-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('volume-mute').classList.add('active');
         });
@@ -218,6 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
         // Setup points granter
         setupPointsGranter();
+        
+        // Setup win simulator
+        initWinSimulator();
     }
 
     // Points Granter functionality (dev feature)
@@ -286,6 +291,68 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Initial display update
         updatePointsGranterDisplay();
+    }
+
+    // Win Simulator functionality
+    function initWinSimulator() {
+        const simulateWinBtn = document.getElementById('simulate-win-btn');
+        const simulate5WinsBtn = document.getElementById('simulate-5-wins-btn');
+        const simulate10WinsBtn = document.getElementById('simulate-10-wins-btn');
+        const winsCountSpan = document.getElementById('current-wins-count');
+        
+        function updateWinsDisplay() {
+            if (gameState.currentUser) {
+                winsCountSpan.textContent = gameState.currentUser.wins;
+            }
+        }
+        
+        function simulateWins(amount) {
+            if (!gameState.currentUser) {
+                alert('No user logged in!');
+                return;
+            }
+            
+            // Add wins
+            gameState.currentUser.wins += amount;
+            
+            // Check for arc progression
+            const newlyUnlocked = gameState.checkArcProgression(gameState.currentUser);
+            
+            // Save user
+            gameState.saveUser(gameState.currentUser);
+            
+            // Show notification
+            let message = `✅ Added ${amount} win${amount > 1 ? 's' : ''}!\n\nTotal Wins: ${gameState.currentUser.wins}`;
+            
+            if (newlyUnlocked && newlyUnlocked.length > 0) {
+                message += `\n\n🎊 NEW ARC${newlyUnlocked.length > 1 ? 'S' : ''} UNLOCKED! 🎊\n`;
+                newlyUnlocked.forEach(arc => {
+                    message += `\n🏝️ ${arc}`;
+                });
+                message += `\n\nNew cards are now available!`;
+            }
+            
+            alert(message);
+            updateWinsDisplay();
+            
+            // Update lobby stats if visible
+            const winsSpan = document.getElementById('wins');
+            if (winsSpan) {
+                winsSpan.textContent = gameState.currentUser.wins;
+            }
+            
+            const arcsUnlockedSpan = document.getElementById('arcs-unlocked');
+            if (arcsUnlockedSpan) {
+                arcsUnlockedSpan.textContent = gameState.currentUser.unlockedArcs.size;
+            }
+        }
+        
+        simulateWinBtn?.addEventListener('click', () => simulateWins(1));
+        simulate5WinsBtn?.addEventListener('click', () => simulateWins(5));
+        simulate10WinsBtn?.addEventListener('click', () => simulateWins(10));
+        
+        // Initial display update
+        updateWinsDisplay();
     }
 
     function renderRarityStats() {
@@ -1721,14 +1788,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const result = gameState.endGame(gameOver);
         
-        // Check for newly unlocked arcs
-        const unlockedArcs = gameState.checkArcProgression(gameState.currentUser);
+        // Clear previous game stats
+        gameoverStats.innerHTML = '';
+        
+        // Use newly unlocked arcs from result
         let arcUnlockNotification = '';
-        if (unlockedArcs && unlockedArcs.length > 0) {
+        if (result.newlyUnlockedArcs && result.newlyUnlockedArcs.length > 0) {
             arcUnlockNotification = `
                 <div class="arc-unlock-notification">
-                    <h3>🎊 New Arc${unlockedArcs.length > 1 ? 's' : ''} Unlocked! 🎊</h3>
-                    ${unlockedArcs.map(arc => `<p>🏝️ ${arc}</p>`).join('')}
+                    <h3>🎊 New Arc${result.newlyUnlockedArcs.length > 1 ? 's' : ''} Unlocked! 🎊</h3>
+                    ${result.newlyUnlockedArcs.map(arc => `<p>🏝️ ${arc}</p>`).join('')}
                     <p>New cards are now available!</p>
                 </div>
             `;
@@ -1771,14 +1840,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (result.tie) {
             gameoverResult.textContent = "🤝 It's a Tie! 🤝";
-            gameoverStats.innerHTML = `
+            gameoverStats.innerHTML += `
                 <p>Both players scored equally!</p>
                 <p>Final Score: ${gameState.currentGame.player1.score} - ${gameState.currentGame.player2.score}</p>
             `;
         } else if (result.conceded) {
             gameoverResult.textContent = result.winner.username === gameState.currentUser.username ? 
                 '🎉 Victory by Concession! 🎉' : '💔 You Conceded 💔';
-            gameoverStats.innerHTML = `
+            gameoverStats.innerHTML += `
                 <p>${result.winner.username} wins!</p>
                 <p>Total Wins: ${result.winner.wins} | Total Losses: ${result.winner.losses}</p>
             `;
@@ -1786,7 +1855,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gameoverResult.textContent = result.winner.username === gameState.currentUser.username ? 
                 '🎉 Victory! 🎉' : '💔 Defeat 💔';
             
-            gameoverStats.innerHTML = `
+            gameoverStats.innerHTML += `
                 <p>${result.winner.username} wins!</p>
                 <p>Final Score: ${gameState.currentGame.player1.score} - ${gameState.currentGame.player2.score}</p>
                 <p>Total Wins: ${result.winner.wins} | Total Losses: ${result.winner.losses}</p>
@@ -2397,6 +2466,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Stop Draft War music
         musicManager.stop();
         
+        // Clear previous stats
+        statsEl.innerHTML = '';
+        
         // Calculate and award points
         const isPlayerWinner = result.winner && result.winner.username === gameState.currentUser.username;
         
@@ -2424,9 +2496,21 @@ document.addEventListener('DOMContentLoaded', () => {
             statsEl.innerHTML += pointsNotification;
         }
         
+        // Add arc unlock notification if any
+        if (result.newlyUnlockedArcs && result.newlyUnlockedArcs.length > 0) {
+            const arcUnlockNotification = `
+                <div class="arc-unlock-notification">
+                    <h3>🎊 New Arc${result.newlyUnlockedArcs.length > 1 ? 's' : ''} Unlocked! 🎊</h3>
+                    ${result.newlyUnlockedArcs.map(arc => `<p>🏝️ ${arc}</p>`).join('')}
+                    <p>New cards are now available!</p>
+                </div>
+            `;
+            statsEl.innerHTML += arcUnlockNotification;
+        }
+        
         if (result.tie) {
             titleEl.textContent = "🤝 It's a Tie! 🤝";
-            statsEl.innerHTML = `
+            statsEl.innerHTML += `
                 <p>Both teams scored equally!</p>
                 <p>Final Score: ${result.score1} - ${result.score2}</p>
             `;
@@ -2435,13 +2519,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const isWinner = result.winner.username === gameState.currentUser.username;
             if (isWinner) {
                 titleEl.textContent = '🎉 Victory! 🎉';
-                statsEl.innerHTML = `
+                statsEl.innerHTML += `
                     <p>${result.loser.username} conceded!</p>
                     <p>You win by forfeit!</p>
                 `;
             } else {
                 titleEl.textContent = '💔 You Conceded 💔';
-                statsEl.innerHTML = `
+                statsEl.innerHTML += `
                     <p>You forfeited the match.</p>
                 `;
             }
@@ -2449,7 +2533,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isWinner = result.winner.username === gameState.currentUser.username;
             titleEl.textContent = isWinner ? '🎉 Victory! 🎉' : '💔 Defeat 💔';
             
-            statsEl.innerHTML = `
+            statsEl.innerHTML += `
                 <p>${result.winner.username} wins!</p>
                 <p>Final Score: ${result.winnerScore} - ${result.loserScore}</p>
                 <p>Cards Wagered: ${result.wager}</p>
