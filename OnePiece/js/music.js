@@ -2,11 +2,12 @@
 class MusicManager {
     constructor() {
         this.battleAudio = null;
-        this.teamBattleAudio = null;
+        this.draftwarAudio = null;
         this.currentVolume = 1.0;
         this.isPlaying = false;
-        this.currentTrack = null; // 'battle' or 'team-battle'
+        this.currentTrack = null; // 'battle' or 'draft-war'
         this.enabled = true; // Track if music is enabled
+        this.isMuted = false; // Track mute state
     }
     
     initialize() {
@@ -17,10 +18,16 @@ class MusicManager {
         }
 
         this.battleAudio = document.getElementById('battle-music');
-        this.teamBattleAudio = document.getElementById('team-battle-music');
+        this.draftwarAudio = document.getElementById('draft-war-music');
         
-        if (this.battleAudio) this.battleAudio.volume = this.currentVolume;
-        if (this.teamBattleAudio) this.teamBattleAudio.volume = this.currentVolume;
+        if (this.battleAudio) {
+            this.battleAudio.volume = this.currentVolume;
+            this.battleAudio.muted = this.isMuted;
+        }
+        if (this.draftwarAudio) {
+            this.draftwarAudio.volume = this.currentVolume;
+            this.draftwarAudio.muted = this.isMuted;
+        }
     }
     
     setVolume(volume) {
@@ -28,23 +35,54 @@ class MusicManager {
         
         this.currentVolume = volume;
         if (this.battleAudio) this.battleAudio.volume = volume;
-        if (this.teamBattleAudio) this.teamBattleAudio.volume = volume;
+        if (this.draftwarAudio) this.draftwarAudio.volume = volume;
+    }
+    
+    mute() {
+        if (!this.enabled) return;
+        
+        this.isMuted = true;
+        if (this.battleAudio) this.battleAudio.muted = true;
+        if (this.draftwarAudio) this.draftwarAudio.muted = true;
+    }
+    
+    unmute() {
+        if (!this.enabled) return;
+        
+        this.isMuted = false;
+        if (this.battleAudio) this.battleAudio.muted = false;
+        if (this.draftwarAudio) this.draftwarAudio.muted = false;
+    }
+    
+    toggleMute() {
+        if (!this.enabled) return;
+        
+        if (this.isMuted) {
+            this.unmute();
+        } else {
+            this.mute();
+        }
+        return this.isMuted;
     }
     
     play(trackType = 'battle') {
-        if (!this.enabled) return; // Don't play if disabled
+        if (!this.enabled || this.isMuted) return; // Don't play if disabled or muted
         
         // Stop any currently playing track
         this.stop();
         
-        const audio = trackType === 'team-battle' ? this.teamBattleAudio : this.battleAudio;
+        const audio = trackType === 'draft-war' ? this.draftwarAudio : this.battleAudio;
         
         if (audio && !this.isPlaying) {
+            audio.muted = this.isMuted; // Ensure muted state is correct
             audio.play().catch(err => console.log('Audio play failed:', err));
             this.isPlaying = true;
             this.currentTrack = trackType;
             const musicControl = document.getElementById('music-control');
-            if (musicControl) musicControl.classList.add('active');
+            if (musicControl) {
+                musicControl.style.display = ''; // Always show when music starts
+                musicControl.classList.add('active');
+            }
         }
     }
     
@@ -55,9 +93,9 @@ class MusicManager {
             this.battleAudio.pause();
             this.battleAudio.currentTime = 0;
         }
-        if (this.teamBattleAudio && this.isPlaying && this.currentTrack === 'team-battle') {
-            this.teamBattleAudio.pause();
-            this.teamBattleAudio.currentTime = 0;
+        if (this.draftwarAudio && this.isPlaying && this.currentTrack === 'draft-war') {
+            this.draftwarAudio.pause();
+            this.draftwarAudio.currentTime = 0;
         }
         this.isPlaying = false;
         this.currentTrack = null;
