@@ -121,8 +121,8 @@ class GameState {
         };
         
         // Send join message with user data
-        // Check if joining for team battle
-        const messageType = this.joiningForTeamBattle ? 'tbJoin' : 'join';
+        // Check if joining for draft war
+        const messageType = this.joiningForDraftWar ? 'tbJoin' : 'join';
         
         this.p2p.send({
             type: messageType,
@@ -131,8 +131,8 @@ class GameState {
         });
      
         // Clear the flag after sending
-        if (this.joiningForTeamBattle) {
-            this.joiningForTeamBattle = false;
+        if (this.joiningForDraftWar) {
+            this.joiningForDraftWar = false;
         }
     }
 
