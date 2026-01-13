@@ -6,15 +6,15 @@
 
 ## 📖 TL;DR - Quick Start
 
-1. **Login** as guest or create profile
-2. **Collect cards** from One Piece characters (163 unique cards!)
-3. **Battle** against bots or other players online
-4. **Win games** to earn points and unlock new story arcs
-5. **Buy cards** in the shop with your points
+1. [**Login**](#-getting-started) as guest or create profile
+2. [**Collect cards**](#-collecting-cards) from One Piece characters (163 unique cards!)
+3. [**Battle**](#-game-mode-1-duel-simple-battle) against bots or other players online
+4. [**Win games**](#-how-to-earn-points) to earn points and unlock new story arcs
+5. [**Buy cards**](#-the-card-shop) in the shop with your points
 6. Two game modes:
-   - **Duel** (3 rounds, highest card wins) - 10 pts per win
-   - **Draft War** (build a 6-card team strategically) - 25 pts per win
-7. Start with 3 arcs unlocked, unlock 17 more by winning or buying
+   - [**Duel**](#-game-mode-1-duel-simple-battle) (3 rounds, highest card wins) - 10 pts per win
+   - [**Draft War**](#-game-mode-2-draft-war-strategy-battle) (build a 6-card team strategically) - 25 pts per win
+7. Start with 3 arcs unlocked, [unlock 17 more](#-unlocking-new-story-arcs) by winning or buying
 8. Build your collection and become King of the Pirates! ⚓
 
 ---
@@ -31,8 +31,7 @@ This is a fun card game where you collect One Piece characters and battle agains
 
 When you first open the game, you'll see a screen asking for your name.
 
-![Login Screen - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture of the login screen showing the "Continue as Guest" and username/password options.
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/home.jpg" alt="Login Screen" height="400">
 
 You can either:
 - Click **"Continue as Guest"** to play right away (easy!)
@@ -44,8 +43,7 @@ You can either:
 
 After logging in, you'll see the **Lobby**. This is like your pirate ship where you choose what to do!
 
-![Lobby Screen - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture of the lobby showing all the buttons (Play Against Bot, Host Game, Join Game, Play Draft War, View Collection, Card Shop).
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/playmode.jpg" alt="Lobby Screen" height="400">
 
 At the top, you can see:
 - ⭐ Your **Points** (money to buy cards)
@@ -62,8 +60,7 @@ At the top, you can see:
 
 Click **"View Collection"** to see all your cards!
 
-![Collection Screen - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture of the collection screen showing the filters at the top and cards displayed below.
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/collection.png" alt="Collection Screen" height="400">
 
 - Each card has a **character's face** and their **power number**
 - Cards have different **colors** (rarities):
@@ -86,14 +83,12 @@ You can filter cards by:
 
 Click **"Card Shop"** to spend your points on new cards!
 
-![Card Shop - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture of the shop showing Available Cards section at the top.
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/shop.jpg" alt="Card Shop" height="400">
 
 ### Section 1: Available Cards
 Buy random cards by rarity! The better the rarity, the more points it costs.
 
-![Arc Shop Section - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture showing the "Story Arc Unlocks" section with arc cards.
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/story.jpg" alt="Arc Shop Section" height="400">
 
 ### Section 2: Story Arc Unlocks
 These are **very expensive**! Unlock new story arcs to get access to more characters.
@@ -123,13 +118,14 @@ Click **"Play Against Bot"** to fight a computer!
 
 ### How to Play a Duel:
 
-![Duel Game Screen - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture during a duel showing both players' cards on the table.
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/duelplay.jpg" alt="Duel Game Screen" height="400">
 
 1. The game picks **3 random cards** from your collection
 2. Each round, **click a card** to play it
 3. The card with the **higher number wins** the round!
 4. Win **2 out of 3 rounds** to win the game!
+
+<img src="https://raw.githubusercontent.com/rpeepz/rpeepz.github.io/refs/heads/main/OnePiece/img/help/duelwin.jpg" alt="Duel Win Screen" height="400">
 
 **Winner gets:**
 - ⭐ Points
@@ -142,26 +138,25 @@ Click **"Play Against Bot"** to fight a computer!
 Click **"Play Draft War"** for a more strategic game!
 
 ![Draft War Mode Selection - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture of the Draft War mode selection (Balanced, Aggressive, Defensive).
+**📸 Screenshot Instructions:** Take a picture of the Draft War mode selection (Classic or Davey Back).
 
 ### Step 1: Choose Your Strategy
-- ⚖️ **Balanced** - Good at everything
-- ⚔️ **Aggressive** - Better attackers
-- 🛡️ **Defensive** - Better defenders
+- 🎴 **Classic** - Standard draft war gameplay
+- 🏴‍☠️ **Davey Back** - Davy Back Fight rules
 
 ### Step 2: Pick Your Cards
 
 ![Draft War Card Selection - SCREENSHOT NEEDED]
-**📸 Screenshot Instructions:** Take a picture during card drafting showing the 5 card options and the roles to fill.
+**📸 Screenshot Instructions:** Take a picture during card drafting showing the 6 card options and the roles to fill.
 
-You'll see **5 random cards**. Pick cards for these jobs:
+You'll see **6 random cards**. Pick cards for these jobs:
 - 👑 **Captain** - Leader (gets 3× power!)
 - ⚔️ **Vice Captain** - Second in command (2.5× power)
 - 🛡️ **Tank** - The tough one (2× power)
 - 💖 **Healer** - Keeps everyone healthy (1.8× power)
 - 🤝 **Support 1 & 2** - Helpers (1.5× power)
 
-After you pick a card for a job, you get **5 new cards** to choose from!
+After you pick a card for a job, you get **6 new cards** to choose from!
 
 ### Step 3: The Battle!
 
@@ -226,7 +221,7 @@ You start with only **3 story arcs** unlocked:
 ### Join a Friend's Game:
 1. Click **"Join Game"**
 2. Type in their **game code**
-3. Click **"Join Lobby"**
+3. Click **"Join Lobby"
 
 ![Multiplayer Lobby - SCREENSHOT NEEDED]
 **📸 Screenshot Instructions:** Take a picture of the multiplayer lobby screen showing the lobby code.
