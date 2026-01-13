@@ -20,6 +20,8 @@ class GameState {
             wins: 0,
             losses: 0,
             collection: new Set(),
+            pool: new Set(),
+            unlockedArcs: new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']), // Start with first 3 arcs
             createdAt: Date.now()
         };
         
@@ -43,18 +45,18 @@ class GameState {
 
     giveStartingCards(user) {
         if (DEV_CONFIG.DEBUG.UNLIMITED_CARDS) {
-            // Grant ALL cards from enabled arcs
+            // Grant ALL cards from enabled AND unlocked arcs
             CARD_DATABASE.forEach(card => {
-                if (ARC_AVAILABILITY[card.arc] === true && card.available) {
+                if (ARC_AVAILABILITY[card.arc] === true && card.available && user.unlockedArcs.has(card.arc)) {
                     user.collection.add(card.id);
                 }
             })
             if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
-                console.log('🎴 UNLIMITED_CARDS: Granted all available cards')
+                console.log('🎴 UNLIMITED_CARDS: Granted all available cards from unlocked arcs')
             }
         } else {
-            // Normal starter deck generation
-            const starterCards = CardRaritySystem.generateStarterDeck();
+            // Normal starter deck generation from unlocked arcs only
+            const starterCards = CardRaritySystem.generateStarterDeck(user.unlockedArcs);
             starterCards.forEach(card => {
                 user.collection.add(card.id);
             })
@@ -71,6 +73,8 @@ class GameState {
             wins: user.wins,
             losses: user.losses,
             collection: Array.from(user.collection),
+            pool: Array.from(user.pool || new Set()),
+            unlockedArcs: Array.from(user.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village'])),
             createdAt: user.createdAt
         };
         localStorage.setItem('onePieceUsers', JSON.stringify(users));
@@ -87,6 +91,8 @@ class GameState {
                 wins: users[username].wins || 0,
                 losses: users[username].losses || 0,
                 collection: new Set(users[username].collection || []),
+                pool: new Set(users[username].pool || []),
+                unlockedArcs: new Set(users[username].unlockedArcs || ['Romance Dawn', 'Orange Town', 'Syrup Village']),
                 createdAt: users[username].createdAt
             };
         }
@@ -213,7 +219,21 @@ class GameState {
 
     createDeck(user, count) {
         const deck = [];
-        const userCards = Array.from(user.collection);
+        const userPool = user.pool || new Set();
+        
+        // Use pool if it has enough cards, otherwise use full collection
+        let userCards;
+        if (userPool.size >= count) {
+            userCards = Array.from(userPool);
+        } else if (userPool.size > 0) {
+            // Use pool cards + fill from collection
+            userCards = Array.from(userPool);
+            const remainingCards = Array.from(user.collection).filter(id => !userPool.has(id));
+            userCards.push(...remainingCards);
+        } else {
+            // No pool, use full collection
+            userCards = Array.from(user.collection);
+        }
         
         // Fill with random cards if needed
         while (userCards.length < count) {
@@ -330,8 +350,46 @@ class GameState {
         return result;
     }
 
+    // Check and unlock new arcs based on wins
+    checkArcProgression(user) {
+        if (!user.unlockedArcs) {
+            user.unlockedArcs = new Set(['Romance Dawn', 'Orange Town', 'Syrup Village']);
+        }
+
+        const arcProgression = [
+            { arc: 'Baratie', requiredWins: 3 },
+            { arc: 'Arlong Park', requiredWins: 5 },
+            { arc: 'Loguetown', requiredWins: 8 },
+            { arc: 'Whiskey Peak', requiredWins: 10 },
+            { arc: 'Little Garden', requiredWins: 12 },
+            { arc: 'Drum Island', requiredWins: 15 },
+            { arc: 'Alabasta', requiredWins: 18 },
+            { arc: 'Jaya', requiredWins: 22 },
+            { arc: 'Skypiea', requiredWins: 25 },
+            { arc: 'Long Ring Long Land', requiredWins: 30 },
+            { arc: 'Water 7', requiredWins: 35 },
+            { arc: 'Enies Lobby', requiredWins: 40 },
+            { arc: 'Thriller Bark', requiredWins: 45 },
+            { arc: 'Sabaody Archipelago', requiredWins: 50 },
+            { arc: 'Amazon Lily', requiredWins: 55 },
+            { arc: 'Impel Down', requiredWins: 60 },
+            { arc: 'Marineford', requiredWins: 70 }
+        ];
+
+        const newlyUnlocked = [];
+        arcProgression.forEach(({ arc, requiredWins }) => {
+            if (user.wins >= requiredWins && !user.unlockedArcs.has(arc)) {
+                user.unlockedArcs.add(arc);
+                newlyUnlocked.push(arc);
+            }
+        });
+
+        return newlyUnlocked;
+    }
+
     endGame(result) {
         const game = this.currentGame;
+        let newlyUnlockedArcs = [];
         
         // Update stats
         if (result.winner === 1) {
@@ -340,12 +398,16 @@ class GameState {
             game.player1.cardsWon.forEach(card => {
                 game.player1.user.collection.add(card.id);
             });
+            // Check for arc progression
+            newlyUnlockedArcs = this.checkArcProgression(game.player1.user);
         } else if (result.winner === 2) {
             game.player2.user.wins++;
             game.player1.user.losses++;
             game.player2.cardsWon.forEach(card => {
                 game.player2.user.collection.add(card.id);
             });
+            // Check for arc progression
+            newlyUnlockedArcs = this.checkArcProgression(game.player2.user);
         }
         
         // Save current user (can't save opponent)
@@ -357,6 +419,7 @@ class GameState {
             winner: result.winner === 1 ? game.player1.user : (result.winner === 2 ? game.player2.user : null),
             loser: result.winner === 1 ? game.player2.user : (result.winner === 2 ? game.player1.user : null),
             cardsWon: result.winner === 1 ? game.player1.cardsWon : (result.winner === 2 ? game.player2.cardsWon : []),
+            newlyUnlockedArcs: newlyUnlockedArcs,
             conceded: result.conceded || false,
             tie: result.winner === 0
         };
