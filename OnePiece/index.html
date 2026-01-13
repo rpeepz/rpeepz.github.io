@@ -97,12 +97,6 @@
 
             <div class="lobby-actions">
 
-                <!-- Play Draft War -->
-                <div class="section">
-                    <h3>🏴‍☠️ Draft War Mode (NEW)</h3>
-                    <button id="play-draft-war-btn" class="btn btn-primary">Play Draft War</button>
-                </div>
-                
                 <!-- Duel against a Bot -->
                 <div class="section">
                     <h3>🤖 Duel vs Bot (Offline)</h3>
@@ -143,9 +137,10 @@
                 <!-- Join Duel Lobby -->
                 <div class="section">
                     <h3>Join a Duel</h3>
-                    <input type="text" id="join-code-input" placeholder="Enter lobby code" maxlength="30">
-                    <button id="join-game-btn" class="btn btn-primary">Join Lobby</button>
+                    <input type="text" id="join-code-input" placeholder="Enter Duel code" maxlength="30">
+                    <button id="join-game-btn" class="btn btn-primary">Join Duel</button>
                     <p class="connection-status hidden" id="join-status">Connecting...</p>
+                
                 </div>
 
                 <!-- Host Duel Lobby -->
@@ -163,6 +158,12 @@
                     </div>
                 </div>
 
+                <!-- Play Draft War -->
+                <div class="section">
+                    <h3>🏴‍☠️ Draft War Mode (NEW)</h3>
+                    <button id="play-draft-war-btn" class="btn btn-primary">Play Draft War</button>
+                </div>
+                
                 <!-- Open Lobbies Browser -->
                 <div class="section">
                     <h3>🌐 Open Lobbies</h3>
@@ -468,8 +469,8 @@
         </div>
         <div>
             <h5>Join Game:</h5>
-            <input type="text" id="tb-join-code-input" placeholder="Enter lobby code" style="width: 100%; margin-bottom: 10px;">
-            <button id="tb-join-game-btn" class="btn btn-primary">Join Lobby</button>
+            <input type="text" id="tb-join-code-input" placeholder="Enter Draft War code" style="width: 100%; margin-bottom: 10px;">
+            <button id="tb-join-game-btn" class="btn btn-primary">Join Game</button>
             <p class="connection-status hidden" id="tb-join-status">Connecting...</p>
         </div>
     </div>
@@ -632,7 +633,7 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.2 | Last Updated: January 2026</p>
+        <p id="version-info">v1.1 | Last Updated: January 2026</p>
         <p class="credits">© 2026 Grand Line Duels | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
         <details style="margin-top: 8px;">
             <summary style="cursor: pointer; color: var(--maya-blue); font-size: 12px; font-weight: 600; transition: color 0.2s;">📚 Sources, Credits & Acknowledgments</summary>
