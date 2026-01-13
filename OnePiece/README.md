@@ -6,15 +6,15 @@
 
 ## 📖 TL;DR - Quick Start
 
-1. [**Login**](#-getting-started) as guest or create profile
-2. [**Collect cards**](#-collecting-cards) from One Piece characters (163 unique cards!)
-3. [**Battle**](#-game-mode-1-duel-simple-battle) against bots or other players online
-4. [**Win games**](#-how-to-earn-points) to earn points and unlock new story arcs
-5. [**Buy cards**](#-the-card-shop) in the shop with your points
+1. [**Login**](#getting-started) as guest or create profile
+2. [**Collect cards**](#collecting-cards) from One Piece characters (163 unique cards!)
+3. [**Battle**](#game-mode-1-duel-simple-battle) against bots or other players online
+4. [**Win games**](#how-to-earn-points) to earn points and unlock new story arcs
+5. [**Buy cards**](#the-card-shop) in the shop with your points
 6. Two game modes:
-   - [**Duel**](#-game-mode-1-duel-simple-battle) (3 rounds, highest card wins) - 10 pts per win
-   - [**Draft War**](#-game-mode-2-draft-war-strategy-battle) (build a 6-card team strategically) - 25 pts per win
-7. Start with 3 arcs unlocked, [unlock 17 more](#-unlocking-new-story-arcs) by winning or buying
+   - [**Duel**](#game-mode-1-duel-simple-battle) (3 rounds, highest card wins) - 10 pts per win
+   - [**Draft War**](#game-mode-2-draft-war-strategy-battle) (build a 6-card team strategically) - 25 pts per win
+7. Start with 3 arcs unlocked, [unlock 17 more](#unlocking-new-story-arcs) by winning or buying
 8. Build your collection and become King of the Pirates! ⚓
 
 ---
