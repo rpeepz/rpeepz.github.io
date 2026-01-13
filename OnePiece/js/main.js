@@ -6,10 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const collectionScreen = document.getElementById('collection-screen');
     const gameScreen = document.getElementById('game-screen');
     const gameoverScreen = document.getElementById('gameover-screen');
-    const teamBattleSelectScreen = document.getElementById('team-battle-select-screen');
-    const teamBattleWagerScreen = document.getElementById('team-battle-wager-screen');
-    const teamBattleGameScreen = document.getElementById('team-battle-game-screen');
-    const teamBattleResultsScreen = document.getElementById('team-battle-results-screen');
+    const draftWarSelectScreen = document.getElementById('draft-war-select-screen');
+    const draftWarWagerScreen = document.getElementById('draft-war-wager-screen');
+    const draftWarGameScreen = document.getElementById('draft-war-game-screen');
+    const draftWarResultsScreen = document.getElementById('draft-war-results-screen');
+    const shopScreen = document.getElementById('shop-screen');
+
     // Login screen elements
     const guestBtn = document.getElementById('guest-btn');
     const createProfileBtn = document.getElementById('create-profile-btn');
@@ -213,6 +215,77 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Test deck button
         document.getElementById('test-deck-btn').addEventListener('click', generateTestDeck);
+    
+        // Setup points granter
+        setupPointsGranter();
+    }
+
+    // Points Granter functionality (dev feature)
+    let pointsMultiplier = 1;
+
+    function setupPointsGranter() {
+        if (!DEV_CONFIG.DEBUG.POINTS_GRANTER) return;
+        
+        // Show the points granter section
+        const granterSection = document.getElementById('points-granter-section');
+        if (granterSection) {
+            granterSection.style.display = 'block';
+        }
+        
+        const minusBtn = document.getElementById('points-minus-btn');
+        const plusBtn = document.getElementById('points-plus-btn');
+        const grantBtn = document.getElementById('grant-points-btn');
+        const multiplierSpan = document.getElementById('points-multiplier');
+        const grantValueSpan = document.getElementById('points-grant-value');
+        const balanceSpan = document.getElementById('current-points-balance');
+        
+        // Update display
+        function updatePointsGranterDisplay() {
+            multiplierSpan.textContent = pointsMultiplier;
+            grantValueSpan.textContent = pointsMultiplier * 10;
+            if (gameState.currentUser) {
+                const currentPoints = pointsManager.getPoints(gameState.currentUser.username);
+                balanceSpan.textContent = currentPoints;
+            }
+        }
+        
+        // Minus button
+        minusBtn?.addEventListener('click', () => {
+            if (pointsMultiplier > 0) {
+                pointsMultiplier--;
+                updatePointsGranterDisplay();
+            }
+        });
+        
+        // Plus button
+        plusBtn?.addEventListener('click', () => {
+            pointsMultiplier++;
+            updatePointsGranterDisplay();
+        });
+        
+        // Grant points button
+        grantBtn?.addEventListener('click', () => {
+            if (!gameState.currentUser) {
+                alert('No user logged in!');
+                return;
+            }
+            
+            const pointsToGrant = pointsMultiplier * 10;
+            const username = gameState.currentUser.username;
+            const newTotal = pointsManager.awardPoints(username, pointsToGrant);
+            
+            alert(`✅ Granted ${pointsToGrant} points!\n\nNew balance: ${newTotal} pts`);
+            updatePointsGranterDisplay();
+            
+            // Update lobby stats if visible
+            const userPointsSpan = document.getElementById('user-points');
+            if (userPointsSpan) {
+                userPointsSpan.textContent = newTotal;
+            }
+        });
+        
+        // Initial display update
+        updatePointsGranterDisplay();
     }
 
     function renderRarityStats() {
@@ -354,54 +427,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case 'tbJoin':
-                // Guest joining team battle
+                // Guest joining draft war
                 gameState.opponentData = {
                     username: data.username,
                     collection: new Set(data.collection)
                 };
-                connectionStatus.textContent = `${data.username} joined Team Battle! Starting...`;
+                connectionStatus.textContent = `${data.username} joined Draft War! Starting...`;
                 connectionStatus.className = 'connection-status connected';
                 
                 setTimeout(() => {
-                    const hostDeck = teamBattleManager.createTeamDeck(gameState.currentUser);
-                    const guestDeck = teamBattleManager.createTeamDeck(gameState.opponentData);
+                    const hostDeck = draftWarManager.createTeamDeck(gameState.currentUser);
+                    const guestDeck = draftWarManager.createTeamDeck(gameState.opponentData);
                     
                     gameState.p2p.send({
                         type: 'tbGameStart',
                         hostDeck: hostDeck,
                         guestDeck: guestDeck,
                         hostUsername: gameState.currentUser.username,
-                        mode: gameState.waitingForTeamBattle.mode,
-                        wager: gameState.waitingForTeamBattle.wager
+                        mode: gameState.waitingForDraftWar.mode,
+                        wager: gameState.waitingForDraftWar.wager
                     });
                     
-                    selectedTeamBattleMode = gameState.waitingForTeamBattle.mode;
-                    selectedWager = gameState.waitingForTeamBattle.wager;
-                    startP2PTeamBattle(hostDeck, guestDeck, gameState.currentUser.username);
+                    selectedDraftWarMode = gameState.waitingForDraftWar.mode;
+                    selectedWager = gameState.waitingForDraftWar.wager;
+                    startP2PDraftWar(hostDeck, guestDeck, gameState.currentUser.username);
                 }, 1000);
                 break;
 
             case 'tbGameStart':
-                // Guest receives team battle start
+                // Guest receives draft war start
                 gameState.opponentData = {
                     username: data.hostUsername,
                     collection: new Set()
                 };
-                selectedTeamBattleMode = data.mode;
+                selectedDraftWarMode = data.mode;
                 selectedWager = data.wager;
-                startP2PTeamBattle(data.hostDeck, data.guestDeck, data.hostUsername);
+                startP2PDraftWar(data.hostDeck, data.guestDeck, data.hostUsername);
                 break;
 
             case 'tbCardDrawn':
                 // Opponent drew a card - opponent is always player2 from our perspective
-                const opponentPlayer = teamBattleManager.currentGame.player2;
+                const opponentPlayer = draftWarManager.currentGame.player2;
                 opponentPlayer.revealedCard = data.card;
-                renderTeamBattleGame(teamBattleManager.currentGame);
+                renderDraftWarGame(draftWarManager.currentGame);
                 break;
 
             case 'tbCardAssigned':
                 // Opponent assigned a card
-                const game = teamBattleManager.currentGame;
+                const game = draftWarManager.currentGame;
                 // Opponent is always player2 from our perspective (whether we're host or guest)
                 const player = game.player2;
                 
@@ -410,15 +483,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 game.currentTurn = 1;
                 game.assignmentPhase = data.gameState.assignmentPhase;
                 
-                renderTeamBattleGame(game);
+                renderDraftWarGame(game);
                 
                 if (game.assignmentPhase >= 6) {
-                    finishTeamBattle(game);
+                    finishDraftWar(game);
                 }
                 break;
 
             case 'tbConcede':
-                // Opponent conceded team battle
+                // Opponent conceded draft war
                 const tbResult = {
                     winner: gameState.currentUser,
                     loser: gameState.opponentData,
@@ -428,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     wager: 0,
                     conceded: true  // Add this flag
                 };
-                showTeamBattleResults(teamBattleManager.currentGame, tbResult);
+                showDraftWarResults(draftWarManager.currentGame, tbResult);
                 break;
 
         }
@@ -527,6 +600,84 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Sop screen handlers
+    const viewShopBtn = document.createElement('button');
+    viewShopBtn.id = 'view-shop-btn';
+    viewShopBtn.className = 'btn btn-secondary';
+    viewShopBtn.textContent = '⭐ Card Shop';
+    document.getElementById('view-collection-btn').parentElement.insertBefore(viewShopBtn, document.getElementById('view-collection-btn').nextSibling);
+
+    viewShopBtn.addEventListener('click', () => {
+        showShop();
+    });
+
+    document.getElementById('back-to-lobby-shop-btn')?.addEventListener('click', () => {
+        showLobby();
+    });
+
+    function showShop() {
+        const username = gameState.currentUser.username;
+        const points = pointsManager.getPoints(username);
+        const streak = pointsManager.getStreak(username);
+        
+        document.getElementById('shop-user-points').textContent = points;
+        document.getElementById('shop-user-streak').textContent = streak + ' 🔥';
+        
+        renderShopInventory();
+        showScreen(shopScreen);
+    }
+
+    function renderShopInventory() {
+        const inventory = pointsManager.getShopInventory();
+        const inventoryDiv = document.getElementById('shop-inventory');
+        const userPoints = pointsManager.getPoints(gameState.currentUser.username);
+        
+        inventoryDiv.innerHTML = '<h3>Available Cards:</h3>';
+        
+        Object.entries(inventory).reverse().forEach(([rarity, info]) => {
+            const canAfford = userPoints >= info.price;
+            
+            const card = document.createElement('div');
+            card.className = `shop-card ${!canAfford ? 'locked' : ''}`;
+            card.innerHTML = `
+                <div class="shop-card-header">
+                    <span class="rarity-badge" style="color: ${info.color}">${rarity}</span>
+                    <span class="shop-card-label">${info.label}</span>
+                </div>
+                <div class="shop-card-price">💰 ${info.price} pts</div>
+                <div class="shop-card-stock">${info.available} available</div>
+                <button class="btn btn-primary shop-buy-btn" data-rarity="${rarity}" ${!canAfford || info.available === 0 ? 'disabled' : ''}>
+                    ${info.available === 0 ? 'Out of Stock' : canAfford ? 'Purchase' : 'Not Enough Points'}
+                </button>
+            `;
+            
+            const buyBtn = card.querySelector('.shop-buy-btn');
+            buyBtn.addEventListener('click', () => {
+                purchaseCard(rarity);
+            });
+            
+            inventoryDiv.appendChild(card);
+        });
+    }
+
+    function purchaseCard(rarity) {
+        const username = gameState.currentUser.username;
+        const result = pointsManager.purchaseCard(username, rarity, gameState.currentUser.collection);
+        
+        if (result.success) {
+            // Add card to user's collection
+            gameState.currentUser.collection.add(result.card.id);
+            gameState.saveUser(gameState.currentUser);
+            
+            alert(`🎉 You purchased ${result.card.name} (${rarity})!\n\nPoints remaining: ${result.pointsRemaining}`);
+            
+            // Refresh shop
+            showShop();
+        } else {
+            alert(result.message);
+        }
+    }
 
     document.getElementById('claim-profile-link').addEventListener('click', (e) => {
         e.preventDefault();
@@ -702,6 +853,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Make player1 card clickable to play it
+    player1CardSlot.addEventListener('click', () => {
+        // Only allow clicking if it's the player's turn and they haven't played yet
+        if (hasPlayedThisRound) return;
+        if (!gameState.currentGame) return;
+        
+        // Check if it's a card-back (face-down card)
+        const cardBack = player1CardSlot.querySelector('.card-back');
+        if (!cardBack) return; // Already revealed/played
+        
+        // Trigger the same action as clicking the play card button
+        playCardBtn.click();
+    });
+
     concedeBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to concede? This will count as a loss.')) {
             const result = gameState.concede();
@@ -724,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             roundNumberSpan.textContent = gameState.currentGame.round;
 
-            player1CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
+            player1CardSlot.innerHTML = '<div class="card-back" style="cursor: pointer;"><img src="img/back.png" alt="Card Back"></div>';
             player2CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
         }
     });
@@ -927,7 +1092,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const totalEnabled = getTotalEnabledCards();
         cardsCollectedSpan.textContent = `${user.collection.size}/${totalEnabled}`;
-    
+        
+        // Add points and streak display
+        const points = pointsManager.getPoints(user.username);
+        const streak = pointsManager.getStreak(user.username);
+        document.getElementById('user-points').textContent = points;
+        document.getElementById('user-streak').textContent = streak;
+        
         lobbyCodeDisplay.classList.add('hidden');
         joinStatus.classList.add('hidden');
         hostGameBtn.disabled = false;
@@ -1171,7 +1342,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roundNumberSpan.textContent = 1;
         maxRoundsSpan.textContent = DEV_CONFIG.GAME.MAX_ROUNDS;
         
-        player1CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
+        player1CardSlot.innerHTML = '<div class="card-back" style="cursor: pointer;"><img src="img/back.png" alt="Card Back"></div>';
         player2CardSlot.innerHTML = '<div class="card-back"><img src="img/back.png" alt="Card Back"></div>';
         waitingMessage.classList.add('hidden');
         playCardBtn.disabled = false;
@@ -1184,6 +1355,36 @@ document.addEventListener('DOMContentLoaded', () => {
         musicManager.stop();
 
         const result = gameState.endGame(gameOver);
+        
+        // Calculate and award points
+        const isPlayerWinner = result.winner && result.winner.username === gameState.currentUser.username;
+        const isPlayerLoser = result.loser && result.loser.username === gameState.currentUser.username;
+        
+        if (!result.conceded) {
+            const pointsResult = pointsManager.calculateDuelPoints({
+                ...result,
+                player1Score: gameState.currentGame.player1.score,
+                player2Score: gameState.currentGame.player2.score,
+                maxRounds: gameState.currentGame.maxRounds,
+                isPlayerWinner,
+                isPlayerLoser
+            });
+            
+            const totalPoints = pointsManager.awardPoints(gameState.currentUser.username, pointsResult.points);
+            const newStreak = pointsManager.updateStreak(gameState.currentUser.username, isPlayerWinner);
+            
+            // Add points notification to game over screen
+            const pointsNotification = `
+                <div class="points-earned">
+                    <h3>⭐ Points Earned: ${pointsResult.points} ⭐</h3>
+                    <p>Performance Grade: ${pointsResult.grade}</p>
+                    <p>Win Streak: ${newStreak} 🔥</p>
+                    <p>Total Points: ${totalPoints}</p>
+                </div>
+            `;
+            
+            gameoverStats.innerHTML += pointsNotification;
+        }
         
         if (result.tie) {
             gameoverResult.textContent = "🤝 It's a Tie! 🤝";
@@ -1261,17 +1462,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // The variables will be set there
             setTimeout(() => {
                 // Set defaults
-                selectedTeamBattleMode = 'CLASSIC_PIRATE';
-                teamBattleOpponentMode = 'p2p';
+                selectedDraftWarMode = 'CLASSIC_PIRATE';
+                draftWarOpponentMode = 'p2p';
                 selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;
                 
                 // Navigate to wager screen
-                showScreen(teamBattleWagerScreen);
+                showScreen(draftWarWagerScreen);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
                 // Show P2P options, hide bot difficulty
-                const difficultyDiv = document.getElementById('team-battle-difficulty');
-                const p2pDiv = document.getElementById('team-battle-p2p-options');
+                const difficultyDiv = document.getElementById('draft-war-difficulty');
+                const p2pDiv = document.getElementById('draft-war-p2p-options');
                 if (difficultyDiv) difficultyDiv.classList.add('hidden');
                 if (p2pDiv) p2pDiv.classList.remove('hidden');
                 
@@ -1311,20 +1512,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Team Battle Mode handlers - P2P ENABLED
-    const playTeamBattleBtn = document.getElementById('play-team-battle-btn');
+    // Draft War Mode handlers - P2P ENABLED
+    const playDraftWarBtn = document.getElementById('play-draft-war-btn');
     
-    let selectedTeamBattleMode = null;
+    let selectedDraftWarMode = null;
     let selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;  // Use config default
     let selectedTBDifficulty = null;
-    let teamBattleOpponentMode = null; // 'bot' or 'p2p'
+    let draftWarOpponentMode = null; // 'bot' or 'p2p'
 
-    playTeamBattleBtn?.addEventListener('click', () => {
-        if (!teamBattleManager.canStartTeamBattle(gameState.currentUser)) {
-            alert('⚠️ You need at least 6 cards to play Team Battle!\n\nPlay some regular games to build your collection first.');
+    playDraftWarBtn?.addEventListener('click', () => {
+        if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+            alert('⚠️ You need at least 6 cards to play Draft War!\n\nPlay some regular games to build your collection first.');
             return;
         }
-        showScreen(teamBattleSelectScreen);
+        showScreen(draftWarSelectScreen);
     });
 
     document.getElementById('back-from-team-select-btn')?.addEventListener('click', () => {
@@ -1335,21 +1536,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mode selection with Bot/P2P choice
     document.querySelectorAll('.select-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            selectedTeamBattleMode = btn.dataset.mode;
+            selectedDraftWarMode = btn.dataset.mode;
             selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;
             
             // Ask: Bot or P2P?
             const choice = confirm('Play vs Bot (OK) or vs Player online (Cancel)?');
-            teamBattleOpponentMode = choice ? 'bot' : 'p2p';
+            draftWarOpponentMode = choice ? 'bot' : 'p2p';
             
-            showScreen(teamBattleWagerScreen);
+            showScreen(draftWarWagerScreen);
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             // Show/hide difficulty selector based on mode
-            const difficultyDiv = document.getElementById('team-battle-difficulty');
-            const p2pDiv = document.getElementById('team-battle-p2p-options');
+            const difficultyDiv = document.getElementById('draft-war-difficulty');
+            const p2pDiv = document.getElementById('draft-war-p2p-options');
             
-            if (teamBattleOpponentMode === 'bot') {
+            if (draftWarOpponentMode === 'bot') {
                 difficultyDiv.classList.remove('hidden');
                 p2pDiv.classList.add('hidden');
             } else {
@@ -1365,7 +1566,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('back-from-wager-btn')?.addEventListener('click', () => {
-        showScreen(teamBattleSelectScreen);
+        showScreen(draftWarSelectScreen);
     });
 
     document.querySelectorAll('.wager-btn').forEach(btn => {
@@ -1377,14 +1578,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Bot difficulty selection
-    document.querySelectorAll('#team-battle-difficulty .btn-difficulty').forEach(btn => {
+    document.querySelectorAll('#draft-war-difficulty .btn-difficulty').forEach(btn => {
         btn.addEventListener('click', () => {
             selectedTBDifficulty = btn.dataset.difficulty;
-            startTeamBattle();
+            startDraftWar();
         });
     });
 
-    // P2P Team Battle handlers
+    // P2P Draft War handlers
     document.getElementById('tb-host-game-btn')?.addEventListener('click', async () => {
         const hostBtn = document.getElementById('tb-host-game-btn');
         const lobbyDisplay = document.getElementById('tb-lobby-code-display');
@@ -1402,9 +1603,9 @@ document.addEventListener('DOMContentLoaded', () => {
             connectionStatus.textContent = 'Waiting for opponent to join...';
             connectionStatus.className = 'connection-status';
             
-            // Mark as waiting for team battle
-            gameState.waitingForTeamBattle = {
-                mode: selectedTeamBattleMode,
+            // Mark as waiting for draft war
+            gameState.waitingForDraftWar = {
+                mode: selectedDraftWarMode,
                 wager: selectedWager
             };
         } catch (err) {
@@ -1430,17 +1631,17 @@ document.addEventListener('DOMContentLoaded', () => {
         joinStatus.className = 'connection-status loading';
         
         try {
-            // Mark that we're joining for team battle
-            gameState.joiningForTeamBattle = true;
+            // Mark that we're joining for draft war
+            gameState.joiningForDraftWar = true;
             
             await gameState.joinLobby(code, gameState.currentUser);
-            joinStatus.textContent = 'Connected! Starting Team Battle...';
+            joinStatus.textContent = 'Connected! Starting Draft War...';
             joinStatus.className = 'connection-status connected';
         } catch (err) {
             joinStatus.textContent = 'Failed: ' + err.message;
             joinStatus.className = 'connection-status error';
             joinBtn.disabled = false;
-            gameState.joiningForTeamBattle = false;
+            gameState.joiningForDraftWar = false;
         }
     });
 
@@ -1462,7 +1663,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Team battle close lobby button
+    // Draft War close lobby button
     const tbCloseLobbyBtn = document.getElementById('tb-close-lobby-btn');
     tbCloseLobbyBtn?.addEventListener('click', () => {
         if (confirm('Are you sure you want to close this lobby?')) {
@@ -1476,58 +1677,58 @@ document.addEventListener('DOMContentLoaded', () => {
             connectionStatus.textContent = '';
             
             // Clear the waiting flag
-            gameState.waitingForTeamBattle = null;
+            gameState.waitingForDraftWar = null;
         }
     });
 
-    function startTeamBattle() {
-        if (!selectedTeamBattleMode) return;
+    function startDraftWar() {
+        if (!selectedDraftWarMode) return;
         
-        if (teamBattleOpponentMode === 'bot') {
+        if (draftWarOpponentMode === 'bot') {
             if (!selectedTBDifficulty) return;
-            startBotTeamBattle();
+            startBotDraftWar();
         }
-        // P2P team battle starts via P2P message handler
+        // P2P draft war starts via P2P message handler
     }
 
-    function startBotTeamBattle() {
+    function startBotDraftWar() {
         try {
-            const game = teamBattleManager.startBotTeamBattle(
+            const game = draftWarManager.startBotDraftWar(
                 gameState.currentUser,
-                selectedTeamBattleMode,
+                selectedDraftWarMode,
                 selectedWager,
                 selectedTBDifficulty
             );
             
-            renderTeamBattleGame(game);
-            showScreen(teamBattleGameScreen);
-            musicManager.play('team-battle');
+            renderDraftWarGame(game);
+            showScreen(draftWarGameScreen);
+            musicManager.play('draft-war');
         } catch (err) {
             alert(err.message);
         }
     }
 
-    function startP2PTeamBattle(hostDeck, guestDeck, hostUsername) {
+    function startP2PDraftWar(hostDeck, guestDeck, hostUsername) {
         const isHost = gameState.isHost;
         const hostUser = isHost ? gameState.currentUser : { username: hostUsername, collection: new Set() };
         const guestUser = isHost ? gameState.opponentData : gameState.currentUser;
         
-        const game = teamBattleManager.startP2PTeamBattle(
+        const game = draftWarManager.startP2PDraftWar(
             hostUser,
             guestUser,
             hostDeck,
             guestDeck,
-            selectedTeamBattleMode,
+            selectedDraftWarMode,
             selectedWager,
             isHost
         );
         
-        renderTeamBattleGame(game);
-        showScreen(teamBattleGameScreen);
-        musicManager.play('team-battle');
+        renderDraftWarGame(game);
+        showScreen(draftWarGameScreen);
+        musicManager.play('draft-war');
     }
 
-    // Keep existing renderTeamBattleGame and other functions...
+    // Keep existing renderDraftWarGame and other functions...
     // But update assignCardToRoleSimple to send P2P message:
 
     function assignCardToRoleSimple(game, role) {
@@ -1544,17 +1745,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            renderTeamBattleGame(game);
+            renderDraftWarGame(game);
             
             if (result.complete) {
-                finishTeamBattle(game);
+                finishDraftWar(game);
             }
         } catch (err) {
             alert(err.message);
         }
     }
 
-    function renderTeamBattleGame(game) {
+    function renderDraftWarGame(game) {
         const blindMode = DEV_CONFIG.GAME.TEAM_BATTLE_BLIND_ASSIGNMENT;
         
         document.getElementById('tb-player1-name').textContent = game.player1.user.username;
@@ -1693,10 +1894,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     const result = game.botDrawAndAssign();
                     if (result) {
-                        renderTeamBattleGame(game);
+                        renderDraftWarGame(game);
                         
                         if (result.complete) {
-                            finishTeamBattle(game);
+                            finishDraftWar(game);
                         }
                     }
                 }, 1500);
@@ -1736,7 +1937,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 
-                renderTeamBattleGame(game);
+                renderDraftWarGame(game);
             });
             
             controlsDiv.classList.add('hidden');
@@ -1798,20 +1999,47 @@ document.addEventListener('DOMContentLoaded', () => {
         controlsDiv.classList.remove('hidden');
     }
 
-    function finishTeamBattle(game) {
+    function finishDraftWar(game) {
         setTimeout(() => {
             const result = game.determineWinner();
-            const finalResult = teamBattleManager.endTeamBattle(result);
-            showTeamBattleResults(game, finalResult);
+            const finalResult = draftWarManager.endDraftWar(result);
+            showDraftWarResults(game, finalResult);
         }, 1000);
     }
 
-    function showTeamBattleResults(game, result) {
+    function showDraftWarResults(game, result) {
         const titleEl = document.getElementById('tb-result-title');
         const statsEl = document.getElementById('tb-result-stats');
         
-        // Stop Team Battle music
+        // Stop Draft War music
         musicManager.stop();
+        
+        // Calculate and award points
+        const isPlayerWinner = result.winner && result.winner.username === gameState.currentUser.username;
+        
+        if (!result.conceded) {
+            const pointsResult = pointsManager.calculateDraftWarPoints({
+                ...result,
+                score1: game.player1.score,
+                score2: game.player2.score,
+                isPlayerWinner
+            });
+            
+            const totalPoints = pointsManager.awardPoints(gameState.currentUser.username, pointsResult.points);
+            const newStreak = pointsManager.updateStreak(gameState.currentUser.username, isPlayerWinner);
+            
+            // Add points notification
+            const pointsNotification = `
+                <div class="points-earned">
+                    <h3>⭐ Points Earned: ${pointsResult.points} ⭐</h3>
+                    <p>Performance Grade: ${pointsResult.grade}</p>
+                    <p>Win Streak: ${newStreak} 🔥</p>
+                    <p>Total Points: ${totalPoints}</p>
+                </div>
+            `;
+            
+            statsEl.innerHTML += pointsNotification;
+        }
         
         if (result.tie) {
             titleEl.textContent = "🤝 It's a Tie! 🤝";
@@ -1865,7 +2093,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('tb-cards-won-display').classList.add('hidden');
         }
         
-        showScreen(teamBattleResultsScreen);
+        showScreen(draftWarResultsScreen);
     }
 
     function renderFinalTeam(game, playerNum, nameId, rolesId, scoreId) {
@@ -1922,7 +2150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('tb-concede-btn')?.addEventListener('click', () => {
         if (confirm('Are you sure you want to concede?')) {
-            const game = teamBattleManager.currentGame;
+            const game = draftWarManager.currentGame;
             
             // Send P2P message if not bot game
             if (!game.isBotGame) {
@@ -1931,7 +2159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            const result = teamBattleManager.endTeamBattle({
+            const result = draftWarManager.endDraftWar({
                 winner: game.player2.user,
                 loser: game.player1.user,
                 winnerScore: 0,
@@ -1940,7 +2168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 wager: 0,
                 conceded: true  // Add this flag
             });
-            showTeamBattleResults(game, result);
+            showDraftWarResults(game, result);
         }
     });
 });
