@@ -20,7 +20,8 @@ const DEV_CONFIG = {
         CONSOLE_LOGGING: false,
         SHOW_CARD_IDS: true,
         SKIP_LOGIN: false,
-        UNLIMITED_CARDS: false
+        UNLIMITED_CARDS: false,
+        POINTS_GRANTER: false
     },
 
     // Arc Availability - Control which arcs are enabled
@@ -168,10 +169,10 @@ function applyDebugSettings() {
         collectionBtn.style.display = 'none';
     }
 
-    // Hide/show team battle mode
-    const teamBattleBtn = document.getElementById('play-team-battle-btn');
-    if (teamBattleBtn && !DEV_CONFIG.FEATURES.TEAM_BATTLE_MODE) {
-        teamBattleBtn.style.display = 'none';
+    // Hide/show draft war mode
+    const draftWarBtn = document.getElementById('play-draft-war-btn');
+    if (draftWarBtn && !DEV_CONFIG.FEATURES.TEAM_BATTLE_MODE) {
+        draftWarBtn.style.display = 'none';
     }
 
     // Hide/show stats bar
