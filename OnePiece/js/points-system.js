@@ -216,7 +216,7 @@ class PointsManager {
     }
     
     // Purchase card with points
-    purchaseCard(username, rarity, userCollection) {
+    purchaseCard(username, rarity, userCollection, userUnlockedArcs = null) {
         const price = POINTS_SYSTEM.CARD_PRICES[rarity];
         const userPoints = this.getPoints(username);
         
@@ -232,12 +232,15 @@ class PointsManager {
         this.savePoints();
         
         // Get random card of that rarity EXCLUDING cards user already owns
-        const availableCards = CARD_DATABASE.filter(card => 
-            card.rarity === rarity && 
-            ARC_AVAILABILITY[card.arc] === true && 
-            card.available &&
-            !userCollection.has(card.id)  // ← NEW: Exclude owned cards
-        );
+        // AND only from unlocked arcs
+        const availableCards = CARD_DATABASE.filter(card => {
+            if (card.rarity !== rarity || !card.available) return false;
+            if (ARC_AVAILABILITY[card.arc] !== true) return false;
+            if (userCollection.has(card.id)) return false;
+            // If unlocked arcs provided, check if card's arc is unlocked
+            if (userUnlockedArcs && !userUnlockedArcs.has(card.arc)) return false;
+            return true;
+        });
         
         if (availableCards.length === 0) {
             // Refund if no cards available
@@ -245,7 +248,7 @@ class PointsManager {
             this.savePoints();
             return {
                 success: false,
-                message: `No new ${rarity} rarity cards available! You own them all.`
+                message: `No new ${rarity} rarity cards available from your unlocked arcs!`
             };
         }
         
@@ -278,6 +281,20 @@ class PointsManager {
         }
         
         return inventory;
+    }
+
+    // Spend points for arc unlocks or other purchases
+    spendPoints(username, amount) {
+        const userPoints = this.getPoints(username);
+        
+        if (userPoints < amount) {
+            return null;
+        }
+        
+        this.userPoints[username] -= amount;
+        this.savePoints();
+        
+        return this.userPoints[username];
     }
     
     // Save points to localStorage
