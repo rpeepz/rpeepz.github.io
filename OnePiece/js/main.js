@@ -1,3 +1,5 @@
+const DEV_CONFIG = require("./dev-config");
+
 // Main application logic
 document.addEventListener('DOMContentLoaded', () => {
     // Screen elements
@@ -1073,6 +1075,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Pick random card
         const randomCard = arcCards[Math.floor(Math.random() * arcCards.length)];
         
+        if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+            console.log('pointsManager:', pointsManager);
+            console.log('spendPoints method:', typeof pointsManager.spendPoints);
+        }
         // Deduct points
         const remaining = pointsManager.spendPoints(username, price);
         
