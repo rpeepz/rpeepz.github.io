@@ -38,7 +38,7 @@ const DEV_CONFIG = {
         "Alabasta": true,
         "Jaya": true,
         "Skypiea": true,
-        "Long Ring Long Land": true,
+        "Long Ring Long Long": true,
         "Water 7": true,
         "Enies Lobby": true,
         "Thriller Bark": true,
@@ -73,9 +73,9 @@ const DEV_CONFIG = {
         STARTING_CARDS: 5,
         DECK_SIZE: 3,
         AUTO_SAVE: true,
-        TEAM_BATTLE_BLIND_ASSIGNMENT: true,
+        TEAM_BATTLE_BLIND_ASSIGNMENT: false,
         TEAM_BATTLE_DEFAULT_WAGER: 1,
-        TEAM_BATTLE_TYPE_BONUS: false
+        TEAM_BATTLE_TYPE_BONUS: true
     },
 
     // UI Settings
