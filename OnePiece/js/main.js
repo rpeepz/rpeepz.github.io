@@ -43,6 +43,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const arcFilter = document.getElementById('arc-filter');
     const rarityFilter = document.getElementById('rarity-filter');
     const collectionGrid = document.getElementById('collection-grid');
+
+    // Free Play button (lobby)
+    const playFreePlayBtn = document.getElementById('play-free-play-btn');
+
+    // Free Play mode event handler
+    playFreePlayBtn?.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Free Play: Draft War/Team Battle logic, but with all cards available, no arc/ownership restrictions, no wager, no card rewards
+        // Use CLASSIC_PIRATE mode, bot opponent, and a custom flag for Free Play
+        // Only include cards that are available (not disabled in the database)
+        const allCards = CARD_DATABASE.filter(card => card.available !== false);
+       
+        // Patch draftWarManager to use all cards for both players
+        const originalCreateTeamDeck = draftWarManager.createTeamDeck;
+        draftWarManager.createTeamDeck = function(user, size) {
+            // TODO consider shuffling differently to ensure variety (fisher-yates shuffle)
+            const shuffled = allCards.slice().sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, size || (DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX));
+        };
+        // Patch bot deck to use all cards as well
+        const originalCreateBotTeamDeck = draftWarManager.createBotTeamDeck;
+        draftWarManager.createBotTeamDeck = function(difficulty, size) {
+            // TODO consider shuffling differently to ensure variety (fisher-yates shuffle)
+            const shuffled = allCards.slice().sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, size || (DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX));
+        };
+        // Start Draft War in Free Play mode
+        const mode = 'CLASSIC_PIRATE';
+        const wager = 0; // No wager
+        const difficulty = 'NORMAL'; // Use lowest bot difficulty for Free Play
+        const game = draftWarManager.startBotDraftWar(gameState.currentUser, mode, wager, difficulty);
+        game.isFreePlay = true;
+        // Restore original methods after game is created
+        draftWarManager.createTeamDeck = originalCreateTeamDeck;
+        draftWarManager.createBotTeamDeck = originalCreateBotTeamDeck;
+        // Show the Draft War game screen, but label as Free Play
+        renderDraftWarGame(game, { freePlay: true });
+        showScreen(draftWarGameScreen);
+        musicManager.play('draft-war');
+    });
     
     // Game screen elements
     const player1NameSpan = document.getElementById('player1-name');
@@ -120,6 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Refresh lobbies button
     refreshLobbiesBtn?.addEventListener('click', () => {
+        // Add spin animation
+        refreshLobbiesBtn.classList.add('spin-refresh');
+        setTimeout(() => {
+            refreshLobbiesBtn.classList.remove('spin-refresh');
+        }, 700);
         refreshLobbyList();
     });
 
@@ -155,6 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const joinBtn = lobbyItem.querySelector('.lobby-join-btn');
             joinBtn.addEventListener('click', () => {
                 if (lobby.gameType === 'draft-war') {
+                    // Check if user has enough cards for draft war
+                    if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+                        alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
+                        return;
+                    }
                     // Join draft war lobby
                     document.getElementById('tb-join-code-input').value = lobby.code;
                     document.getElementById('tb-join-game-btn').click();
@@ -217,6 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('restore-lobby-btn').addEventListener('click', () => {
             if (lobby.gameType === 'draft-war') {
+                // Check if user has enough cards
+                if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+                    alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
+                    banner.remove();
+                    return;
+                }
                 // Restore draft war lobby
                 selectedDraftWarMode = 'CLASSIC_PIRATE';
                 draftWarOpponentMode = 'p2p';
@@ -584,8 +640,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Host creates decks and starts game
                 setTimeout(() => {
-                    const hostDeck = gameState.createDeck(gameState.currentUser, DEV_CONFIG.GAME.DECK_SIZE || 5);
-                    const guestDeck = gameState.createDeck(gameState.opponentData, DEV_CONFIG.GAME.DECK_SIZE || 5);
+                    const hostDeck = gameState.createDeck(gameState.currentUser, DEV_CONFIG.GAME.DECK_SIZE || DEV_CONFIG.GAME.MAX_ROUNDS);
+                    const guestDeck = gameState.createDeck(gameState.opponentData, DEV_CONFIG.GAME.DECK_SIZE || DEV_CONFIG.GAME.MAX_ROUNDS);
                     // Send game start to guest
                     gameState.p2p.send({
                         type: 'gameStart',
@@ -694,6 +750,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (game.assignmentPhase >= 6) {
                     finishDraftWar(game);
                 }
+                break;
+
+            case 'tbSkip':
+                // Opponent skipped their turn
+                const skipGame = draftWarManager.currentGame;
+                skipGame.skipTurn(2); // Opponent is player 2
+                renderDraftWarGame(skipGame);
                 break;
 
             case 'tbConcede':
@@ -1205,6 +1268,13 @@ document.addEventListener('DOMContentLoaded', () => {
         showCollection();
     });
 
+    // Pool status link in lobby
+    const poolStatusLink = document.getElementById('pool-status-link');
+    poolStatusLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showCollection();
+    });
+
     backToLobbyBtn.addEventListener('click', () => {
         showLobby();
     });
@@ -1240,15 +1310,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const poolSelectionMode = document.getElementById('pool-selection-mode');
     const poolCountSpan = document.getElementById('pool-count');
     const poolMaxSpan = document.getElementById('pool-max');
+    const poolActionButtons = document.getElementById('pool-action-buttons');
     
     poolSelectionMode.addEventListener('change', () => {
         const isActive = poolSelectionMode.checked;
         if (isActive) {
             collectionGrid.parentElement.classList.add('pool-selection-active');
+            poolActionButtons.classList.remove('hidden');
         } else {
             collectionGrid.parentElement.classList.remove('pool-selection-active');
+            poolActionButtons.classList.add('hidden');
         }
         renderCollection();
+    });
+
+    // Auto-select best cards button
+    document.getElementById('auto-select-pool-btn').addEventListener('click', () => {
+        
+        // if (!confirm(`This will replace your current pool with the top ${POOL_MAX_SIZE} cards by rarity and power. Continue?`)) {
+        //     return;
+        // }
+        
+        // Reset the manual flag so autoUpdatePool can work
+        gameState.currentUser.poolManuallySet = false;
+        
+        // Run auto-update
+        autoUpdatePool(gameState.currentUser);
+        
+        // Set flag back to true since they're "manually" choosing auto-select
+        gameState.currentUser.poolManuallySet = true;
+        
+        // Save and refresh
+        gameState.saveUser(gameState.currentUser);
+        renderCollection();
+        
+        alert(`✅ Pool updated with your ${POOL_MAX_SIZE} best cards!`);
+    });
+
+    // Deselect all from pool button
+    document.getElementById('deselect-all-pool-btn').addEventListener('click', () => {
+        if (!confirm('Remove all cards from your pool?')) {
+            return;
+        }
+        
+        gameState.currentUser.pool = new Set();
+        gameState.currentUser.poolManuallySet = true;
+        gameState.saveUser(gameState.currentUser);
+        renderCollection();
+        
+        alert('✅ All cards removed from pool!');
     });
 
     // Game screen handlers
@@ -1393,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Create player deck
-        const playerDeck = gameState.createDeck(gameState.currentUser, DEV_CONFIG.GAME.DECK_SIZE || 5);
+        const playerDeck = gameState.createDeck(gameState.currentUser, DEV_CONFIG.GAME.DECK_SIZE || DEV_CONFIG.GAME.MAX_ROUNDS);
 
         // Start bot game (no P2P needed)
         const game = gameState.startBotGame(playerDeck, difficulty);
@@ -1570,6 +1680,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hasEnoughCards) {
             poolStatusLobby.classList.remove('hidden');
             document.getElementById('lobby-pool-count').textContent = userPool.size;
+            document.getElementById('lobby-pool-max').textContent = POOL_MAX_SIZE;
         } else {
             poolStatusLobby.classList.add('hidden');
         }
@@ -1610,18 +1721,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Show/hide pool features based on collection size
         const hasEnoughCards = gameState.currentUser.collection.size >= POOL_MAX_SIZE;
-        const poolModeToggle = document.getElementById('pool-mode-toggle');
+        const poolManagementSection = document.getElementById('pool-management-section');
         const poolStatusDisplay = document.getElementById('pool-status-display');
         const poolFirstSortContainer = document.getElementById('pool-first-sort-container');
+        const poolActionButtons = document.getElementById('pool-action-buttons');
         
         if (hasEnoughCards) {
-            poolModeToggle.classList.remove('hidden');
+            poolManagementSection.classList.remove('hidden');
             poolStatusDisplay.classList.remove('hidden');
             poolFirstSortContainer.classList.remove('hidden');
+            // Show action buttons only if pool selection mode is active
+            if (poolSelectionMode.checked) {
+                poolActionButtons.classList.remove('hidden');
+            }
         } else {
-            poolModeToggle.classList.add('hidden');
+            poolManagementSection.classList.add('hidden');
             poolStatusDisplay.classList.add('hidden');
             poolFirstSortContainer.classList.add('hidden');
+            poolActionButtons.classList.add('hidden');
             // Ensure pool mode is off if not enough cards
             poolSelectionMode.checked = false;
             collectionGrid.parentElement.classList.remove('pool-selection-active');
@@ -1647,6 +1764,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 arcFilter.appendChild(option);
             }
         });
+        
+        // Update collection count display
+        const totalEnabled = getTotalEnabledCards();
+        document.getElementById('collection-owned-count').textContent = gameState.currentUser.collection.size;
+        document.getElementById('collection-total-count').textContent = totalEnabled;
         
         renderCollection();
         showScreen(collectionScreen);
@@ -1797,6 +1919,9 @@ document.addEventListener('DOMContentLoaded', () => {
             userPool.add(cardId);
         }
         
+        // Mark pool as manually set
+        gameState.currentUser.poolManuallySet = true;
+        
         // Save to localStorage
         gameState.currentUser.pool = userPool;
         gameState.saveUser(gameState.currentUser);
@@ -1807,6 +1932,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Auto-populate pool with best cards (highest rarity -> power -> name)
     function autoUpdatePool(user) {
+        // Skip auto-update if user has manually set their pool
+        if (user.poolManuallySet) {
+            return;
+        }
+
         if (!user.pool) {
             user.pool = new Set();
         }
@@ -1846,6 +1976,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const rarityInfo = CardRaritySystem.getRarityInfo(card.rarity);
         const typeInfo = CHARACTER_TYPES[card.type] || { name: 'Unknown', icon: '❓', color: '#888888' };
         
+        // Build subtypes HTML if card has subtypes
+        let subtypesHTML = '';
+        if (card.subtypes && card.subtypes.length > 0) {
+            const subtypesBadges = card.subtypes.map(st => {
+                const subtypeInfo = CHARACTER_SUBTYPES[st];
+                if (subtypeInfo) {
+                    return `<span class="subtype-badge" style="background: ${subtypeInfo.color}20; color: ${subtypeInfo.color}; border: 1px solid ${subtypeInfo.color};">
+                        ${subtypeInfo.icon} ${subtypeInfo.name}
+                    </span>`;
+                }
+                return '';
+            }).join('');
+            
+            subtypesHTML = `
+                <div class="modal-stat-item" style="margin-bottom: 15px;">
+                    <div class="modal-stat-label">Subtypes</div>
+                    <div class="modal-subtypes">
+                        ${subtypesBadges}
+                    </div>
+                </div>
+            `;
+        }
+        
         modalCardDisplay.innerHTML = `
             <div class="modal-card ${owned ? '' : 'locked'}" data-rarity="${card.rarity}">
                 <div class="modal-card-header">
@@ -1878,6 +2031,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span>${typeInfo.name}</span>
                     </div>
                 </div>
+                
+                ${subtypesHTML}
                 
                 ${card.flavorText ? `
                     <div class="modal-card-flavor">
@@ -1961,6 +2116,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clear previous game stats
         gameoverStats.innerHTML = '';
+        
+        // Render matchup history
+        renderMatchupHistory();
         
         // Use newly unlocked arcs from result
         let arcUnlockNotification = '';
@@ -2120,6 +2278,74 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Render matchup history in game over screen
+    function renderMatchupHistory() {
+        const matchupDisplay = document.getElementById('matchup-history-display');
+        const matchupGrid = document.getElementById('matchup-history-grid');
+        
+        if (!gameState.currentGame || !gameState.currentGame.matchupHistory || gameState.currentGame.matchupHistory.length === 0) {
+            matchupDisplay.classList.add('hidden');
+            return;
+        }
+        
+        const history = gameState.currentGame.matchupHistory;
+        matchupDisplay.classList.remove('hidden');
+        matchupGrid.innerHTML = '';
+        
+        history.forEach(matchup => {
+            const matchupDiv = document.createElement('div');
+            matchupDiv.className = 'matchup-item';
+            
+            const card1 = matchup.card1;
+            const card2 = matchup.card2;
+            const img1 = CHARACTER_IMAGES[card1.name] || '❓';
+            const img2 = CHARACTER_IMAGES[card2.name] || '❓';
+            const img1HTML = img1 !== '❓' ? `<img src="${img1}" alt="${card1.name}">` : `<div class="card-emoji">${img1}</div>`;
+            const img2HTML = img2 !== '❓' ? `<img src="${img2}" alt="${card2.name}">` : `<div class="card-emoji">${img2}</div>`;
+            
+            // Determine if this is a bot game or P2P game for labeling
+            const isBotGame = gameState.currentGame.isBotGame;
+            const isHost = gameState.isHost;
+            
+            let p1Label, p2Label;
+            if (isBotGame) {
+                p1Label = 'You';
+                p2Label = 'Bot';
+            } else {
+                p1Label = isHost ? 'You' : gameState.currentGame.player1.user.username;
+                p2Label = !isHost ? 'You' : gameState.currentGame.player2.user.username;
+            }
+            
+            matchupDiv.innerHTML = `
+                <div class="matchup-round">Round ${matchup.round}</div>
+                <div class="matchup-cards">
+                    <div class="matchup-card ${matchup.winner === 1 ? 'winner' : matchup.winner === 2 ? 'loser' : 'tie'}">
+                        <div class="matchup-card-label">${p1Label}</div>
+                        <div class="matchup-card-image">${img1HTML}</div>
+                        <div class="matchup-card-info">
+                            <div class="matchup-card-name">${card1.name}</div>
+                            <div class="matchup-card-power">⚔️ ${card1.power}</div>
+                        </div>
+                    </div>
+                    <div class="matchup-vs">VS</div>
+                    <div class="matchup-card ${matchup.winner === 2 ? 'winner' : matchup.winner === 1 ? 'loser' : 'tie'}">
+                        <div class="matchup-card-label">${p2Label}</div>
+                        <div class="matchup-card-image">${img2HTML}</div>
+                        <div class="matchup-card-info">
+                            <div class="matchup-card-name">${card2.name}</div>
+                            <div class="matchup-card-power">⚔️ ${card2.power}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="matchup-result">
+                    ${matchup.winner === 1 ? `${p1Label} won this round!` : matchup.winner === 2 ? `${p2Label} won this round!` : 'Tie!'}
+                </div>
+            `;
+            
+            matchupGrid.appendChild(matchupDiv);
+        });
+    }
+
     // Apply developer configuration
     if (typeof applyDebugSettings === 'function') {
         applyDebugSettings();
@@ -2145,7 +2371,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     playDraftWarBtn?.addEventListener('click', () => {
         if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
-            alert('⚠️ You need at least 6 cards to play Draft War!\n\nPlay some regular games to build your collection first.');
+            alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
             return;
         }
         showScreen(draftWarSelectScreen);
@@ -2159,6 +2385,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mode selection with Bot/P2P choice
     document.querySelectorAll('.select-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            // Check if user has enough cards
+            if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+                alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
+                return;
+            }
+            
             selectedDraftWarMode = btn.dataset.mode;
             selectedWager = DEV_CONFIG.GAME.TEAM_BATTLE_DEFAULT_WAGER || 1;
             
@@ -2194,6 +2426,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.wager-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            // Check if user has enough cards
+            if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+                alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
+                return;
+            }
+            
             selectedWager = parseInt(btn.dataset.wager);
             document.querySelectorAll('.wager-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -2203,13 +2441,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bot difficulty selection
     document.querySelectorAll('#draft-war-difficulty .btn-difficulty').forEach(btn => {
         btn.addEventListener('click', () => {
-            selectedTBDifficulty = btn.dataset.difficulty;
+            const difficulty = btn.dataset.difficulty;
+            selectedTBDifficulty = difficulty;
             startDraftWar();
         });
     });
 
     // P2P Draft War handlers
     document.getElementById('tb-host-game-btn')?.addEventListener('click', async () => {
+        // Check if user has enough cards
+        if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+            alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
+            return;
+        }
+        
         const hostBtn = document.getElementById('tb-host-game-btn');
         const lobbyDisplay = document.getElementById('tb-lobby-code-display');
         const lobbyCodeSpan = document.getElementById('tb-lobby-code');
@@ -2243,6 +2488,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('tb-join-game-btn')?.addEventListener('click', async () => {
+        // Check if user has enough cards
+        if (!draftWarManager.canStartDraftWar(gameState.currentUser)) {
+            alert(`⚠️ You need at least ${DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX} cards to play Draft War!\n\nPlay some regular games to build your collection first.`);
+            return;
+        }
+        
         const code = document.getElementById('tb-join-code-input').value.trim();
         if (!code) {
             alert('Please enter a lobby code');
@@ -2388,7 +2639,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderDraftWarGame(game) {
-        const blindMode = DEV_CONFIG.GAME.TEAM_BATTLE_BLIND_ASSIGNMENT;
+        const blindMode = game.isFreePlay ? true : DEV_CONFIG.GAME.TEAM_BATTLE_BLIND_ASSIGNMENT;
         
         document.getElementById('tb-player1-name').textContent = game.player1.user.username;
         document.getElementById('tb-player2-name').textContent = game.player2.user.username;
@@ -2550,15 +2801,15 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = `
                 <div class="tb-card-draw-area">
                     <div class="card-slot">
-                        <div class="card-back">
+                        <div class="card-back" id="tb-draw-card-back" style="cursor: pointer;">
                             <img src="img/back.png" alt="Card Back">
                         </div>
                     </div>
-                    <button id="tb-draw-card-btn" class="btn btn-primary btn-large">Draw Card</button>
+                    <p style="color: var(--text-secondary); margin-top: 10px;">Tap card to draw</p>
                 </div>
             `;
             
-            document.getElementById('tb-draw-card-btn').addEventListener('click', () => {
+            document.getElementById('tb-draw-card-back').addEventListener('click', () => {
                 const card = game.drawCard(1);
                 
                 // Send P2P message if not bot game
@@ -2611,6 +2862,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const availableRoles = game.getAvailableRoles(1);
         
+        // Add role buttons
         availableRoles.forEach(role => {
             const roleInfo = ROLE_MODIFIERS[game.mode][role];
             
@@ -2627,6 +2879,37 @@ document.addEventListener('DOMContentLoaded', () => {
             
             roleButtonsDiv.appendChild(btn);
         });
+        
+        // Add skip button if available
+        if (DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX > 0 && game.canSkip(1)) {
+            const skipBtn = document.createElement('button');
+            skipBtn.className = 'btn role-skip-btn';
+            skipBtn.innerHTML = `
+                <span class="role-name-large">⏭️ Skip</span>
+                <span class="role-desc">(${game.maxSkips - game.player1Skips} skip left)</span>
+            `;
+            
+            skipBtn.addEventListener('click', () => {
+                // Confirm skip action
+                if (!confirm(`Skip "${card.name}" [${card.rarity}] and draw a new card?`)) {
+                    return;
+                }
+                
+                game.skipTurn(1);
+                
+                // Send skip to opponent if P2P
+                if (!game.isBotGame) {
+                    gameState.p2p.send({
+                        type: 'tbSkip',
+                        playerNum: 1
+                    });
+                }
+                
+                renderDraftWarGame(game);
+            });
+            
+            roleButtonsDiv.appendChild(skipBtn);
+        }
         
         controlsDiv.classList.remove('hidden');
     }
@@ -2651,29 +2934,39 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Calculate and award points
         const isPlayerWinner = result.winner && result.winner.username === gameState.currentUser.username;
-        
+        let isFreePlay = game.isFreePlay;
         if (!result.conceded) {
-            const pointsResult = pointsManager.calculateDraftWarPoints({
-                ...result,
-                score1: game.player1.score,
-                score2: game.player2.score,
-                isPlayerWinner
-            });
-            
-            const totalPoints = pointsManager.awardPoints(gameState.currentUser.username, pointsResult.points);
-            const newStreak = pointsManager.updateStreak(gameState.currentUser.username, isPlayerWinner);
-            
-            // Add points notification
-            const pointsNotification = `
-                <div class="points-earned">
-                    <h3>⭐ Points Earned: ${pointsResult.points} ⭐</h3>
-                    <p>Performance Grade: ${pointsResult.grade}</p>
-                    <p>Win Streak: ${newStreak} 🔥</p>
-                    <p>Total Points: ${totalPoints}</p>
-                </div>
-            `;
-            
-            statsEl.innerHTML += pointsNotification;
+            let pointsResult, totalPoints, newStreak;
+            if (isFreePlay) {
+                // Free Play: Only award points, no grade, no streak, no wager, no card rewards
+                const basePoints = isPlayerWinner ? 10 : 2;
+                totalPoints = pointsManager.awardPoints(gameState.currentUser.username, basePoints);
+                statsEl.innerHTML += `
+                    <div class="points-earned">
+                        <h3>⭐ Points Earned: ${basePoints} ⭐</h3>
+                        <p>Total Points: ${totalPoints}</p>
+                    </div>
+                `;
+            } else {
+                pointsResult = pointsManager.calculateDraftWarPoints({
+                    ...result,
+                    score1: game.player1.score,
+                    score2: game.player2.score,
+                    isPlayerWinner
+                });
+                totalPoints = pointsManager.awardPoints(gameState.currentUser.username, pointsResult.points);
+                newStreak = pointsManager.updateStreak(gameState.currentUser.username, isPlayerWinner);
+                // Add points notification
+                const pointsNotification = `
+                    <div class="points-earned">
+                        <h3>⭐ Points Earned: ${pointsResult.points} ⭐</h3>
+                        <p>Performance Grade: ${pointsResult.grade}</p>
+                        <p>Win Streak: ${newStreak} 🔥</p>
+                        <p>Total Points: ${totalPoints}</p>
+                    </div>
+                `;
+                statsEl.innerHTML += pointsNotification;
+            }
         }
         
         // Add arc unlock notification if any
@@ -2689,7 +2982,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (result.tie) {
-            titleEl.textContent = "🤝 It's a Tie! 🤝";
+            titleEl.textContent = isFreePlay ? "🤝 Free Play Tie! 🤝" : "🤝 It's a Tie! 🤝";
             statsEl.innerHTML += `
                 <p>Both teams scored equally!</p>
                 <p>Final Score: ${result.score1} - ${result.score2}</p>
@@ -2698,40 +2991,40 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show concede message
             const isWinner = result.winner.username === gameState.currentUser.username;
             if (isWinner) {
-                titleEl.textContent = '🎉 Victory! 🎉';
+                titleEl.textContent = isFreePlay ? '🎉 Free Play Win! 🎉' : '🎉 Victory! 🎉';
                 statsEl.innerHTML += `
                     <p>${result.loser.username} conceded!</p>
                     <p>You win by forfeit!</p>
                 `;
             } else {
-                titleEl.textContent = '💔 You Conceded 💔';
+                titleEl.textContent = isFreePlay ? '💔 Free Play Concede 💔' : '💔 You Conceded 💔';
                 statsEl.innerHTML += `
                     <p>You forfeited the match.</p>
                 `;
             }
         } else {
             const isWinner = result.winner.username === gameState.currentUser.username;
-            titleEl.textContent = isWinner ? '🎉 Victory! 🎉' : '💔 Defeat 💔';
-            
+            titleEl.textContent = isFreePlay
+                ? (isWinner ? '🎉 Free Play Win! 🎉' : '💔 Free Play Loss 💔')
+                : (isWinner ? '🎉 Victory! 🎉' : '💔 Defeat 💔');
             statsEl.innerHTML += `
                 <p>${result.winner.username} wins!</p>
                 <p>Final Score: ${result.winnerScore} - ${result.loserScore}</p>
-                <p>Cards Wagered: ${result.wager}</p>
+                ${isFreePlay ? '<p>No wager. No card rewards. Just for fun!</p>' : `<p>Cards Wagered: ${result.wager}</p>`}
             `;
         }
         
         // Show final teams
         renderFinalTeam(game, 1, 'tb-final-p1-name', 'tb-final-p1-roles', 'tb-final-p1-score');
         renderFinalTeam(game, 2, 'tb-final-p2-name', 'tb-final-p2-roles', 'tb-final-p2-score');
-        
-        // Show cards won
-        if (result.cardsWon && result.cardsWon.length > 0 && result.winner.username === gameState.currentUser.username) {
+        // Hide cards won for Free Play
+        if (isFreePlay) {
+            document.getElementById('tb-cards-won-display').classList.add('hidden');
+        } else if (result.cardsWon && result.cardsWon.length > 0 && result.winner.username === gameState.currentUser.username) {
             const cardsWonDisplay = document.getElementById('tb-cards-won-display');
             const cardsWonGrid = document.getElementById('tb-cards-won-grid');
-            
             cardsWonDisplay.classList.remove('hidden');
             cardsWonGrid.innerHTML = '';
-            
             result.cardsWon.forEach(card => {
                 const cardDiv = createCollectionCard(card);
                 cardsWonGrid.appendChild(cardDiv);
@@ -2739,49 +3032,43 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             document.getElementById('tb-cards-won-display').classList.add('hidden');
         }
-        
         showScreen(draftWarResultsScreen);
     }
 
     function renderFinalTeam(game, playerNum, nameId, rolesId, scoreId) {
         const player = playerNum === 1 ? game.player1 : game.player2;
-        
         document.getElementById(nameId).textContent = player.user.username;
         document.getElementById(scoreId).textContent = player.score;
-        
         const rolesContainer = document.getElementById(rolesId);
         rolesContainer.innerHTML = '';
-        
-        for (const role in player.assignments) {
+        // Use the original role order
+        const roleOrder = Object.keys(ROLE_MODIFIERS[game.mode]);
+        for (const role of roleOrder) {
             const card = player.assignments[role];
+            if (!card) continue;
             const roleInfo = ROLE_MODIFIERS[game.mode][role];
             let roleScore = game.calculateRoleScore(card, role);
-            
             const roleDiv = document.createElement('div');
             roleDiv.className = 'final-role-item';
-            
             let calculationHTML = `(${card.power} × ${roleInfo.multiplier}`;
             let bonusHTML = '';
-            
             // Show type bonus and synergy if enabled
             if (DEV_CONFIG.GAME.TEAM_BATTLE_TYPE_BONUS && card.type) {
                 const bonusInfo = game.getTypeBonusInfo(card, role);
                 if (bonusInfo) {
                     calculationHTML += ` × ${bonusInfo.baseBonus}`;
                     bonusHTML = `<span class="type-bonus" style="color: ${bonusInfo.color}">${bonusInfo.icon} ${bonusInfo.type}</span>`;
-                    
                     if (bonusInfo.hasSynergy) {
                         calculationHTML += ` × ${bonusInfo.synergyBonus}`;
                         bonusHTML += `<span class="synergy-bonus">✨ Synergy!</span>`;
                     }
                 }
             }
-            
             calculationHTML += ` = ${roleScore})`;
-            
+            const rarityColor = RARITY_TIERS[card.rarity]?.color || '#ffffff';
             roleDiv.innerHTML = `
                 <span class="role-label">${roleInfo.name}:</span>
-                <span class="card-name">${card.name}</span>
+                <span class="card-name">${card.name} <span style="color: ${rarityColor}; font-weight: bold;">[${card.rarity}]</span></span>
                 ${bonusHTML}
                 <span class="role-calculation">${calculationHTML}</span>
             `;
