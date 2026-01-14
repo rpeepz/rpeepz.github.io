@@ -32,7 +32,7 @@ class DraftWarGame {
         this.botDifficulty = null;
         this.player1Skips = 0;  // Track skips used
         this.player2Skips = 0;
-        this.maxSkips = 1;  // Max skips allowed per player
+        this.maxSkips = DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX;  // Max skips allowed per player
     }
 
 startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficulty = null) {
@@ -175,6 +175,7 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
             let finalModifier = roleModifier;
             let typeBonus = 1;
             let synergyBonus = 1;
+            let subtypeBonus = 0; // Additive bonus
             
             if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
                 console.log(`\n🎴 ${card.name} in ${roleInfo.name}:`);
@@ -208,9 +209,24 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
                 }
             }
             
+            // Apply subtype bonus if enabled
+            if (DEV_CONFIG.GAME.TEAM_BATTLE_SUBTYPE_BONUS && card.subtypes && card.subtypes.length > 0) {
+                subtypeBonus = calculateSubtypeBonus(card.subtypes, role, 'draft_war');
+                
+                if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                    console.log(`  Subtypes: [${card.subtypes.join(', ')}]`);
+                    console.log(`  Subtype Bonus: +${(subtypeBonus * 100).toFixed(1)}%`);
+                }
+                
+                // Apply subtype bonus multiplicatively (1 + bonus)
+                finalModifier *= (1 + subtypeBonus);
+            } else if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
+                console.log(`  Subtype Bonus: DISABLED or no subtypes`);
+            }
+            
             const roleScore = Math.floor(card.power * finalModifier);
             if (DEV_CONFIG.DEBUG.CONSOLE_LOGGING) {
-                console.log(`  Final Multiplier: ${finalModifier}x`);
+                console.log(`  Final Multiplier: ${finalModifier.toFixed(2)}x`);
                 console.log(`  Final Score: ${roleScore}`);
             }
             
@@ -399,8 +415,12 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
         
         const player = playerNum === 1 ? this.player1 : this.player2;
         
-        // Clear revealed card (put it back)
+        // Remove the skipped card from the unassigned pool permanently
         if (player.revealedCard) {
+            const cardIndex = player.unassignedCards.findIndex(c => c.id === player.revealedCard.id);
+            if (cardIndex !== -1) {
+                player.unassignedCards.splice(cardIndex, 1);
+            }
             player.revealedCard = null;
         }
         
@@ -411,32 +431,22 @@ startGame(player1Data, player2Data, mode, wager, isBotGame = false, botDifficult
             this.player2Skips++;
         }
         
-        // Switch turns
-        this.currentTurn = this.currentTurn === 1 ? 2 : 1;
+        // Draw a new card immediately
+        const newCard = this.drawCard(playerNum);
+        // Do NOT switch turns; player keeps their turn after skipping
         
         // Check if both players have same number of assignments
         const p1Assigned = Object.keys(this.player1.assignments).length;
         const p2Assigned = Object.keys(this.player2.assignments).length;
         
         // If assignments are unequal, we're in catch-up phase
-        if (p1Assigned !== p2Assigned) {
-            // Don't increment phase, let the other player catch up
-            return {
-                nextTurn: this.currentTurn,
-                phase: this.assignmentPhase,
-                complete: this.assignmentPhase >= 6,
-                skipped: true
-            };
-        } else {
-            // Both have same assignments, phase complete
-            this.assignmentPhase++;
-            return {
-                nextTurn: this.currentTurn,
-                phase: this.assignmentPhase,
-                complete: this.assignmentPhase >= 6,
-                skipped: true
-            };
-        }
+        // Never increment assignmentPhase when skipping
+        return {
+            nextTurn: this.currentTurn,
+            phase: this.assignmentPhase,
+            complete: this.assignmentPhase >= 6,
+            skipped: true
+        };
     }
 
     serializeState() {
@@ -469,10 +479,10 @@ class DraftWarManager {
 
     canStartDraftWar(user) {
         // Need at least 6 cards
-        return user.collection.size >= 6;
+        return user.collection.size >= DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX;
     }
 
-    createTeamDeck(user, size = 6) {
+    createTeamDeck(user, size = DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX) {
         const userPool = user.pool || new Set();
         
         // Use pool if it has enough cards, otherwise use full collection
@@ -502,7 +512,7 @@ class DraftWarManager {
         return shuffled.slice(0, size);
     }
 
-    createBotTeamDeck(difficulty, size = 6) {
+    createBotTeamDeck(difficulty, size = DEV_CONFIG.GAME.TEAM_BATTLE_REQUIRED_CARDS + DEV_CONFIG.GAME.TEAM_BATTLE_SKIP_MAX) {
         const botConfig = BOT_DIFFICULTIES[difficulty];
         const availableCards = CardRaritySystem.getAvailablePool().filter(card =>
             botConfig.rarities.includes(card.rarity)
