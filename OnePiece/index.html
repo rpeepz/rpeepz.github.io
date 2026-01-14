@@ -90,8 +90,10 @@
             </div>
 
             <div class="pool-status-lobby hidden" id="pool-status-lobby">
-                <span class="pool-status-label">Card Pool:</span>
-                <span id="lobby-pool-count">0</span> / 25 cards selected
+                <a href="#" id="pool-status-link" style="text-decoration: none; color: inherit;">
+                    <span class="pool-status-label">Card Pool:</span>
+                    <span id="lobby-pool-count">0</span> / <span id="lobby-pool-max">25</span> cards selected
+                </a>
                 <!-- <span class="pool-status-hint">(Games will use your pool if set)</span> -->
             </div>
 
@@ -132,6 +134,7 @@
                         </div>
                         <button id="cancel-bot-btn" class="btn btn-secondary">Cancel</button>
                     </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Face off against a bot in a classic duel. Choose your difficulty and test your skills!</p>
                 </div>
 
                 <!-- Join Duel Lobby -->
@@ -140,7 +143,7 @@
                     <input type="text" id="join-code-input" placeholder="Enter Duel code" maxlength="30">
                     <button id="join-game-btn" class="btn btn-primary">Join Duel</button>
                     <p class="connection-status hidden" id="join-status">Connecting...</p>
-                
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Enter a code to join a friend's duel lobby and battle online in real time.</p>
                 </div>
 
                 <!-- Host Duel Lobby -->
@@ -156,14 +159,23 @@
                         </div>
                         <p id="connection-status"></p>
                     </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Host a duel and share your code with a friend to play online. Wait for them to join and start the battle!</p>
                 </div>
 
                 <!-- Play Draft War -->
                 <div class="section">
-                    <h3>🏴‍☠️ Draft War Mode (NEW)</h3>
+                    <h3>🏴‍☠️ Draft War</h3>
                     <button id="play-draft-war-btn" class="btn btn-primary">Play Draft War</button>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Draft your pirate crew from your collection and battle in a strategic team-based mode. Play solo or online!</p>
                 </div>
                 
+                <!-- Free Play Mode -->
+                <div class="section">
+                    <h3>🆓 Free Play (All Cards)</h3>
+                    <button id="play-free-play-btn" class="btn btn-primary">Free Play</button>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Try every card in the game! Bot only.</p>
+                </div>
+
                 <!-- Open Lobbies Browser -->
                 <div class="section">
                     <h3>🌐 Open Lobbies</h3>
@@ -248,7 +260,7 @@
     <div id="collection-screen" class="screen">
         <div class="container">
             <div class="header">
-                <h2>Card Collection</h2>
+                <h2>Card Collection <span id="collection-count-display" style="font-size: 0.7em; color: var(--text-secondary);">(<span id="collection-owned-count">0</span>/<span id="collection-total-count">0</span>)</span></h2>
                 <button id="back-to-lobby-btn" class="btn btn-small">Back to Lobby</button>
             </div>
             <div class="filter-section">
@@ -258,22 +270,6 @@
                 <select id="arc-filter">
                     <option value="all">All Arcs</option>
                 </select>
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="owned-only-filter">
-                    <span>Show Only Owned Cards</span>
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="sort-by-power-filter">
-                    <span>Sort by Highest Power</span>
-                </label>
-                <label class="filter-checkbox hidden" id="pool-first-sort-container">
-                    <input type="checkbox" id="pool-first-sort">
-                    <span>⭐ Pool Cards First</span>
-                </label>
-                <label class="filter-checkbox pool-mode-toggle hidden" id="pool-mode-toggle">
-                    <input type="checkbox" id="pool-selection-mode">
-                    <span>⭐ Pool Selection Mode</span>
-                </label>
                 <select id="rarity-filter" class="filter-select">
                     <option value="all">All Rarities</option>
                     <option value="SSS">SSS - Legendary</option>
@@ -285,7 +281,31 @@
                     <option value="D">D - Basic</option>
                     <option value="F">F - Starter</option>
                 </select>
+                <label class="filter-checkbox">
+                    <input type="checkbox" id="owned-only-filter">
+                    <span>Show Only Owned Cards</span>
+                </label>
+                <label class="filter-checkbox">
+                    <input type="checkbox" id="sort-by-power-filter">
+                    <span>Sort by Highest Power</span>
+                </label>
+                <label class="filter-checkbox hidden" id="pool-first-sort-container">
+                    <input type="checkbox" id="pool-first-sort">
+                    <span>⭐ Sort by Pool Cards</span>
+                </label>
             </div>
+            
+            <div class="pool-management-section hidden" id="pool-management-section">
+                <label class="filter-checkbox pool-mode-toggle" id="pool-mode-toggle">
+                    <input type="checkbox" id="pool-selection-mode">
+                    <span>Edit Card Pool</span>
+                </label>
+                <div class="pool-action-buttons hidden" id="pool-action-buttons">
+                    <button id="auto-select-pool-btn" class="btn btn-secondary">🤖 Auto-Select Best Cards</button>
+                    <button id="deselect-all-pool-btn" class="btn btn-secondary">❌ Deselect All</button>
+                </div>
+            </div>
+            
             <div class="pool-status hidden" id="pool-status-display">
                 <span id="pool-count">0</span> / <span id="pool-max">25</span> cards in pool
             </div>
@@ -379,21 +399,7 @@
                 <button id="back-from-team-select-btn" class="btn btn-small">Back to Lobby</button>
             </div>
             
-            <div class="draft-war-mode-selection">
-                <div class="mode-card" id="davy-back-mode">
-                    <h3>🏴‍☠️ Davy Back Fight</h3>
-                    <p class="mode-description">High risk, high reward</p>
-                    <div class="role-list">
-                        <span class="role-badge captain">Captain (×2.0)</span>
-                        <span class="role-badge vice">Vice-Captain (×1.5)</span>
-                        <span class="role-badge tank">Tank (×1.3)</span>
-                        <span class="role-badge healer">Healer (×1.2)</span>
-                        <span class="role-badge support">Support (×1.1)</span>
-                        <span class="role-badge traitor">Traitor (×-0.5)</span>
-                    </div>
-                    <button class="btn btn-primary select-mode-btn" data-mode="DAVY_BACK">Play</button>
-                </div>
-                
+            <div class="draft-war-mode-selection">                
                 <div class="mode-card" id="classic-pirate-mode">
                     <h3>💀 Classic Pirate</h3>
                     <p class="mode-description">Balanced team composition</p>
@@ -406,6 +412,20 @@
                         <span class="role-badge support">Support (×1.1)</span>
                     </div>
                     <button class="btn btn-primary select-mode-btn" data-mode="CLASSIC_PIRATE">Play</button>
+                </div>
+
+                <div class="mode-card" id="davy-back-mode">
+                    <h3>🏴‍☠️ Davy Back Fight</h3>
+                    <p class="mode-description">High risk, high reward</p>
+                    <div class="role-list">
+                        <span class="role-badge captain">Captain (×2.0)</span>
+                        <span class="role-badge vice">Vice-Captain (×1.5)</span>
+                        <span class="role-badge tank">Tank (×1.3)</span>
+                        <span class="role-badge healer">Healer (×1.2)</span>
+                        <span class="role-badge support">Support (×1.1)</span>
+                        <span class="role-badge traitor">Traitor (×-0.5)</span>
+                    </div>
+                    <button class="btn btn-primary select-mode-btn" data-mode="DAVY_BACK">Play</button>
                 </div>
             </div>
         </div>
@@ -551,10 +571,12 @@
                 <div id="tb-cards-won-grid" class="card-grid"></div>
             </div>
             
-            <button id="tb-return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
-            <a href="https://square.link/u/T6XoDQMr" target="_blank" class="support-link">
-                <button class="btn btn-support">☕ Enjoyed the game? Support me!</button>
-            </a>
+            <div style="display: inline-grid; margin-top: 24px;">
+                <button id="tb-return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
+                <a href="https://square.link/u/T6XoDQMr" target="_blank" class="support-link">
+                    <button class="btn btn-support">☕ Enjoyed the game? Support me!</button>
+                </a>
+            </div>
         </div>
     </div>
     
@@ -608,14 +630,20 @@
         <div class="container">
             <h1 id="gameover-result"></h1>
             <div id="gameover-stats"></div>
+            <div id="matchup-history-display" class="hidden">
+                <h3>⚔️ Battle History ⚔️</h3>
+                <div id="matchup-history-grid" class="matchup-history-grid"></div>
+            </div>
             <div id="cards-won-display" class="hidden">
                 <h3>Cards Won:</h3>
                 <div id="cards-won-grid" class="card-grid"></div>
             </div>
-            <button id="return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
-            <a href="https://square.link/u/T6XoDQMr" target="_blank" class="support-link">
-                <button class="btn btn-support">☕ Enjoyed the game? Support me!</button>
-            </a>
+            <div style="display: inline-grid; margin-top: 24px;">
+                <button id="return-lobby-btn" class="btn btn-primary">Return to Lobby</button>
+                <a href="https://square.link/u/T6XoDQMr" target="_blank" class="support-link">
+                    <button class="btn btn-support">☕ Enjoyed the game? Support me!</button>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -633,7 +661,7 @@
     
     <!-- Footer -->
     <footer id="site-footer" class="site-footer">
-        <p id="version-info">v1.1 | Last Updated: January 2026</p>
+        <p id="version-info">v1.2 | Last Updated: January 2026</p>
         <p class="credits">© 2026 Grand Line Duels | One Piece © Eiichiro Oda/Shueisha, Inc.</p>
         <details style="margin-top: 8px;">
             <summary style="cursor: pointer; color: var(--maya-blue); font-size: 12px; font-weight: 600; transition: color 0.2s;">📚 Sources, Credits & Acknowledgments</summary>
