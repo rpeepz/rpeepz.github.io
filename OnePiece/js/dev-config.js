@@ -69,13 +69,16 @@ const DEV_CONFIG = {
 
     // Game Settings
     GAME: {
-        MAX_ROUNDS: 3,
-        STARTING_CARDS: 5,
-        DECK_SIZE: 3,
+        MAX_ROUNDS: 3, // DUEL
+        STARTING_CARDS: 5, // COLLECTION
+        DECK_SIZE: 3, // DUEL
         AUTO_SAVE: true,
+        TEAM_BATTLE_SKIP_MAX: 1, // 0 = disabled, >0 = number of skips
+        TEAM_BATTLE_REQUIRED_CARDS:  6,
         TEAM_BATTLE_BLIND_ASSIGNMENT: false,
         TEAM_BATTLE_DEFAULT_WAGER: 1,
-        TEAM_BATTLE_TYPE_BONUS: true
+        TEAM_BATTLE_TYPE_BONUS: true,
+        TEAM_BATTLE_SUBTYPE_BONUS: false
     },
 
     // UI Settings
