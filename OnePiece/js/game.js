@@ -74,6 +74,7 @@ class GameState {
             losses: user.losses,
             collection: Array.from(user.collection),
             pool: Array.from(user.pool || new Set()),
+            poolManuallySet: user.poolManuallySet || false,
             unlockedArcs: Array.from(user.unlockedArcs || new Set(['Romance Dawn', 'Orange Town', 'Syrup Village'])),
             createdAt: user.createdAt
         };
@@ -92,6 +93,7 @@ class GameState {
                 losses: users[username].losses || 0,
                 collection: new Set(users[username].collection || []),
                 pool: new Set(users[username].pool || []),
+                poolManuallySet: users[username].poolManuallySet || false,
                 unlockedArcs: new Set(users[username].unlockedArcs || ['Romance Dawn', 'Orange Town', 'Syrup Village']),
                 createdAt: users[username].createdAt
             };
@@ -165,7 +167,8 @@ class GameState {
             player1Played: false,
             player2Played: false,
             player1Card: null,
-            player2Card: null
+            player2Card: null,
+            matchupHistory: []
         };
         
         return this.currentGame;
@@ -199,7 +202,8 @@ class GameState {
             player1Card: null,
             player2Card: null,
             isBotGame: true,
-            botDifficulty: botDifficulty
+            botDifficulty: botDifficulty,
+            matchupHistory: []
         };
         
         return this.currentGame;
@@ -308,6 +312,15 @@ class GameState {
                 game.player2.cardsWon.push(card1);
             }
         }
+        
+        // Store matchup in history
+        if (!game.matchupHistory) game.matchupHistory = [];
+        game.matchupHistory.push({
+            round: game.round,
+            card1: { ...card1 },
+            card2: { ...card2 },
+            winner: winner
+        });
         
         // Reset for next round
         game.player1Played = false;
