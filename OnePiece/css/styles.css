@@ -63,10 +63,6 @@ body {
 }
 
 .site-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
     padding: 10px 20px;
@@ -138,8 +134,7 @@ body.dark-mode details[open] > summary {
 .screen {
     display: none;
     padding: 20px;
-    margin-bottom: 60px;
-    min-height: 100vh;
+    min-height: 80vh;
 }
 
 .screen.active {
@@ -149,13 +144,17 @@ body.dark-mode details[open] > summary {
 }
 
 .container {
-    background: var(--bg-primary);
+    background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(46,99,164, 0) 70%);
     border-radius: 20px;
     padding: 40px;
     box-shadow: 0 20px 60px var(--shadow-heavy);
     max-width: 1200px;
     width: 100%;
     transition: background 0.3s ease;
+}
+
+.container .dark-mode {
+    background: black;
 }
 
 #collection-screen .container,
@@ -220,7 +219,7 @@ h3 {
 
 .btn-secondary {
     background: var(--tangerine);
-    color: var(--text-primary);
+    color: var(--bg-primary);
 }
 
 .btn-secondary:hover {
@@ -631,8 +630,7 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
     justify-content: center;
     align-items: center;
     gap: 40px;
-    margin: 60px 0;
-    min-height: 350px;
+    margin: 30px 0;
 }
 
 .card-slot {
@@ -692,9 +690,9 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
 }
 
 .card-image {
-    width: 100%;
+    /* width: 100%;
     height: 140px;
-    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); */
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -1368,7 +1366,7 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
     bottom: 0;
     border-radius: 12px;
     pointer-events: none;
-    opacity: 0.15;
+    opacity: 0.25;
     box-shadow: inset 0 0 60px 30px var(--rarity-color, transparent);
 }
 
@@ -1450,7 +1448,7 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
 }
 
 .collection-card .card-image {
-    height: 120px;
+    /* height: 120px; */
     font-size: 36px;
 }
 
@@ -1476,11 +1474,11 @@ body.dark-mode .modal-card[data-rarity="F"]:not(.locked) {
     font-size: 0.7em;
     padding: 2px 6px;
     border-radius: 4px;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(250, 250, 250, 0.9);
 }
 
 body.dark-mode .rarity-badge {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(50, 50, 50, 1);
 }
 
 /* Card Detail Modal */
@@ -2224,14 +2222,14 @@ body.dark-mode .rarity-badge {
     align-items: center;
     padding: 15px;
     text-align: center;
-    background: var(--bg-secondary);
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--maya-blue), var(--lapis));
     border: 2px solid var(--border-color);
     transition: all 0.3s;
 }
 
 .btn-difficulty:hover {
-    background: var(--maya-blue);
-    color: white;
+    background: linear-gradient(170deg, var(--maya-blue), var(--lapis));
     border-color: var(--maya-blue);
     transform: translateX(5px);
 }
@@ -3150,7 +3148,7 @@ draft-war-comparison {
     }
 
     .card-image {
-        height: 100px;
+        /* height: 100px; */
         font-size: 40px;
     }
 
@@ -3219,7 +3217,7 @@ draft-war-comparison {
     }
 
     .collection-card .card-image {
-        height: 90px;
+        /* height: 90px; */
         font-size: 32px;
     }
 
@@ -3375,7 +3373,7 @@ draft-war-comparison {
     }
 
     .collection-card .card-image {
-        height: 70px;
+        /* height: 70px; */
         font-size: 28px;
     }
 
