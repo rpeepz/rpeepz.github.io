@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const player1ScoreSpan = document.getElementById('player1-score');
     const player2ScoreSpan = document.getElementById('player2-score');
     const roundNumberSpan = document.getElementById('round-number');
-    const maxRoundsSpan = document.getElementById('max-rounds');const player1CardSlot = document.getElementById('player1-card-slot');
+    const maxRoundsSpan = document.getElementById('max-rounds');
+    const player1CardSlot = document.getElementById('player1-card-slot');
     const player2CardSlot = document.getElementById('player2-card-slot');
     const playCardBtn = document.getElementById('play-card-btn');
     const concedeBtn = document.getElementById('concede-btn');
@@ -1510,7 +1511,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Verify bot deck was created successfully
         if (!game.player2.deck || game.player2.deck.length < DEV_CONFIG.GAME.DECK_SIZE) {
-            alert(`⚠️ Failed to create bot deck for ${BOT_DIFFICULTIES[difficulty].name} difficulty.\n\nPlease enable more arcs in the Admin Panel.`);
+            alert(`⚠️ Failed to create bot deck for ${BOT_DIFFICULTIES[difficulty].name} difficulty.\n\nPlease enable more arcs by unlocking them.`);
             return;
         }
         
@@ -1563,7 +1564,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const img2HTML = img2 !== '❓' ? `<img src="${img2}" alt="${result.card2.name}">` : img2;
 
         player1CardSlot.innerHTML = `
-            <div class="card ${p1Class} ${result.winner === 1 ? 'winner' : ''}">
+            <div class="card ${p1Class} ${result.winner === 1 ? 'winner' : ''} collection-card" data-rarity="${result.card1.rarity}">
                 <div class="card-header">
                     <div class="card-name">${result.card1.name}</div>
                     <div class="card-arc">${result.card1.arc}</div>
@@ -1576,7 +1577,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         player2CardSlot.innerHTML = `
-            <div class="card ${p2Class} ${result.winner === 2 ? 'winner' : ''}">
+            <div class="card ${p2Class} ${result.winner === 2 ? 'winner' : ''} collection-card" data-rarity="${result.card2.rarity}">
                 <div class="card-header">
                     <div class="card-name">${result.card2.name}</div>
                     <div class="card-arc">${result.card2.arc}</div>
@@ -1624,7 +1625,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imgHTML = img !== '❓' ? `<img src="${img}" alt="${card.name}">` : img;
     
         const cardHTML = `
-            <div class="card ${isMyCard ? 'my-card' : 'opponent-card'}">
+            <div class="card ${isMyCard ? 'my-card' : 'opponent-card'} collection-card" data-rarity="${card.rarity}">
                 <div class="card-header">
                     <div class="card-name">${card.name}</div>
                     <div class="card-arc">${card.arc}</div>
@@ -2191,6 +2192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
         
+        // Collection Card being won
         if (result.cardsWon && result.cardsWon.length > 0 && result.winner && result.winner.username === gameState.currentUser.username) {
             cardsWonDisplay.classList.remove('hidden');
             cardsWonGrid.innerHTML = '';
