@@ -27,7 +27,7 @@
     <!-- Theme Toggle -->
     <div id="theme-toggle" class="theme-toggle">
         <span class="theme-toggle-icon" id="theme-icon">🌙</span>
-        <span id="theme-text">Dark</span>
+        <span id="theme-text" style="color: var(--text-tertiary);">Dark</span>
     </div>
 
     <!-- Battle Music Audio -->
@@ -76,7 +76,7 @@
     <div id="lobby-screen" class="screen">
         <div class="container">
             <div class="header">
-                <h2>Welcome, <span id="player-name" class="my-username"></span>!
+                <h2>Welcome to Grand Line Duels, <span id="player-name" class="my-username"></span>
                     <a href="#" id="claim-profile-link" class="claim-profile-link hidden">Claim Profile</a>
                 </h2>
                 <div style="display: flex; gap: 10px;">
@@ -610,6 +610,7 @@
             </div>
 
             <div class="game-controls">
+                <p style="color: var(--text-secondary); margin-top: 10px;">Tap card to draw</p>
                 <button id="play-card-btn" class="btn btn-primary btn-large">Play Card</button>
                 <button id="concede-btn" class="btn btn-danger">Concede</button>
             </div>
