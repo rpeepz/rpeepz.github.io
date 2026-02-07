@@ -248,4 +248,5 @@ function OnJobEntryHideClick(eventObject)
 	job.css('display', 'none');
 	custom_filter = true;
 	UpdateCurrentFilterText();
+
 }
