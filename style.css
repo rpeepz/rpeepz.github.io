@@ -190,6 +190,8 @@
         top: 0;
         background-color: #5e7260;
         z-index: 999;
+        overflow-y: auto;
+        overflow-x: clip;
     }
     
     #name-header {
@@ -247,6 +249,30 @@
         margin-top: 15px;
         margin-left: 10px;
         color: #2B2B2B;
+    }
+    
+    /* #filter-panel {
+        max-height: 65vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    } */
+    
+    #filter-panel::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #filter-panel::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+    }
+    
+    #filter-panel::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+    }
+    
+    #filter-panel::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.5);
     }
     
     #educational-tagsel {
