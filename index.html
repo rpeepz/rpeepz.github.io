@@ -8,7 +8,6 @@
         <meta name="author" content="Robert Papagna">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="style1.css">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="resume.js"></script>
         <!-- <link rel="stylesheet" media="all" href="application.css"> -->
@@ -26,9 +25,10 @@
             <div id="name-header">Robert Papagna</div>
             <div id="name-subheader">Portfolio and online resume</div>
             <div id="filter-panel">
-                <div class="sidebar-h1">Category</div>
+                <div class="sidebar-h1">Filter Category</div>
+<!-- 
                 <div class="tagsel-container">
-                    <div id="tagsel-all" class="tagsel-vertical">All Projects</div>
+                    <div id="tagsel-all" class="tagsel-vertical">All Items</div>
                     <div class="tagsel-vertical">Academic</div>
                     <div class="tagsel-vertical">Active</div>
                     <div class="tagsel-vertical">Automotive</div>
@@ -38,6 +38,28 @@
                     <div class="tagsel-vertical">Recreational</div>
                     <div class="tagsel-vertical">Technical</div>
                     Has Media<input id="educational-tagsel-checkbox" type="checkbox" checked><br>
+                </div> -->
+
+                <div class="tagsel-container">
+                    <div id="tagsel-all" class="tagsel-vertical active">All Items</div>
+                    <div class="tagsel-vertical" data-category="work">Engineering</div>
+                    <div class="tagsel-vertical" data-category="work">Deck Operations</div>
+                    <div class="tagsel-vertical" data-category="work">Refit Maintenance</div>
+                    <div class="tagsel-vertical" data-category="work">Management</div>
+                    <div class="tagsel-vertical" data-category="project">Computer Science</div>
+                    <div class="tagsel-vertical" data-category="project">Web Development</div>
+                    <div class="tagsel-vertical" data-category="project">Security Crypto</div>
+                    <div class="tagsel-vertical" data-category="project">Graphics Games</div>
+                    <div class="tagsel-vertical" data-category="project">Academic</div>
+                    <div class="tagsel-vertical" data-category="project">Recreational</div>
+                    <div class="tagsel-vertical" data-category="project">Technical</div>
+                    <div class="tagsel-vertical" data-category="project">Automotive</div>
+                    <div class="tagsel-vertical" data-category="project">Electronics</div>
+                </div>
+                <div class="filter-options">
+                    <label><input type="checkbox" id="toggle-work" checked> Show Work History</label>
+                    <label><input type="checkbox" id="toggle-projects" checked> Show Projects</label>
+                    <label><input type="checkbox" id="toggle-educational" checked> Include Educational</label>
                 </div>
             </div>
         </div>
@@ -230,9 +252,12 @@
             </div>
                 
             <h1>Certification</h1>
-            <!-- <div class="expandable-section" id="history"> -->
-                <!-- <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div> -->
-                <!-- <div class="expandable-section-expandedtext" id="expanded"> -->
+            <!-- <div class="certification-highlight">
+                <a id="2ndEng_cv" href="./rpcv.pdf" target="blank">2nd Engineer CV (pdf)</a>
+            </div> -->
+            <div class="expandable-section" id="history">
+                <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
+                <div class="expandable-section-expandedtext" id="expanded">
                     <div id="education">
                         <table>
                             <tr class="education-table"><td><span class="ed-degree"><a id="2ndEng_cv" href="./rpcv.pdf" target="blank">2nd Engineer CV (pdf)</a></span></td>
@@ -252,34 +277,41 @@
                             <tr class="education-table"><td><span class="ed-degree">Red Cross First Aid Certified</span></td>
             
                         </table>
-                    <!-- </div> -->
-                <!-- </div> -->
+                    </div>
+                </div>
             </div>
-            <h1>Work History</h1>
+            <div id="current-filter">All Projects, Include Media</div>
+            <h2>Work History</h2>
             <div class="expandable-section" id="history">
                 <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
                 <div class="expandable-section-expandedtext" id="expanded">
                     <span id="job-history-subheader">Sorted by start date, most recent first. May include volunteer positions and professional associations as noted. All references ok to contact.</span>
                     <!-- <span id="job-filter-text">Current Filter: *Custom*</span> -->
-              
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="engineering,refit-maintenance,logistics">
+                        <span class="job-title">3rd Engineer</span>
+                        <span class="job-employer">Feadship - Archimedes 222ft</span>
+                        <span class="job-employer-website"><a href="https://www.feadship.nl/fleet/archimedes1" target="_blank">https://www.feadship.nl/fleet/archimedes1/</a></span>
+                        <span class="job-date">November 2024 - October 2025</span>
+                        <span class="job-description">Full time 3rd Engineer operating in Atlantic Caribbean, and Pacific Northwest.<br>Follow instruction of Cheif Engineer, Hold watchkeeping duties in the engine room, Perform planned and unplanned maintenance, keep logs of jobs and materials.</span>
+                        <span class="job-reference">Christopher Walsh, Captain. Cell (516) 445-7357. <a href="mailto:Captain@myarchimedes.com">Captain@myarchimedes.com</a></span>
+                    </div>
+                    <div class="job-entry" data-tags="engineering,deck-operations,navigation,management">
                         <span class="job-title">Mate / Engineer</span>
                         <span class="job-employer">Riva - Iron Gryphon 100ft</span>
                         <span class="job-employer-website"><a href="https://www.superyachttimes.com/yachts/iron-gryphon" target="_blank">https://www.superyachttimes.com/yachts/iron-gryphon/</a></span>
                         <span class="job-date">July 2023 - November 2024</span>
                         <span class="job-description">Full time Mate and Engineer operating in the Northern Biscayne Bay, Miami area.<br>Lead deck and engineering department. Perform routine and inspection and maintenance, keeping logs reporting to management. Assist in recruitment and subcontracting, manage records for crew, vendors, and vessel spending.</span>
-<!--WILL                <span class="job-reference">Will Nock, President Dayboard Mgt. Cell (954) 895-9460. <a href="mailto:Will@dayboardmgt.com">Will@dayboardmgt.com</a></span> -->
                         <span class="job-reference">Carlos Mejia, Captain. Cell (954) 932-6718. <a href="mailto:CaptainCarlosMejia@icloud.com">CaptainCarlosMejia@icloud.com</a></span>
                     </div>
-                 <div class="job-entry">
-                        <span class="job-title">Refit Engineer</span>
+                    <div class="job-entry" data-tags="engineering,refit-maintenance">
+                        <span class="job-title">Shipyard Engineer</span>
                         <span class="job-employer">Moonen - Rearden Steel 120ft</span>
                         <span class="job-employer-website"><a href="https://www.fraseryachts.com/en/yacht-for-sale/rearden-steel/" target="_blank">https://www.fraseryachts.com/en/yacht-for-sale/rearden-steel/</a></span>
                         <span class="job-date">February 2023 - July 2023</span>
                         <span class="job-description">3rd Engineer on a team refit project.<br>Collaborate and perform repairs or restorative tasks in all major departments; deck, hull, structure, mechanical and electrical.</span>
 <!--CHRISTIAN           <span class="job-reference">Christian ??, Chief Engineer. Cell (954) 932-6718</span> -->
                     </div>
-                <div class="job-entry">
+                    <div class="job-entry" data-tags="engineering,navigation, deck-operations">
                         <span class="job-title">Mate / Engineer</span>
                         <span class="job-employer">Burger - Independence 114ft</span>
                         <span class="job-employer-website"><a href="https://www.superyachttimes.com/yachts/independence-33m" target="_blank">https://www.superyachttimes.com/yachts/independence-33m</a></span>
@@ -287,7 +319,7 @@
                         <span class="job-description">Full time Mate and Engineer on board.<br>Oversaw all engineering operations, second to captain. Report and document technical conditions, perform maintenance, repairs and overhauls.<br>Managed recruitment of crew and vendors for seasonal operation and shipyard period.</span>
                         <span class="job-reference">Daniel Sweigard, Engineering contractor. Cell (954) 552-5531</span>
                     </div>
-                <div class="job-entry">
+                    <div class="job-entry" data-tags="engineering,deck-operations,navigation">
                         <span class="job-title">Crossing Engineer</span>
                         <span class="job-employer">Admiral - Safe Haven 123ft</span>
                         <span class="job-employer-website"><a href="https://www.superyachttimes.com/yachts/safe-haven" target="_blank">https://www.superyachttimes.com/yachts/safe-haven</a></span>
@@ -296,7 +328,7 @@
                         <span class="job-reference">Ben Whitlock, Captain. <a href="mailto:Captainwlock@yahoo.com">Captainwlock@yahoo.com</a></span>
                         <span class="job-reference">Robert Lukacevic. Cell (954) 696-4514.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="deck-operations,navigation">
                         <span class="job-title">First Mate</span>
                         <span class="job-employer">Sunseeker - Full Circle 92ft</span>
                         <span class="job-employer-website"><a href="https://www.superyachttimes.com/yachts/full-circle-28m" target="_blank">https://www.superyachttimes.com/yachts/full-circle-28m</a></span>
@@ -305,7 +337,7 @@
                         <span class="job-reference">Glenn Markus, Yacht owner. Cell (954) 868-3726. <a href="mailto:markus02@bellsouth.net">markus02@bellsouth.net</a></span>
                         <span class="job-reference">Alana Markus, Yacht owner. Cell (954) 868-3727.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="deck-operations,navigation">
                         <span class="job-title">Deckhand - Delivery</span>
                         <span class="job-employer">Sunreef - Obsession 74ft</span>
                         <span class="job-employer-website"><a href="https://www.sunreef-yachts.com/en/launched/sunreef-74-obsession" target="_blank">https://www.sunreef-yachts.com/sunreef-74-obsession</a></span>
@@ -313,7 +345,7 @@
                         <span class="job-description">Deckhand aboard a catamaran performing a delivery from Rybovich Riviera Beach to Pier Sixty-Six Marina. Handle lines and fenders, general engine watch, rinse-down.</span>
                         <span class="job-reference">Captain Tim. Cell (954) 612-2809.
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="refit-maintenance,engineering">
                         <span class="job-title">Refit Crew</span>
                         <span class="job-employer">Trinity Yachts - Nina Lu 141ft</span>
                         <span class="job-employer-website"><a href="https://yachtharbour.com/yacht/waku-2749" target="_blank">yachtharbour.com/yacht/waku</a></span>
@@ -322,14 +354,14 @@
                         <span class="job-reference">Julianne Hammond, Co-owner of refit team. Cell (305) 304-6320. </span>
                         <!-- <a href="mailto:kcooper@snelsonco.com">kcooper@snelsonco.com</a> -->
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="volunteer,environmental,recreational">
                         <span class="job-title">Beach Cleanup</span>
                         <span class="job-employer">The Mocean Community</span>
                         <span class="job-employer-website"><a href="https://www.facebook.com/MoceanCommunity/" target="_blank">facebook.com/MoceanCommunity</a></span>
                         <span class="job-date">Sep 19 2020</span>
                         <span class="job-description">Volunteer position. Participate in 'World Cleanup Day' by assisting the Mocean Community in picking up garbage along the south Florida beach (Fort Lauderdale).</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="engineering,deck-operations">
                         <span class="job-title">Engineer Daywork</span>
                         <span class="job-employer">Horizon Yachts - Status Quo 40m</span>
                         <span class="job-employer-website"><a href="https://www.superyachttimes.com/yachts/status-quo-40m" target="_blank">superyachttimes.com/yachts/status-quo-40m</a></span>
@@ -337,26 +369,26 @@
                         <span class="job-description">Install plumbing for sea strainers, maintenance on ABT-TRAC stabilizers, paint bilge, detail engine room</span>
                         <!-- <span class="job-reference">Julianne Hammond, Co-owner of refit team. Cell (305) 304-6320. </span> -->
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="refit-maintenance,deck-operations">
                         <span class="job-title">Interior Daywork</span>
                         <span class="job-employer">Sheleighleigh 20m</span>
                         <span class="job-date">Aug 2020</span>
                         <span class="job-description">Tidy cabin, wax floor, full exterior washdown.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="engineering,refit-maintenance">
                         <span class="job-title">Engineering Daywork</span>
                         <span class="job-employer">Westport Yachts - Andiamo 45m</span>
                         <span class="job-date">Aug 2020</span>
                         <span class="job-description">Restore wooden sauna, sanding and painting interior spaces.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="deck-operations">
                         <span class="job-title">Deckhand</span>
                         <span class="job-employer">Customline Yachts - C 30m</span>
                         <span class="job-date">Jul 2020 - Aug 2020</span>
                         <span class="job-description">Solo deckhand, washdown, two part acid teak, detail engine room, overhaul main engine room bilge, sea trial, polish and clean interior spaces.</span>
                         <span class="job-reference">Joe Collins, Captain. Cell (754) 248-4247. </span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="refit-maintenance">
                         <span class="job-title">Shrinkwrap Crew</span>
                         <span class="job-employer">KB Yachts</span>
                         <span class="job-employer-website"><a href="http://www.kbyachts.com/index.html" target="_blank">kbyachts.com</a></span>
@@ -364,14 +396,14 @@
                         <span class="job-description">Assemble scaffolding and construct shrinkwrap enclosure.</span>
                         <span class="job-reference">Karen Goebel, Company Owner. Cell (954) 646-9661 . </span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="engineering,education,computer-science,web-development,security-crypto,academic">
                         <span class="job-title">42 Cadet</span>
                         <span class="job-employer">42 Silicon Valley</span>
                         <span class="job-employer-website"><a href="https://www.42.us.org/" target="_blank">42.us.org</a></span>
                         <span class="job-date">Feb 2019 - July 2020</span>
                         <span class="job-description">Studying software engineering in a nontraditional program.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="environmental">
                         <span class="job-title">Site Management Assistant</span>
                         <span class="job-employer">East Bay Waldorf School</span>
                         <span class="job-employer-website"><a href="https://www.eastbaywaldorf.org/" target="_blank">eastbaywaldorf.org</a></span>
@@ -389,41 +421,41 @@
                         <span class="job-reference">Kevin Buffardi, CSU Chico Dept. of Computer Science. Office (530) 898-5617. <a href="mailto:kbuffardi@csuchico.edu">kbuffardi@csuchico.edu</a></span>
                         <span class="job-reference">Dr. Ben Nolting, formerly CSU Chico Dept. of Mathematics. <a href="mailto:bnolting@gmail.com">bnolting@gmail.com</a></span>
                     </div> -->
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="customer-service,electronics">
                         <span class="job-title">Retail Associate</span>
                         <span class="job-employer">Best Buy</span>
                         <span class="job-employer-website"><a href="http://www.bestbuy.com/" target="_blank">bestbuy.com</a></span>
                         <span class="job-date">Aug 2016 - Dec 2018</span>
                         <span class="job-description">Managed employee schedules, handled cash on a daily basis, customer service.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="education,engineering,automotive">
                         <span class="job-title">Student</span>
                         <span class="job-employer">Contra Costa Community College</span>
                         <span class="job-date">Jul 2014 - May 2016</span>
                         <span class="job-description">General education, Automotive engine technician</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="active,logistics">
                         <span class="job-title">Preload</span>
                         <span class="job-employer">UPS</span>
                         <span class="job-employer-website"><a href="https://www.ups.com/us/en/Home.page" target="_blank">ups.com</a></span>
                         <span class="job-date">Feb 2014 - Jul 2016</span>
                         <span class="job-description">Maximize delivery efficiency in up to 7 package cars per day.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="safety,active,customer-service">
                         <span class="job-title">Lifeguard</span>
                         <span class="job-employer">Albany Aquatic Center</span>
                         <span class="job-employer-website"><a href="https://www.albanyaquaticcenter.com/" target="_blank">albanyaquaticcenter.com</a></span>
                         <span class="job-date">Feb 2012 - May 2013</span>
                         <span class="job-description">Train lifeguards in deep and shallow water, maintain water chemistry, janitorial services</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="recreational,photography,volunteer,graphics-games">
                         <span class="job-title">Lead Photographer</span>
                         <span class="job-employer">Masked Media</span>
                         <span class="job-employer-website"><a href="https://www.facebook.com/MaskedMedia/" target="_blank">facebook.com/MaskedMedia</a></span>
                         <span class="job-date">Aug 2012 - Jul 2017</span>
                         <span class="job-description">Volunteer / recreational activity position. Attend, document, and create promotions for live music events and festivals.</span>
                     </div>
-                    <div class="job-entry">
+                    <div class="job-entry" data-tags="environmental,volunteer,active">
                         <span class="job-title">Ambassador</span>
                         <span class="job-employer">Pinole, CA Environmental Studies Academy</span>
                         <span class="job-date">Sep 2010 - Jul 2013</span>
@@ -433,11 +465,11 @@
             </div>
             <!-- <a href="#deckhand_cv">Click here to see an example of how a company uses Facebook ads.</a> -->
             <!-- end work history -->
-            <h1>Projects Timeline</h1>
+            <h2>Projects Timeline</h2>
             <div class="expandable-section" class="projects-container" id="projects-container">
                 <div class="expandable-section-clicktoexpand" id="hidden-inline">Click to expand...</div>
                 <div class="expandable-section-expandedtext" id="expanded">
-                    <div id="current-filter">All Projects, Include Media</div>
+                    
                     
                     <!-- <ul id='timeline'>
                         <li class='work'>
@@ -507,7 +539,18 @@
                         </li>
                       </ul> -->
 
-                    <div class="project">
+                      <div class="project" data-tags="computer-science,graphics-games,recreational,web-development">
+                        <div class="project-title">One Piece War</div>
+                        <div id="project-name" class="project-name">Play Classic War with a pirate twist</div>
+                        <div id="expanded" class="project-description description-text">My first project of 2026, a game inspired by One Piece. Play war; The one with highest power wins. Randomly pit cards from your collection against others to see who will become king of the pirates. You cant go far without your crew, so fight and see who will win! Log in your your profile, or play as a guest in this showdown style battle area where you can play from just about anywhere. Made entirely by me and my laptop running visual stuido code and github copilot.</div>
+                        <div id="expanded" class="project-description description-text">Total working time: 1 day</div>
+                        <div id="project-tags" class="project-tags"><span class="proj-tagsel">Computer</span>, <span class="proj-tagsel">Recreational</span></div>
+                        <div align="right" class="project-bottom-container">
+                            <div class="project-url"><a href="./OnePiece/" target="_blank">Play One Piece Card War</a></div>
+                            <div class="project-date">January 2026</div>
+                        </div>
+                    </div>
+                    <div class="project" data-tags="computer-science,graphics-games,recreational">
                         <div class="project-title">Tetris!</div>
                         <div id="project-name" class="project-name">Play Tetris 4 made in JavaScript</div>
                         <div id="expanded" class="project-description description-text">A project I made on my laptop. Tetris, the original block puzzle game, but made by me. I used my knowledge of graphical programming and javascript and combined that inside a fantastic coding playground p5. Using the tools of the p5 library I was able to code from scratch and JavaScript a working replica of Tetris that you can play in any web browser (that supports p5's coding environment).</div>
@@ -518,7 +561,7 @@
                             <div class="project-date">June 2023</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="computer-science,recreational,graphics-games">
                         <div class="project-title">Connect 4</div>
                         <div id="project-name" class="project-name">Play Connect 4 made in JavaScript</div>
                         <div id="expanded" class="project-description description-text">A project I made on my laptop. Connect 4, the classic kids game, but made by me. I used my knowledge of graphical programming and javascript and combined that inside a fantastic coding playground p5. Using the tools of the p5 library I was able to code from scratch and JavaScript a working replica of Connect 4 that you can play in any web browser (that supports p5's coding environment).</div>
@@ -529,7 +572,7 @@
                             <div class="project-date">June 2023</div>
                         </div>
                     </div>
-                      <div class="project">
+                      <div class="project" data-tags="computer-science,recreational,web-development">
                         <div class="project-title">This Website</div>
                         <div id="project-name" class="project-name">Portfolio and Online Resume</div>
                         <div id="expanded" class="project-description description-text">Full credit to Gavin Fielder who originally built this website. I have modified it in vscode using templates I found online, also using HTML, CSS, Javascript, and JQuery. CSS is responsive to height and width. It is hosted on GithubPages.</div>
@@ -540,7 +583,7 @@
                             <div class="project-date">October 2020</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,technical,education,security-crypto">
                         <div class="project-title">Security Encryption / Asymmetric Key Cryptosystems</div>
                         <div id="project-name" class="project-name">ft_ssl_rsa</div>
                         <div id="expanded" class="project-description description-text">This project is a continuation of the previous encryption project. I coded a random prime number generator and used it to make private RSA keys. I recoded part of the OpenSSL program, specifically GENRSA, RSA, and RSAUTL.</div>
@@ -551,7 +594,7 @@
                             <div class="project-date">November 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,electronics,technical">
                         <div class="project-title">42 Robotics Lab</div>
                         <div id="project-name" class="project-name">Robotic Autonomous Painting Robot</div>
                         <div id="expanded" class="project-description description-text">I was part of an R&amp;D team creating a programmable robot with the goal of autonomously painting a flat wall section. My major contributions were coding the brain (Arduino) that takes control of the motors. The motors kept track internally of its position within its frame via encoders. This was a sponsored project with 42 Robo Lab, led by Daniel Goncharov.</div>
@@ -562,7 +605,7 @@
                             <div class="project-date">October 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,graphics-games">
                         <div class="project-title">Raycasting 3d game engine</div>
                         <div id="project-name" class="project-name">Wolf3D</div>
                         <div id="expanded" class="project-description description-text">A project to test the understanding of graphics and practical application of mathematics. I built an engine to render a custom 'map' similar to the popular '90's game Wolfenstein 3D.</div>
@@ -573,7 +616,7 @@
                             <div class="project-date">September 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,technical,graphics-games">
                         <div class="project-title">Graphically Beautiful Fractals</div>
                         <div id="project-name" class="project-name">fract'ol</div>
                         <div id="expanded" class="project-description description-text">I made an interactive program that uses the mouse position as an input to the formula which displays a fractal image. I programmed more than one set of famous fractals, and the ability to view depth with varying color schemes. I also implemented multi threaded processing to improve performance.</div>
@@ -584,7 +627,7 @@
                             <div class="project-date">September 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,web-development">
                         <div class="project-title">eCommerce Auto parts shop</div>
                         <div id="project-name" class="project-name">Website Rush</div>
                         <div id="expanded" class="project-description description-text">An ecommerce site where users buy advertised items, built entirely in HTML and PHP. Built as a 2-day challenge for me and a randomly assigned partner to build a functional ecommerce site.</div>
@@ -595,7 +638,7 @@
                             <div class="project-date">September 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,security-crypto">
                         <div class="project-title">Security Enryption / Cryptographic Hashing Algorithms</div>
                         <div id="project-name" class="project-name">ft_ssl_md5</div>
                         <div id="expanded" class="project-description description-text">A partial recode of the OpenSSL program. I implemented md5, sha1, sha224, sha256, sha384, sha512 hashing algorithms.</div>
@@ -606,7 +649,7 @@
                             <div class="project-date">August 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science,artificial-intelligence,technical">
                         <div class="project-title">Artificial Intelligence</div>
                         <div id="project-name" class="project-name">filler</div>
                         <div id="expanded" class="project-description description-text">The goal of this project was to create a player for an algorithmic game called filler: where two players on a board, take turns placing a random shape piece, earning points until one player can no longer make a turn.</div>
@@ -617,7 +660,7 @@
                             <div class="project-date">July 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science">
                         <div class="project-title">Recode of UNIX ls</div>
                         <div id="project-name" class="project-name">ft_ls</div>
                         <div id="expanded" class="project-description description-text">A recode of the unix shell ls command. Mine typically runs ~200% faster than the system ls</div>
@@ -628,7 +671,7 @@
                             <div class="project-date">June 2019</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="academic,computer-science">
                         <div class="project-title">Recode of the libc printf</div>
                         <div id="project-name" class="project-name">ft_printf</div>
                         <div id="expanded" class="project-description description-text">One of the major early projects at 42, a recoding of the libc printf with at least the options %d, %i, %u, %s, %c, %p, %x, %X, %o, and at least the optional flags 0, ' ', +, -, #, hh, h, l, ll, L, precision, and field width.</div>
@@ -650,7 +693,7 @@
                             <div class="project-date">July 2017</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="active,recreational">
                         <div class="project-title">Backyard Construction</div>
                         <div id="project-name" class="project-name">retaining wall</div>
                         <div id="expanded" class="project-description description-text"></div>
@@ -661,7 +704,7 @@
                             <div class="project-date">October 2016</div>
                         </div>
                     </div>
-                    <div class="project">
+                    <div class="project" data-tags="automotive,recreational,technical,engineering,electronics">
                         <div class="project-title">BMW Turbo</div>
                         <div id="project-name" class="project-name">install and tune</div>
                         <div id="expanded" class="project-description description-text">A project to upgrade the performance of my car. I spent just under one year researching the process and parts needed to install a turbocharger onto my 2003 BMW. After acquiring all the parts, I was able to achieve my goal of increasing the total horsepower of my car.</div>
