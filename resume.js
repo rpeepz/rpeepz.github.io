@@ -122,6 +122,48 @@ $(document).ready(function()
 			$('#sidebar').removeClass('active');
 		}
 	});
+
+	// Theme toggle with prefers-color-scheme support
+	const THEME_STORAGE_KEY = 'portfolio-theme';
+	const themeToggle = $('#theme-toggle');
+	const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+	function applyTheme(theme, shouldStore) {
+		$('body').removeClass('theme-light theme-dark').addClass(`theme-${theme}`);
+		if (shouldStore) {
+			localStorage.setItem(THEME_STORAGE_KEY, theme);
+		}
+		if (themeToggle.length) {
+			const isDark = theme === 'dark';
+			themeToggle.attr('aria-pressed', isDark);
+			themeToggle.text(isDark ? 'Light mode' : 'Dark mode');
+		}
+	}
+
+	function getInitialTheme() {
+		const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+		if (storedTheme) {
+			return storedTheme;
+		}
+		return mediaQuery.matches ? 'dark' : 'light';
+	}
+
+	applyTheme(getInitialTheme(), false);
+
+	if (themeToggle.length) {
+		themeToggle.on('click', function() {
+			const isDark = $('body').hasClass('theme-dark');
+			applyTheme(isDark ? 'light' : 'dark', true);
+		});
+	}
+
+	if (mediaQuery && typeof mediaQuery.addEventListener === 'function') {
+		mediaQuery.addEventListener('change', function(event) {
+			if (!localStorage.getItem(THEME_STORAGE_KEY)) {
+				applyTheme(event.matches ? 'dark' : 'light', false);
+			}
+		});
+	}
 });
 
 function ExpandableClick(eventObject)
