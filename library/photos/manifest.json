@@ -695,6 +695,12 @@
   "project/c4": [
     "c41.webp"
   ],
+  "project/filler": [
+    "filler.gif"
+  ],
+  "project/frac": [
+    "frac.gif"
+  ],
   "project/onshape": [
     "onshape1.MOV",
     "onshape2.MOV",
@@ -775,5 +781,9 @@
     "wall34.webp",
     "wall35.webp",
     "wall36.webp"
+  ],
+  "project/wolf": [
+    "wolf1.gif",
+    "wolf2.png"
   ]
 }
