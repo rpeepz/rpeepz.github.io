@@ -12,6 +12,32 @@
 
 //Requires jquery
 
+// Centralized filter configuration
+const FILTER_CONFIG = {
+	work: ['engineering', 'deck-operations', 'refit-maintenance', 'management'],
+	project: ['computer-science', 'web-development', 'security-crypto', 'graphics-games', 'academic', 'recreational', 'technical', 'automotive', 'electronics']
+};
+
+// Helper functions for tag management
+const TagUtils = {
+	// Convert display text to tag format
+	textToTag: function(text) {
+		return text.toLowerCase().replace(/\s+/g, '-');
+	},
+	
+	// Check if element has matching tag
+	hasTag: function(tagsString, targetTag) {
+		if (!tagsString) return false;
+		var tagArray = tagsString.split(',').map(t => t.trim());
+		return tagArray.includes(targetTag);
+	},
+	
+	// Get all tags from filter config
+	getAllTags: function() {
+		return [...FILTER_CONFIG.work, ...FILTER_CONFIG.project];
+	}
+};
+
 var include_educational;
 var show_work_history;
 var show_projects;
@@ -133,12 +159,13 @@ function OnFilterSelect(eventObject)
 	$(eventObject.target).addClass('active');
 	
 	var filterText = $(eventObject.target).text();
+	var filterTag = $(eventObject.target).data('tag');
 	var category = $(eventObject.target).data('category');
 	
 	if (filterText === 'All Items') {
 		ShowAllItems();
 	} else {
-		ShowItemsWithFilter(filterText, category);
+		ShowItemsWithFilter(filterText, filterTag, category);
 	}
 }
 
@@ -151,22 +178,21 @@ function ShowAllItems()
 	UpdateCurrentFilterText();
 }
 
-function ShowItemsWithFilter(filterText, category)
+function ShowItemsWithFilter(filterText, filterTag, category)
 {
 	current_filter = filterText;
 	
-	// Convert filter text to tag format (lowercase, hyphens)
-	var filterTag = filterText.toLowerCase().replace(/\s+/g, '-');
+	// If filterTag not provided, convert from text
+	if (!filterTag) {
+		filterTag = TagUtils.textToTag(filterText);
+	}
 	
 	// Filter work history
 	if (show_work_history) {
 		$('.job-entry').each(function() {
 			var tags = $(this).data('tags');
-			if (tags && tags.includes(filterTag)) {
-				$(this).css('display', 'block');
-			} else {
-				$(this).css('display', 'none');
-			}
+			var shouldShow = TagUtils.hasTag(tags, filterTag);
+			$(this).css('display', shouldShow ? 'block' : 'none');
 		});
 	} else {
 		$('.job-entry').css('display', 'none');
@@ -176,21 +202,17 @@ function ShowItemsWithFilter(filterText, category)
 	if (show_projects) {
 		$('.project').each(function() {
 			var tags = $(this).data('tags');
-			var projTags = $(this).children("#project-tags").html();
+			var shouldShow = TagUtils.hasTag(tags, filterTag);
 			
-			// Check both data-tags and the visible project tags
-			var hasTag = (tags && tags.includes(filterTag)) || 
-						(projTags && projTags.toLowerCase().includes(filterText.toLowerCase()));
-			
-			if (hasTag) {
-				if (projTags.includes('Educational') && include_educational == false) {
-					$(this).css('display', 'none');
-				} else {
-					$(this).css('display', 'block');
+			if (shouldShow) {
+				// Check educational filter
+				var projTags = $(this).children("#project-tags").html();
+				if (projTags && projTags.includes('Educational') && !include_educational) {
+					shouldShow = false;
 				}
-			} else {
-				$(this).css('display', 'none');
 			}
+			
+			$(this).css('display', shouldShow ? 'block' : 'none');
 		});
 	} else {
 		$('.project').css('display', 'none');
@@ -208,9 +230,13 @@ function applyFilters()
 		var activeFilter = $('.tagsel-vertical.active');
 		if (activeFilter.length) {
 			var filterText = activeFilter.text();
+			var filterTag = activeFilter.data('tag');
 			var category = activeFilter.data('category');
-			ShowItemsWithFilter(filterText, category);
+			ShowItemsWithFilter(filterText, filterTag, category);
 		}
+	}
+	if (typeof reinitializeGalleries === 'function') {
+		reinitializeGalleries();
 	}
 }
 
