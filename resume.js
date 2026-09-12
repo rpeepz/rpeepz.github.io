@@ -6,7 +6,7 @@
 //   By: gfielder <marvin@42.fr>                    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2019/04/14 14:56:01 by gfielder          #+#    #+#             //
-//   Updated: 2025/10/12 20:35:03 by rpapagna         ###   ########.fr       //
+//   Updated: 2026/09/12 13:22:23 by rpapagna         ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -166,33 +166,35 @@ $(document).ready(function()
 	}
 });
 
-function ExpandableClick(eventObject)
-{
-	var expanded = $(eventObject.target).children("#expanded");
-	var hidden = $(eventObject.target).children("#hidden");
-	var hiddeninline = $(eventObject.target).children("#hidden-inline");
+function ExpandableClick(event) {
+    // 1. Find the parent section regardless of click depth
+    const container = event.target.closest('.expandable-section');
+    if (!container) return;
 
-	if (expanded.length == 0)
-	{
-		//Clicked an inner element
-		expanded = $(eventObject.target.parentElement).children("#expanded");
-		hidden = $(eventObject.target.parentElement).children("#hidden");
-		hiddeninline = $(eventObject.target.parentElement).children("#hidden-inline");
-	}
-	if (expanded.css('display') == "none")
-	{
-		/*Is hidden, expand*/
-		expanded.css('display', 'block');
-		hidden.css('display', 'none');
-		hiddeninline.html("Click to collapse...");
-	}
-	else
-	{
-		/*Is expanded, hide*/
-		expanded.css('display', 'none');
-		hidden.css('display', 'block');
-		hiddeninline.html("Click to expand...");
-	}
+    // 2. Select elements inside the container
+    const expanded = container.querySelector('#expanded');
+    const hidden = container.querySelector('#hidden');
+    const hiddenInline = container.querySelector('#hidden-inline');
+
+    // 3. Toggle visibility state
+    const isHidden = getComputedStyle(expanded).display === 'none';
+
+    if (isHidden) {
+        expanded.style.display = 'block';
+        if (hidden) hidden.style.display = 'none';
+        if (hiddenInline) hiddenInline.textContent = 'Click to collapse...';
+
+        // 4. Find the preceding h2 and scroll smoothly
+        const header = container.previousElementSibling?.tagName === 'H2'
+            ? container.previousElementSibling
+            : container.parentElement.querySelector('h2');
+
+        (header || container).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        expanded.style.display = 'none';
+        if (hidden) hidden.style.display = 'block';
+        if (hiddenInline) hiddenInline.textContent = 'Click to expand...';
+    }
 }
 
 function OnFilterSelect(eventObject)
