@@ -184,10 +184,11 @@ function ExpandableClick(event) {
         if (hidden) hidden.style.display = 'none';
         if (hiddenInline) hiddenInline.textContent = 'Click to collapse...';
 
-        // 4. Find the preceding h2 and scroll smoothly
-        const header = container.previousElementSibling?.tagName === 'H2'
-            ? container.previousElementSibling
-            : container.parentElement.querySelector('h2');
+        // 4. Find the preceding h1 and scroll smoothly
+        const prev = container.previousElementSibling;
+		const header = (prev?.tagName === 'H1' || prev?.tagName === 'H2')
+		? prev
+		: container.parentElement?.querySelector('h1, h2');
 
         (header || container).scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
